@@ -22,8 +22,19 @@ export const formatCop = (value: unknown) =>
 
 export const sendKoraEmail = async (message: EmailMessage) => {
   const apiKey = Deno.env.get("RESEND_API_KEY");
-  if (!apiKey) return false;
+  if (apiKey) {
+    try {
+      const sent = await sendWithResend(apiKey, message);
+      if (sent) return true;
+    } catch (error) {
+      console.error("Resend notification failed", error);
+    }
+  }
 
+  return sendWithGoogleAppsScript(message);
+};
+
+const sendWithResend = async (apiKey: string, message: EmailMessage) => {
   const to = Deno.env.get("KORA_NOTIFICATION_EMAIL") || "info@kora3d.co";
   const from = Deno.env.get("KORA_EMAIL_FROM") || "Kora <notificaciones@kora3d.co>";
   const response = await fetch("https://api.resend.com/emails", {
@@ -47,6 +58,22 @@ export const sendKoraEmail = async (message: EmailMessage) => {
   if (!response.ok) {
     throw new Error(`Resend ${response.status}: ${await response.text()}`);
   }
+  return true;
+};
+
+const sendWithGoogleAppsScript = async (message: EmailMessage) => {
+  const url = Deno.env.get("GOOGLE_APPS_SCRIPT_WEBHOOK_URL");
+  if (!url) return false;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(message)
+  });
+  if (!response.ok) throw new Error(`Google Apps Script ${response.status}`);
+
+  const result = await response.json().catch(() => ({ ok: false }));
+  if (!result.ok) throw new Error("Google Apps Script no pudo enviar el correo");
   return true;
 };
 

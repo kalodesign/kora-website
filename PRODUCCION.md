@@ -123,6 +123,29 @@ npx supabase secrets set KORA_EMAIL_FROM="Kora <notificaciones@kora3d.co>"
 
 No compartas `RESEND_API_KEY` por chat ni la agregues a FileZilla o GitHub. La configuracion permite responder directamente a la persona que envio Contacto u orden, y conserva fotos o archivos como privados en Supabase Storage.
 
+### Alternativa gratuita: Google Apps Script
+
+Si no quieres usar Resend al inicio, usa el archivo `google-apps-script/Code.gs`:
+
+1. Entra a [script.google.com](https://script.google.com) con una cuenta de Google que pueda enviar correos.
+2. Crea un proyecto, pega `Code.gs` y cambia `WEBHOOK_TOKEN` por una cadena larga y privada.
+3. Pulsa `Deploy > New deployment > Web app`.
+4. Selecciona ejecutar como tu cuenta y acceso para cualquiera con el enlace. Autoriza el permiso para enviar correo.
+5. Copia la URL terminada en `/exec` y agrega `?token=EL_MISMO_TOKEN` al final.
+6. Guarda esa URL completa como secreto de Supabase:
+
+```powershell
+npx supabase secrets set GOOGLE_APPS_SCRIPT_WEBHOOK_URL="https://script.google.com/macros/s/TU_DEPLOYMENT_ID/exec?token=TU_TOKEN_LARGO"
+```
+
+Este metodo envia a `info@kora3d.co` desde la cuenta de Google propietaria del script. Es adecuado para alertas internas de la version 1; no es un sustituto para correos masivos o de marketing.
+
+## Catalogo y almacenamiento en version 1
+
+Los productos continuan en `data/products.json` y las imagenes en `assets/`, alojados en tu hosting. No se suben al Storage de Supabase.
+
+Supabase se usa solo para solicitudes, ordenes y sus archivos adjuntos. El plan Free incluye 1 GB de Storage, suficiente para una version inicial si mantienes fotos y referencias bajo control. Revisa Storage cada mes y elimina adjuntos antiguos cuando ya no los necesites.
+
 ## Catalogo de productos
 
 La fuente de productos sigue siendo:
