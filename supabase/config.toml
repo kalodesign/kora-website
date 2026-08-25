@@ -1,0 +1,11 @@
+[functions.contact]
+verify_jwt = false
+
+[functions.pet-request]
+verify_jwt = false
+
+[functions.checkout-wompi]
+verify_jwt = false
+
+[functions.wompi-webhook]
+verify_jwt = false

@@ -39,7 +39,8 @@
     submitButton.textContent = "Enviando solicitud";
 
     try {
-      const response = await fetch("/api/contact", {
+      const contactEndpoint = window.koraEndpoint?.("contact", "/api/contact") || "/api/contact";
+      const response = await fetch(contactEndpoint, {
         method: "POST",
         body: new FormData(form)
       });

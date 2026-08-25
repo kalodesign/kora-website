@@ -1,117 +1,121 @@
 # Produccion Kora / Cora3D
 
-## Archivos que van al hosting
+La arquitectura de produccion queda separada en dos partes:
 
-Sube todo el contenido del proyecto al hosting de `www.cora3d.co`, incluyendo:
+- `www.cora3d.co` en cPanel sirve HTML, CSS, JavaScript, imagenes y el catalogo.
+- Supabase ejecuta formularios, archivos, ordenes y la confirmacion de Wompi.
 
-- `index.html`
-- `mascotas.html`
-- `llaveros.html`
-- `hazlotumismo.html`
-- `producto.html`
-- `nosotros.html`
-- `contacto.html`
-- `checkout-resultado.html`
-- `styles.css`
-- todos los `.js`
-- carpeta `assets/`
-- carpeta `data/`
-- `server.mjs` si el hosting permite Node.js
+No se necesita Render ni un proceso Node encendido. `server.mjs` se conserva para desarrollo local.
 
-## Repositorio de productos
+## 1. Crear la base de datos y Storage
 
-La fuente principal del catalogo es:
+1. Entra a tu proyecto de Supabase.
+2. Abre `SQL Editor` y crea una consulta nueva.
+3. Copia y ejecuta todo el archivo `supabase-schema.sql`.
+4. En `Table Editor` deben aparecer `contact_requests`, `pet_requests` y `orders`.
+5. En `Storage` deben aparecer los buckets privados `contact-references` y `pet-photos`.
+
+Las tablas tienen RLS activado y no exponen datos al navegador. Las funciones usan la llave privada que Supabase inyecta en su propio entorno.
+
+## 2. Vincular y publicar las funciones
+
+Instala Supabase CLI una vez. En PowerShell, dentro de la carpeta del proyecto:
+
+```powershell
+npx supabase login
+npx supabase link --project-ref TU_PROJECT_REF
+```
+
+El `project ref` es el identificador de tu proyecto. Aparece en la URL:
 
 ```txt
-data/products.json
+https://TU_PROJECT_REF.supabase.co
 ```
 
-Cada producto usa esta estructura:
+Configura los secretos de prueba de Wompi. No escribas estas llaves en ningun archivo del sitio:
 
-```json
-{
-  "id": "dije-corazon-rojo",
-  "title": "Dije corazon rojo",
-  "category": "Dijes",
-  "image": "assets/image-12.png",
-  "description": "Descripcion breve del producto.",
-  "size": "30x34 mm",
-  "price": 18000,
-  "compareAt": 24000,
-  "stock": 18
-}
+```powershell
+npx supabase secrets set WOMPI_PUBLIC_KEY=pub_test_TU_LLAVE
+npx supabase secrets set WOMPI_INTEGRITY_SECRET=test_integrity_TU_SECRETO
+npx supabase secrets set WOMPI_EVENTS_SECRET=test_events_TU_SECRETO
+npx supabase secrets set KORA_SITE_URL=https://www.cora3d.co
+npx supabase secrets set KORA_PRODUCTS_URL=https://www.cora3d.co/data/products.json
+npx supabase secrets set KORA_ALLOWED_ORIGINS=https://www.cora3d.co,https://cora3d.co
+npx supabase secrets set KORA_FREE_SHIPPING_FROM_COP=50000
+npx supabase secrets set KORA_SHIPPING_FLAT_COP=0
 ```
 
-Tambien existe un editor privado:
+Publica las cuatro funciones:
+
+```powershell
+npx supabase functions deploy contact --use-api
+npx supabase functions deploy pet-request --use-api
+npx supabase functions deploy checkout-wompi --use-api
+npx supabase functions deploy wompi-webhook --use-api
+```
+
+`supabase/config.toml` ya indica que estas funciones reciben solicitudes publicas. Los formularios validan el origen y el webhook valida criptograficamente cada evento de Wompi.
+
+## 3. Conectar el sitio de cPanel
+
+Abre `config.js` y cambia una sola linea:
+
+```js
+supabaseFunctionsUrl: "https://TU_PROJECT_REF.supabase.co/functions/v1"
+```
+
+Sube por FileZilla a la raiz publica:
+
+- `config.js`
+- `script.js`
+- `contact.js`
+- todos los `.html` modificados
+
+No subas la carpeta `supabase/`, `supabase-schema.sql`, `.env` ni secretos a cPanel. Esos archivos son de configuracion y desarrollo.
+
+## 4. Configurar Wompi Sandbox
+
+En el panel de Wompi usa primero las llaves de pruebas y registra como URL de eventos:
 
 ```txt
-admin-productos.html?key=TU_CLAVE_PRIVADA
+https://TU_PROJECT_REF.supabase.co/functions/v1/wompi-webhook
 ```
 
-Si el hosting no ejecuta Node.js, el editor funciona en modo local: editas, exportas `products.json` y lo vuelves a subir por FileZilla a `data/products.json`.
-
-## Variables privadas
-
-Copia `.env.example` como `.env` en el servidor donde corra `server.mjs` y llena estos valores:
-
-```txt
-KORA_PRIVATE_KEY=
-KORA_SITE_URL=https://www.cora3d.co
-
-WOMPI_PUBLIC_KEY=
-WOMPI_INTEGRITY_SECRET=
-WOMPI_EVENTS_SECRET=
-
-SUPABASE_URL=
-SUPABASE_SERVICE_ROLE_KEY=
-SUPABASE_CONTACT_TABLE=contact_requests
-SUPABASE_PET_TABLE=pet_requests
-SUPABASE_ORDERS_TABLE=orders
-```
-
-No subas `.env` a repositorios publicos.
-
-## Wompi
-
-El checkout usa Web Checkout de Wompi:
-
-1. El carrito envia los productos a `/api/checkout/wompi`.
-2. El backend valida precios desde `data/products.json`.
-3. El backend crea una orden en `data/orders.json`.
-4. El backend genera la firma de integridad.
-5. El usuario es enviado a Wompi para pagar.
-
-Configura en Wompi esta URL de eventos:
-
-```txt
-https://www.cora3d.co/api/wompi/webhook
-```
-
-La pagina de retorno es:
+El retorno del comprador ya queda configurado como:
 
 ```txt
 https://www.cora3d.co/checkout-resultado.html
 ```
 
-Importante: la aprobacion real del pago se confirma por webhook, no por la pagina de retorno.
+La pagina de retorno no aprueba una compra. Solo el webhook firmado de Wompi puede cambiar el estado guardado en `orders`.
 
-## Supabase
+## 5. Probar antes de recibir dinero
 
-El backend intenta guardar automaticamente:
+Haz las pruebas en este orden:
 
-- Contacto y cotizaciones en `contact_requests`
-- Solicitudes de mascotas en `pet_requests`
-- Ordenes de tienda en `orders`
+1. Abre `contacto.html`, envia una cotizacion y confirma una fila en `contact_requests`.
+2. Abre `mascotas.html`, envia el formulario con foto y confirma la fila y el archivo privado en `pet-photos`.
+3. Agrega un producto, completa el checkout y confirma una orden `PENDING` en `orders`.
+4. Paga con un medio Sandbox de Wompi.
+5. Confirma que esa misma orden cambia a `APPROVED`, `DECLINED` o el estado enviado por Wompi.
+6. Revisa `Edge Functions > Logs` si alguna prueba falla.
 
-Si ya tienes automatizaciones de correo en Supabase, conecta esas automatizaciones a esas tablas o cambia los nombres con las variables `SUPABASE_*_TABLE`.
+No cambies a llaves `pub_prod_`, `prod_integrity_` y `prod_events_` hasta completar las seis pruebas.
 
-## Bajo costo recomendado
+## 6. Notificacion por correo
 
-Para salir rapido:
+La nueva solicitud se inserta en `pet_requests`, igual que la integracion anterior. Si tu automatizacion de correo ya escucha esa tabla, volvera a ejecutarse al recibir una fila.
 
-1. Hosting actual para HTML, CSS, JS y assets.
-2. Backend pequeno Node.js en un servicio barato o gratuito si el hosting no soporta Node.
-3. Supabase free tier para guardar leads y ordenes.
-4. Wompi Web Checkout para pagos.
-5. Envio inicialmente manual o tarifa fija desde `KORA_SHIPPING_FLAT_COP`.
+Para comprobarla, envia una solicitud y revisa `Database > Webhooks` o la automatizacion que tenias creada. Si estaba conectada a otra tabla, cambia el evento a `INSERT` sobre `public.pet_requests`. El correo no debe depender del navegador: debe activarse desde esa insercion en Supabase.
 
+## Catalogo de productos
+
+La fuente de productos sigue siendo:
+
+```txt
+data/products.json
+```
+
+Cuando cambies productos, sube ese archivo por FileZilla. El checkout vuelve a consultar el catalogo y calcula precios del lado seguro; no confia en el precio que manda el navegador.
+
+El editor `admin-productos.html` puede exportar el JSON, pero no debe publicarse como panel de administracion hasta agregar autenticacion real.

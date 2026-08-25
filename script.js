@@ -459,7 +459,8 @@ selectors.checkoutForm?.addEventListener("submit", async (event) => {
   selectors.checkoutStatus.textContent = "";
 
   try {
-    const response = await fetch("/api/checkout/wompi", {
+    const checkoutEndpoint = window.koraEndpoint?.("checkout-wompi", "/api/checkout/wompi") || "/api/checkout/wompi";
+    const response = await fetch(checkoutEndpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -473,7 +474,16 @@ selectors.checkoutForm?.addEventListener("submit", async (event) => {
       "amount-in-cents": String(checkout.amountInCents),
       reference: checkout.reference,
       "signature:integrity": checkout.integrity,
-      "redirect-url": checkout.redirectUrl
+      "redirect-url": checkout.redirectUrl,
+      "customer-data:email": checkout.customer?.email || "",
+      "customer-data:full-name": checkout.customer?.name || "",
+      "customer-data:phone-number": checkout.customer?.phone || "",
+      "shipping-address:address-line-1": checkout.customer?.address || "",
+      "shipping-address:country": "CO",
+      "shipping-address:city": checkout.customer?.city || "",
+      "shipping-address:phone-number": checkout.customer?.phone || "",
+      "shipping-address:region": checkout.customer?.region || "",
+      "shipping-address:name": checkout.customer?.name || ""
     });
     window.location.href = `${checkout.checkoutUrl}?${params.toString()}`;
   } catch (error) {
@@ -547,7 +557,8 @@ petModalForm?.addEventListener("submit", (event) => {
 
   submitButton.disabled = true;
   submitButton.textContent = "Enviando solicitud";
-  fetch("/api/pet-request", {
+  const petRequestEndpoint = window.koraEndpoint?.("pet-request", "/api/pet-request") || "/api/pet-request";
+  fetch(petRequestEndpoint, {
     method: "POST",
     body: new FormData(petModalForm)
   })
