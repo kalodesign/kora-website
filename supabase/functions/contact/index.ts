@@ -6,6 +6,7 @@ import {
   textValue,
   uploadFormFile
 } from "../_shared/http.ts";
+import { emailLayout, escapeHtml, sendKoraEmail } from "../_shared/email.ts";
 
 const allowedExtensions = new Set([".png", ".jpg", ".jpeg", ".pdf", ".stl", ".obj"]);
 
@@ -47,6 +48,23 @@ Deno.serve(async (request) => {
       reference
     });
     if (error) throw error;
+
+    await sendKoraEmail({
+      subject: `Nueva cotizacion: ${name}`,
+      replyTo: email,
+      idempotencyKey: `contact-${id}`,
+      text: `Nueva cotizacion\nNombre: ${name}\nCorreo: ${email}\nEmpresa: ${textValue(formData, "company", 180)}\nTipo: ${projectType}\nCantidad: ${textValue(formData, "quantity", 20)}\nPresupuesto: ${textValue(formData, "budget", 60)}\n\nDetalles:\n${details}`,
+      html: emailLayout("Nueva cotizacion", `
+        <p><strong>Nombre:</strong> ${escapeHtml(name)}</p>
+        <p><strong>Correo:</strong> ${escapeHtml(email)}</p>
+        <p><strong>Empresa:</strong> ${escapeHtml(textValue(formData, "company", 180) || "No indicada")}</p>
+        <p><strong>Tipo:</strong> ${escapeHtml(projectType)}</p>
+        <p><strong>Cantidad:</strong> ${escapeHtml(textValue(formData, "quantity", 20) || "No indicada")}</p>
+        <p><strong>Presupuesto:</strong> ${escapeHtml(textValue(formData, "budget", 60) || "No indicado")}</p>
+        <p><strong>Detalles:</strong><br>${escapeHtml(details).replaceAll("\n", "<br>")}</p>
+        ${reference ? `<p><strong>Referencia adjunta:</strong> ${escapeHtml(reference.originalName)}</p>` : ""}
+      `)
+    }).catch((emailError) => console.error("contact email", emailError));
 
     return jsonResponse(request, { ok: true, id }, 201);
   } catch (error) {

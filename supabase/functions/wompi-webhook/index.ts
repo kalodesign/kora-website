@@ -5,6 +5,7 @@ import {
   jsonResponse,
   sha256
 } from "../_shared/http.ts";
+import { emailLayout, escapeHtml, formatCop, sendKoraEmail } from "../_shared/email.ts";
 
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return handleOptions(request);
@@ -37,7 +38,7 @@ Deno.serve(async (request) => {
     const supabase = getSupabaseAdmin();
     const { data: order, error: readError } = await supabase
       .from("orders")
-      .select("id, reference, status, amount_in_cents, currency")
+      .select("id, reference, status, amount_in_cents, currency, total, customer, items")
       .eq("reference", transaction.reference)
       .maybeSingle();
     if (readError) throw readError;
@@ -57,6 +58,28 @@ Deno.serve(async (request) => {
       updated_at: new Date().toISOString()
     }).eq("id", order.id);
     if (updateError) throw updateError;
+
+    const customer = order.customer && typeof order.customer === "object"
+      ? order.customer as Record<string, unknown>
+      : {};
+    const itemLines = Array.isArray(order.items)
+      ? order.items.map((item: Record<string, unknown>) => `${item.qty} x ${item.title}`).join("\n")
+      : "";
+    const status = String(transaction.status || order.status);
+    await sendKoraEmail({
+      subject: `Pago ${status}: ${order.reference}`,
+      replyTo: String(customer.email || ""),
+      idempotencyKey: `wompi-${String(transaction.id || order.reference)}-${status}`,
+      text: `Actualizacion de pago Wompi\nReferencia: ${order.reference}\nEstado: ${status}\nTransaccion: ${transaction.id || "No disponible"}\nCliente: ${customer.name || "No disponible"}\nProductos:\n${itemLines}\nTotal: ${formatCop(order.total)}`,
+      html: emailLayout(`Pago ${status}`, `
+        <p><strong>Referencia:</strong> ${escapeHtml(order.reference)}</p>
+        <p><strong>Estado:</strong> ${escapeHtml(status)}</p>
+        <p><strong>Transaccion Wompi:</strong> ${escapeHtml(transaction.id || "No disponible")}</p>
+        <p><strong>Cliente:</strong> ${escapeHtml(customer.name || "No disponible")}</p>
+        <p><strong>Productos:</strong><br>${escapeHtml(itemLines).replaceAll("\n", "<br>")}</p>
+        <p><strong>Total:</strong> ${escapeHtml(formatCop(order.total))}</p>
+      `)
+    }).catch((emailError) => console.error("wompi email", emailError));
 
     return jsonResponse(request, { ok: true });
   } catch (error) {

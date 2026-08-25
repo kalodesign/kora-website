@@ -102,11 +102,26 @@ Haz las pruebas en este orden:
 
 No cambies a llaves `pub_prod_`, `prod_integrity_` y `prod_events_` hasta completar las seis pruebas.
 
-## 6. Notificacion por correo
+## 6. Notificaciones por correo
 
-La nueva solicitud se inserta en `pet_requests`, igual que la integracion anterior. Si tu automatizacion de correo ya escucha esa tabla, volvera a ejecutarse al recibir una fila.
+Las funciones ya preparan copias internas para `info@kora3d.co` cuando ocurre cualquiera de estos eventos:
 
-Para comprobarla, envia una solicitud y revisa `Database > Webhooks` o la automatizacion que tenias creada. Si estaba conectada a otra tabla, cambia el evento a `INSERT` sobre `public.pet_requests`. El correo no debe depender del navegador: debe activarse desde esa insercion en Supabase.
+- Nueva cotizacion desde Contacto.
+- Nueva solicitud de Mascotas.
+- Nueva orden pendiente de pago.
+- Cambio de estado enviado por Wompi, incluido `APPROVED`.
+
+Para activarlas crea una cuenta en Resend, agrega y verifica el dominio `kora3d.co` en `Domains`, y crea una API key. Resend te mostrara registros DNS; agregalos desde la zona DNS de tu cPanel y espera la verificacion del dominio.
+
+Una vez verificado, pega la llave solo en tu propia terminal:
+
+```powershell
+npx supabase secrets set RESEND_API_KEY=re_TU_LLAVE_PRIVADA
+npx supabase secrets set KORA_NOTIFICATION_EMAIL=info@kora3d.co
+npx supabase secrets set KORA_EMAIL_FROM="Kora <notificaciones@kora3d.co>"
+```
+
+No compartas `RESEND_API_KEY` por chat ni la agregues a FileZilla o GitHub. La configuracion permite responder directamente a la persona que envio Contacto u orden, y conserva fotos o archivos como privados en Supabase Storage.
 
 ## Catalogo de productos
 

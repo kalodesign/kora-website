@@ -5,6 +5,7 @@ import {
   jsonResponse,
   sha256
 } from "../_shared/http.ts";
+import { emailLayout, escapeHtml, formatCop, sendKoraEmail } from "../_shared/email.ts";
 
 type CatalogProduct = {
   id: string;
@@ -89,6 +90,21 @@ Deno.serve(async (request) => {
       payment_provider: "wompi"
     });
     if (error) throw error;
+
+    const itemLines = items.map((item) => `${item?.qty} x ${item?.title}: ${formatCop(item?.total)}`).join("\n");
+    await sendKoraEmail({
+      subject: `Nueva orden pendiente ${reference}`,
+      replyTo: cleanCustomer.email,
+      idempotencyKey: `order-${id}-created`,
+      text: `Nueva orden pendiente de pago\nReferencia: ${reference}\nCliente: ${cleanCustomer.name}\nCorreo: ${cleanCustomer.email}\nCelular: ${cleanCustomer.phone}\nEntrega: ${cleanCustomer.address}, ${cleanCustomer.city}, ${cleanCustomer.region}\n\nProductos:\n${itemLines}\n\nTotal: ${formatCop(total)}`,
+      html: emailLayout("Nueva orden pendiente de pago", `
+        <p><strong>Referencia:</strong> ${escapeHtml(reference)}</p>
+        <p><strong>Cliente:</strong> ${escapeHtml(cleanCustomer.name)}<br>${escapeHtml(cleanCustomer.email)}<br>${escapeHtml(cleanCustomer.phone)}</p>
+        <p><strong>Entrega:</strong> ${escapeHtml(`${cleanCustomer.address}, ${cleanCustomer.city}, ${cleanCustomer.region}`)}</p>
+        <p><strong>Productos:</strong><br>${items.map((item) => `${escapeHtml(item?.qty)} x ${escapeHtml(item?.title)}: ${escapeHtml(formatCop(item?.total))}`).join("<br>")}</p>
+        <p><strong>Total:</strong> ${escapeHtml(formatCop(total))}</p>
+      `)
+    }).catch((emailError) => console.error("order created email", emailError));
 
     return jsonResponse(request, {
       ok: true,
