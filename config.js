@@ -1,6 +1,5 @@
 window.KORA_CONFIG = Object.freeze({
-  // Reemplaza TU-PROYECTO por el ID que aparece en la URL de tu proyecto Supabase.
-  supabaseFunctionsUrl: "https://TU-PROYECTO.supabase.co/functions/v1"
+  supabaseFunctionsUrl: "https://hapveghsbqnhkeuraxow.supabase.co/functions/v1"
 });
 
 window.koraEndpoint = (function createEndpointResolver() {

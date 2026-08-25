@@ -23,13 +23,13 @@ Instala Supabase CLI una vez. En PowerShell, dentro de la carpeta del proyecto:
 
 ```powershell
 npx supabase login
-npx supabase link --project-ref TU_PROJECT_REF
+npx supabase link --project-ref hapveghsbqnhkeuraxow
 ```
 
 El `project ref` es el identificador de tu proyecto. Aparece en la URL:
 
 ```txt
-https://TU_PROJECT_REF.supabase.co
+https://hapveghsbqnhkeuraxow.supabase.co
 ```
 
 Configura los secretos de prueba de Wompi. No escribas estas llaves en ningun archivo del sitio:
@@ -61,7 +61,7 @@ npx supabase functions deploy wompi-webhook --use-api
 Abre `config.js` y cambia una sola linea:
 
 ```js
-supabaseFunctionsUrl: "https://TU_PROJECT_REF.supabase.co/functions/v1"
+supabaseFunctionsUrl: "https://hapveghsbqnhkeuraxow.supabase.co/functions/v1"
 ```
 
 Sube por FileZilla a la raiz publica:
@@ -78,7 +78,7 @@ No subas la carpeta `supabase/`, `supabase-schema.sql`, `.env` ni secretos a cPa
 En el panel de Wompi usa primero las llaves de pruebas y registra como URL de eventos:
 
 ```txt
-https://TU_PROJECT_REF.supabase.co/functions/v1/wompi-webhook
+https://hapveghsbqnhkeuraxow.supabase.co/functions/v1/wompi-webhook
 ```
 
 El retorno del comprador ya queda configurado como:
