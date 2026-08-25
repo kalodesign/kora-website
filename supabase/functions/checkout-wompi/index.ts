@@ -23,7 +23,7 @@ Deno.serve(async (request) => {
   try {
     const publicKey = Deno.env.get("WOMPI_PUBLIC_KEY");
     const integritySecret = Deno.env.get("WOMPI_INTEGRITY_SECRET");
-    const siteUrl = (Deno.env.get("KORA_SITE_URL") || "https://www.cora3d.co").replace(/\/$/, "");
+    const siteUrl = (Deno.env.get("KORA_SITE_URL") || "https://kora3d.co").replace(/\/$/, "");
     const productsUrl = Deno.env.get("KORA_PRODUCTS_URL") || `${siteUrl}/data/products.json`;
     if (!publicKey || !integritySecret) {
       return jsonResponse(request, { error: "Wompi no esta configurado todavia" }, 503);

@@ -1,8 +1,8 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const defaultOrigins = [
-  "https://www.cora3d.co",
-  "https://cora3d.co",
+  "https://kora3d.co",
+  "https://www.kora3d.co",
   "http://localhost:4174",
   "http://127.0.0.1:4174"
 ];

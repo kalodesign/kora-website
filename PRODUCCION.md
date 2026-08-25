@@ -2,7 +2,7 @@
 
 La arquitectura de produccion queda separada en dos partes:
 
-- `www.cora3d.co` en cPanel sirve HTML, CSS, JavaScript, imagenes y el catalogo.
+- `kora3d.co` en cPanel sirve HTML, CSS, JavaScript, imagenes y el catalogo.
 - Supabase ejecuta formularios, archivos, ordenes y la confirmacion de Wompi.
 
 No se necesita Render ni un proceso Node encendido. `server.mjs` se conserva para desarrollo local.
@@ -38,9 +38,9 @@ Configura los secretos de prueba de Wompi. No escribas estas llaves en ningun ar
 npx supabase secrets set WOMPI_PUBLIC_KEY=pub_test_TU_LLAVE
 npx supabase secrets set WOMPI_INTEGRITY_SECRET=test_integrity_TU_SECRETO
 npx supabase secrets set WOMPI_EVENTS_SECRET=test_events_TU_SECRETO
-npx supabase secrets set KORA_SITE_URL=https://www.cora3d.co
-npx supabase secrets set KORA_PRODUCTS_URL=https://www.cora3d.co/data/products.json
-npx supabase secrets set KORA_ALLOWED_ORIGINS=https://www.cora3d.co,https://cora3d.co
+npx supabase secrets set KORA_SITE_URL=https://kora3d.co
+npx supabase secrets set KORA_PRODUCTS_URL=https://kora3d.co/data/products.json
+npx supabase secrets set KORA_ALLOWED_ORIGINS=https://kora3d.co,https://www.kora3d.co
 npx supabase secrets set KORA_FREE_SHIPPING_FROM_COP=50000
 npx supabase secrets set KORA_SHIPPING_FLAT_COP=0
 ```
@@ -84,7 +84,7 @@ https://hapveghsbqnhkeuraxow.supabase.co/functions/v1/wompi-webhook
 El retorno del comprador ya queda configurado como:
 
 ```txt
-https://www.cora3d.co/checkout-resultado.html
+https://kora3d.co/checkout-resultado.html
 ```
 
 La pagina de retorno no aprueba una compra. Solo el webhook firmado de Wompi puede cambiar el estado guardado en `orders`.

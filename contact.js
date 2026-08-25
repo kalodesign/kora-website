@@ -37,12 +37,15 @@
     const submitButton = form.querySelector("button[type='submit']");
     submitButton.disabled = true;
     submitButton.textContent = "Enviando solicitud";
+    const controller = new AbortController();
+    const requestTimeout = window.setTimeout(() => controller.abort(), 20000);
 
     try {
       const contactEndpoint = window.koraEndpoint?.("contact", "/api/contact") || "/api/contact";
       const response = await fetch(contactEndpoint, {
         method: "POST",
-        body: new FormData(form)
+        body: new FormData(form),
+        signal: controller.signal
       });
       if (!response.ok) throw new Error("No se pudo enviar");
 
@@ -56,6 +59,7 @@
       status.textContent = "No pudimos enviar la solicitud. Inténtalo de nuevo o escríbenos a info@kora.co.";
       submitButton.textContent = "Enviar solicitud";
     } finally {
+      window.clearTimeout(requestTimeout);
       submitButton.disabled = false;
     }
   });
