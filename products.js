@@ -1,0 +1,189 @@
+window.KORA_PRODUCTS = [
+  {
+    "id": "dije-corazon-rojo",
+    "title": "Dije corazon rojo",
+    "category": "Dijes",
+    "image": "assets/image-12.png",
+    "description": "Dije en forma de corazon para armar llaveros, collares o accesorios personalizados.",
+    "size": "30x34 mm",
+    "price": 18000,
+    "compareAt": 24000,
+    "stock": 18
+  },
+  {
+    "id": "dije-concha-dorada",
+    "title": "Dije concha dorada",
+    "category": "Dijes",
+    "image": "assets/image-10.png",
+    "description": "Pieza dorada con acabado brillante para composiciones delicadas y playeras.",
+    "size": "18x24 mm",
+    "price": 16000,
+    "compareAt": 20000,
+    "stock": 12
+  },
+  {
+    "id": "dije-hongo-rojo",
+    "title": "Dije hongo rojo",
+    "category": "Dijes",
+    "image": "assets/image-08.png",
+    "description": "Dije tipo hongo con puntos blancos, ideal para accesorios divertidos y coloridos.",
+    "size": "24x28 mm",
+    "price": 15000,
+    "compareAt": 19000,
+    "stock": 16
+  },
+  {
+    "id": "dije-redondo-gratitud",
+    "title": "Dije redondo gratitud",
+    "category": "Dijes",
+    "image": "assets/image-09.png",
+    "description": "Dije circular con grafica colorida para sumar mensajes especiales a tu pieza.",
+    "size": "32 mm",
+    "price": 17000,
+    "compareAt": 22000,
+    "stock": 10
+  },
+  {
+    "id": "dije-palmera",
+    "title": "Dije palmera",
+    "category": "Dijes",
+    "image": "assets/image-04.png",
+    "description": "Dije tropical de palmera para combinaciones frescas y llamativas.",
+    "size": "27x36 mm",
+    "price": 15000,
+    "compareAt": 18000,
+    "stock": 14
+  },
+  {
+    "id": "argolla-dorada",
+    "title": "Argolla dorada",
+    "category": "Bases",
+    "image": "assets/image-06.png",
+    "description": "Argolla metalica dorada para ensamblar dijes y accesorios personalizados.",
+    "size": "25 mm",
+    "price": 9000,
+    "compareAt": 12000,
+    "stock": 25
+  },
+  {
+    "id": "cadena-dorada",
+    "title": "Cadena dorada",
+    "category": "Bases",
+    "image": "assets/image-07.png",
+    "description": "Cadena corta para conectar varios dijes en una misma composicion.",
+    "size": "45 mm",
+    "price": 11000,
+    "compareAt": 14000,
+    "stock": 20
+  },
+  {
+    "id": "set-inicial",
+    "title": "Set inicial personalizado",
+    "category": "Sets",
+    "image": "assets/image-13.png",
+    "description": "Base de armado para empezar tu accesorio con una seleccion lista para personalizar.",
+    "size": "Kit",
+    "price": 36000,
+    "compareAt": 45000,
+    "stock": 8
+  },
+  {
+    "id": "llavero-coqueta-rosada",
+    "title": "Coqueta rosada",
+    "category": "A medida",
+    "image": "assets/llaveros-image-03.jpeg",
+    "description": "Llavero personalizado con composicion rosada, detalles brillantes y estilo dulce.",
+    "size": "Personalizado",
+    "price": 70000,
+    "compareAt": 80000,
+    "stock": 8,
+    "components": [
+      { "productId": "dije-corazon-rojo", "quantity": 1 },
+      { "productId": "dije-redondo-gratitud", "quantity": 1 },
+      { "productId": "dije-palmera", "quantity": 1 },
+      { "productId": "argolla-dorada", "quantity": 1 },
+      { "productId": "cadena-dorada", "quantity": 1 }
+    ]
+  },
+  {
+    "id": "llavero-mantente-salvaje",
+    "title": "Mantente salvaje",
+    "category": "A medida",
+    "image": "assets/llaveros-image-05.png",
+    "description": "Llavero con mensaje, corazon y dijes coloridos para llevar una pieza con personalidad.",
+    "size": "Personalizado",
+    "price": 55000,
+    "compareAt": 60000,
+    "stock": 10,
+    "components": [
+      { "productId": "dije-corazon-rojo", "quantity": 1 },
+      { "productId": "dije-redondo-gratitud", "quantity": 1 },
+      { "productId": "argolla-dorada", "quantity": 1 }
+    ]
+  },
+  {
+    "id": "llavero-playa-azul",
+    "title": "Playa azul",
+    "category": "A medida",
+    "image": "assets/llaveros-image-04.png",
+    "description": "Llavero inspirado en colores de playa, con tonos azules y acabado divertido.",
+    "size": "Personalizado",
+    "price": 55000,
+    "compareAt": 60000,
+    "stock": 12,
+    "components": [
+      { "productId": "dije-palmera", "quantity": 1 },
+      { "productId": "dije-concha-dorada", "quantity": 1 },
+      { "productId": "argolla-dorada", "quantity": 1 }
+    ]
+  },
+  {
+    "id": "llavero-nombre-rosa",
+    "title": "Nombre rosa",
+    "category": "A medida",
+    "image": "assets/llaveros-image-02.png",
+    "description": "Llavero con nombre personalizado y piezas coordinadas en tonos suaves.",
+    "size": "A medida",
+    "price": 65000,
+    "compareAt": 75000,
+    "stock": 9,
+    "components": [
+      { "productId": "dije-corazon-rojo", "quantity": 1 },
+      { "productId": "cadena-dorada", "quantity": 1 },
+      { "productId": "argolla-dorada", "quantity": 1 }
+    ]
+  },
+  {
+    "id": "llavero-corazon-rojo",
+    "title": "Corazon rojo",
+    "category": "A medida",
+    "image": "assets/llaveros-image-06.png",
+    "description": "Llavero con dije de corazon rojo y herrajes dorados para un look llamativo.",
+    "size": "Personalizado",
+    "price": 60000,
+    "compareAt": 70000,
+    "stock": 11,
+    "components": [
+      { "productId": "dije-corazon-rojo", "quantity": 1 },
+      { "productId": "cadena-dorada", "quantity": 1 },
+      { "productId": "argolla-dorada", "quantity": 1 }
+    ]
+  },
+  {
+    "id": "llavero-color-pop",
+    "title": "Color pop",
+    "category": "A medida",
+    "image": "assets/llaveros-image-07.png",
+    "description": "Combinacion vibrante de colores y dijes para bolsos, llaves o mochilas.",
+    "size": "Personalizado",
+    "price": 58000,
+    "compareAt": 68000,
+    "stock": 7,
+    "components": [
+      { "productId": "dije-hongo-rojo", "quantity": 1 },
+      { "productId": "dije-redondo-gratitud", "quantity": 1 },
+      { "productId": "dije-palmera", "quantity": 1 },
+      { "productId": "argolla-dorada", "quantity": 1 }
+    ]
+  }
+];

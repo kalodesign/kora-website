@@ -1,0 +1,2335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Kora Studio | Cotizador interno de impresión</title>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:           #F5F1EA;          /* beige predominante */
+    --bg-soft:      #FAF7F0;
+    --surface:      #FFFFFF;
+    --surface-2:    #ECE6DB;
+    --ink:          #2B2B2B;          /* negro carbón — texto */
+    --ink-2:        #3D3D3D;
+    --ink-dim:      rgba(43,43,43,.62);
+    --ink-dimmer:   rgba(43,43,43,.42);
+    --line:         rgba(43,43,43,.09);
+    --line-2:       rgba(43,43,43,.16);
+    --accent:       #6E7151;          /* olivo — acento de marca */
+    --accent-hover: #565A3D;
+    --accent-soft:  #E2E4D2;
+    --olive:        #6E7151;
+    --green:        #4A6B33;
+    --warning:      #8A6B1F;
+    --danger:       #8E3A2B;
+    --mono:         'Archivo', 'Arial Narrow', Arial, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+  body {
+    font-family: 'Archivo', 'Arial Narrow', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--ink); color: var(--bg); }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ink-dimmer); }
+
+  h1, h2, h3, h4 { letter-spacing: -0.025em; font-weight: 500; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ── Reveal ── */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .9s cubic-bezier(.22,.68,0,1.2), transform .9s cubic-bezier(.22,.68,0,1.2); }
+  .reveal.is-in { opacity: 1; transform: translateY(0); }
+  .reveal.d1 { transition-delay: .06s; } .reveal.d2 { transition-delay: .14s; }
+  .reveal.d3 { transition-delay: .22s; } .reveal.d4 { transition-delay: .30s; }
+
+  /* ── Utilities ── */
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 11px; font-weight: 600; letter-spacing: 2.5px;
+    text-transform: uppercase; color: var(--ink-2);
+  }
+  .eyebrow::before { content: ""; width: 16px; height: 1px; background: var(--accent); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 26px; border-radius: 999px;
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    letter-spacing: .4px;
+    cursor: pointer; border: none; text-decoration: none;
+    transition: transform .15s, background .25s, box-shadow .25s, color .25s, border-color .25s;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--ink); color: var(--bg);
+  }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-1px); }
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-accent:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent; color: var(--ink);
+    border: 1px solid var(--line-2);
+  }
+  .btn-ghost:hover { border-color: var(--ink); background: var(--ink); color: var(--bg); }
+  
+  /* ── NAV ── */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 32px;
+    background: rgba(245,241,234,.92);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  }
+  .logo {
+    display: inline-flex; align-items: center; gap: 12px;
+    font-weight: 700; font-size: 17px; letter-spacing: 3px;
+  }
+  .logo .mark { width: 30px; height: 30px; }
+  .nav-links { display: flex; gap: 4px; align-items: center; }
+  .nav-links a {
+    font-size: 13.5px; font-weight: 500;
+    padding: 9px 16px; border-radius: 999px;
+    transition: background .2s, color .2s;
+  }
+  .nav-links a:hover { background: var(--surface-2); }
+
+  /* ── CALCULATOR ── */
+  .panel.cream { padding: 140px 0 110px; background: var(--bg-soft); }
+  .sec-head {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 40px; margin-bottom: 56px; flex-wrap: wrap;
+  }
+  .sec-head h2 {
+    font-size: clamp(36px, 4.6vw, 60px);
+    line-height: 1.05; max-width: 760px;
+    font-weight: 400;
+    margin-top: 18px;
+  }
+  .sec-head h2 em { font-style: italic; font-weight: 300; color: var(--accent); }
+  .sec-head .side { max-width: 320px; }
+  .sec-head .side p { color: var(--ink-dim); font-size: 14.5px; line-height: 1.75; }
+
+  .calc {
+    display: grid; grid-template-columns: 1.4fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .calc-form, .calc-result {
+    background: var(--surface);
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    padding: 28px;
+  }
+  .calc-result { position: sticky; top: 90px; }
+
+  .calc-card {
+    border-radius: 12px; border: 1px solid var(--line);
+    padding: 20px 22px; margin-bottom: 14px;
+    background: var(--bg-soft);
+    transition: border-color .2s;
+  }
+  .calc-card:hover { border-color: var(--line-2); }
+  .calc-card:last-child { margin-bottom: 0; }
+  .cc-title {
+    font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--ink-dim);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .cc-title .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--ink); color: var(--bg);
+    font-family: var(--mono); font-size: 11px; font-weight: 600;
+    letter-spacing: 0;
+  }
+  .cc-title .sub { color: var(--ink-dim); font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 12px; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 11.5px; font-weight: 500;
+    color: var(--ink-dim);
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    background: var(--surface);
+    border: 1px solid var(--line-2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--ink);
+    transition: border-color .15s, box-shadow .15s;
+    width: 100%;
+  }
+  .field input.big { font-size: 18px; padding: 12px 14px; font-weight: 500; }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(110,113,81,.18);
+  }
+  .field .hint { font-size: 10.5px; color: var(--ink-dimmer); }
+
+  .info-box {
+    background: rgba(110,113,81,.07);
+    border-left: 3px solid var(--olive);
+    border-radius: 4px;
+    padding: 10px 14px;
+    font-size: 12px; line-height: 1.55;
+    color: var(--ink-2);
+    margin-bottom: 12px;
+  }
+  .info-box strong { color: var(--ink); font-weight: 600; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--surface-2); color: var(--ink-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 11px;
+    font-size: 11px; font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* Result card */
+  .res-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--accent); font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .res-tag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .res-list-price {
+    font-family: var(--mono); font-size: 14px;
+    color: var(--ink-dim); text-decoration: line-through;
+  }
+  .res-final {
+    font-family: var(--mono); font-size: 42px;
+    font-weight: 600; color: var(--ink);
+    letter-spacing: -0.025em; line-height: 1;
+    margin-top: 4px; margin-bottom: 6px;
+    word-break: break-all;
+  }
+  .res-final .cur { font-size: 16px; color: var(--accent); font-weight: 600; margin-right: 6px; }
+  .res-meta { font-size: 12px; color: var(--ink-dim); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge {
+    display: inline-flex; align-items: center;
+    font-size: 10.5px; font-weight: 600; letter-spacing: .3px;
+    padding: 3px 8px; border-radius: 999px;
+  }
+  .badge-green { background: rgba(74,107,51,.14); color: var(--green); }
+  .badge-amber { background: rgba(138,107,31,.14); color: var(--warning); }
+  .badge-red   { background: rgba(142,58,43,.14); color: var(--danger); }
+  .badge-ink   { background: var(--surface-2); color: var(--ink); }
+
+  .res-divider { border: none; border-top: 1px dashed var(--line-2); margin: 22px 0; }
+
+  .res-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; padding: 7px 0;
+  }
+  .res-row .k { color: var(--ink-dim); }
+  .res-row .v { font-family: var(--mono); color: var(--ink); font-weight: 500; }
+  .res-row.savings .v { color: var(--green); }
+  .res-row.total {
+    font-size: 14px; font-weight: 600;
+    margin-top: 6px; padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .res-row.total .v { color: var(--accent); font-size: 16px; font-weight: 700; }
+
+  .res-metrics {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-top: 20px;
+  }
+  .res-metric {
+    background: var(--bg-soft); border-radius: 10px;
+    padding: 12px 14px; border: 1px solid var(--line);
+  }
+  .res-metric .l {
+    font-size: 10.5px; color: var(--ink-dim);
+    text-transform: uppercase; letter-spacing: 1px; font-weight: 500;
+  }
+  .res-metric .v {
+    font-family: var(--mono); font-size: 17px; font-weight: 600;
+    color: var(--ink); margin-top: 2px;
+  }
+
+  .res-actions {
+    display: flex; gap: 8px; margin-top: 22px;
+  }
+  .res-actions .btn { flex: 1; justify-content: center; padding: 13px 16px; font-size: 12.5px; }
+
+  /* Discount table */
+  .disc-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 12px; }
+  .disc-table th {
+    text-align: left; padding: 9px 10px;
+    font-size: 10.5px; font-weight: 600; letter-spacing: .5px;
+    text-transform: uppercase; color: var(--ink-dim);
+    border-bottom: 1px solid var(--line-2);
+  }
+  .disc-table td {
+    padding: 10px;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--mono);
+  }
+  .disc-table tr.now td { background: rgba(110,113,81,.07); }
+  .disc-table tr.now td:first-child { color: var(--accent); font-weight: 600; }
+
+  /* Slider */
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 4px; border-radius: 2px;
+    background: var(--surface-2); outline: none; padding: 0;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--accent); border: 3px solid var(--surface);
+    cursor: grab; box-shadow: 0 0 0 1px var(--line-2);
+  }
+
+  /* Advanced collapse */
+  .adv-trigger {
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; user-select: none;
+  }
+  .adv-trigger .toggle-text { font-size: 11.5px; color: var(--ink-dim); font-weight: 500; }
+  .adv-panel { display: none; margin-top: 18px; }
+  .adv-panel.open { display: block; }
+
+  /* Delivery card */
+  .delivery {
+    background: linear-gradient(135deg, var(--accent-soft), #F0EFE2);
+    border: 1px solid rgba(110,113,81,.22);
+    border-radius: 14px; padding: 20px 22px;
+    margin-top: 14px;
+  }
+  .delivery .lab {
+    font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; margin-bottom: 8px;
+  }
+  .delivery .date { font-family: var(--mono); font-size: 22px; font-weight: 600; }
+  .delivery .meta { font-size: 12px; color: var(--ink-dim); margin-top: 4px; }
+  .delivery .bar { background: rgba(20,19,16,.07); height: 6px; border-radius: 3px; margin-top: 14px; overflow: hidden; }
+  .delivery .bar-fill { height: 100%; background: var(--accent); border-radius: 3px; width: 8%; }
+
+  /* Timeline */
+  .timeline { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 14px; }
+  .timeline .day {
+    width: 18px; height: 18px; border-radius: 4px;
+    background: var(--accent); opacity: .9;
+  }
+  .timeline .day.rest { background: var(--surface-2); border: 1px solid var(--line-2); opacity: .8; }
+  .legend { display: flex; gap: 14px; margin-top: 10px; font-size: 11px; color: var(--ink-dim); }
+  .legend span span {
+    display: inline-block; width: 10px; height: 10px; border-radius: 3px;
+    vertical-align: middle; margin-right: 4px;
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; top: 90px; left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--ink); color: var(--bg);
+    padding: 14px 24px; border-radius: 999px;
+    font-size: 13px; font-weight: 500;
+    z-index: 200;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s, transform .3s;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1080px) {
+    .calc { grid-template-columns: 1fr; }
+    .calc-result { position: static; }
+  }
+  @media (max-width: 720px) {
+    .container { padding: 0 16px; }
+    .nav { padding: 12px 16px; }
+    .nav .logo img { height: 44px !important; }
+    .panel.cream { padding: 100px 0 60px; }
+    .grid2, .grid3 { grid-template-columns: 1fr; gap: 10px; }
+    .calc-form, .calc-result { padding: 16px; width: 100%; box-sizing: border-box; overflow: hidden; }
+    .calc-card { padding: 14px 16px; overflow: hidden; }
+    .nav-actions .btn { display: none; }
+    .res-final { font-size: 30px; }
+    .res-metrics { grid-template-columns: 1fr; gap: 8px; }
+    .res-actions { flex-direction: column; gap: 8px; }
+    .res-actions .btn { width: 100%; justify-content: center; }
+    .chips { gap: 4px; }
+    .chip { font-size: 10px; padding: 4px 8px; white-space: normal; }
+    .qfab { bottom: 16px; right: 16px; padding: 11px 16px; font-size: 12px; }
+    .qdraw { width: 100vw; }
+  }
+
+  /* ── QUOTER DRAWER ── */
+  .qover {
+    position: fixed; inset: 0; background: rgba(43,43,43,.45);
+    z-index: 150; opacity: 0; pointer-events: none;
+    transition: opacity .3s;
+  }
+  .qover.open { opacity: 1; pointer-events: all; }
+
+  .qdraw {
+    position: fixed; right: 0; top: 0; bottom: 0;
+    width: min(500px, 100vw); z-index: 160;
+    background: var(--surface); border-left: 1px solid var(--line);
+    display: flex; flex-direction: column;
+    transform: translateX(102%);
+    transition: transform .36s cubic-bezier(.22,.68,0,1.2);
+    box-shadow: -12px 0 48px rgba(0,0,0,.15);
+  }
+  .qdraw.open { transform: translateX(0); }
+
+  .qdraw-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 22px; border-bottom: 1px solid var(--line); flex-shrink: 0;
+  }
+  .qdraw-head h3 { font-size: 15px; font-weight: 600; letter-spacing: -.02em; }
+  .qdraw-head .hbtns { display: flex; gap: 6px; align-items: center; }
+
+  .qdraw-body { flex: 1; overflow-y: auto; padding: 18px 22px; }
+
+  .q-empty-state {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 220px; gap: 14px;
+    color: var(--ink-dimmer); text-align: center;
+  }
+  .q-empty-state p { font-size: 13px; line-height: 1.7; }
+
+  .q-item {
+    background: var(--bg-soft); border-radius: 12px;
+    border: 1px solid var(--line); padding: 14px 16px; margin-bottom: 10px;
+    transition: border-color .15s;
+  }
+  .q-item:hover { border-color: var(--line-2); }
+  .q-item-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 8px; margin-bottom: 8px;
+  }
+  .q-item-name { font-size: 13.5px; font-weight: 600; color: var(--ink); flex: 1; }
+  .q-item-del {
+    background: none; border: none; cursor: pointer;
+    color: var(--ink-dimmer); padding: 4px; border-radius: 6px;
+    display: flex; transition: color .15s, background .15s; flex-shrink: 0;
+  }
+  .q-item-del:hover { color: var(--danger); background: rgba(142,58,43,.08); }
+  .q-item-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line);
+  }
+  .q-item-unit { font-size: 11.5px; color: var(--ink-dim); }
+  .q-item-total { font-family: var(--mono); font-size: 16px; font-weight: 600; color: var(--accent); }
+
+  .qdraw-foot {
+    padding: 18px 22px; border-top: 1px solid var(--line);
+    flex-shrink: 0; background: var(--bg-soft);
+  }
+  .qtot-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+  }
+  .qtot-row .lab { font-size: 12.5px; color: var(--ink-dim); }
+  .qtot-row .amt { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--ink); }
+
+  .btn-sm { padding: 8px 14px !important; font-size: 12px !important; gap: 6px !important; }
+
+  /* Cart FAB */
+  .qfab {
+    position: fixed; bottom: 28px; right: 28px; z-index: 140;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--ink); color: var(--bg);
+    border: none; cursor: pointer; padding: 13px 20px; border-radius: 999px;
+    font-family: 'Archivo', 'Arial Narrow', Arial, sans-serif; font-size: 13px; font-weight: 600;
+    box-shadow: 0 6px 24px rgba(43,43,43,.28);
+    transition: background .2s, transform .2s, box-shadow .2s, opacity .3s;
+    opacity: 0; pointer-events: none; transform: translateY(16px);
+  }
+  .qfab.on { opacity: 1; pointer-events: all; transform: translateY(0); }
+  .qfab:hover { background: var(--accent); transform: translateY(-2px) !important; box-shadow: 0 10px 32px rgba(43,43,43,.3); }
+  .qbadge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--bg); color: var(--ink);
+    font-size: 11px; font-weight: 700; font-family: var(--mono);
+  }
+
+  /* Drawer tabs */
+  .qdraw-tabs { display: flex; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+  .qtab {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 11px 8px; background: none; border: none; border-bottom: 2px solid transparent;
+    cursor: pointer; font-family: 'Archivo', 'Arial Narrow', Arial, sans-serif;
+    font-size: 12.5px; font-weight: 500; color: var(--ink-dim);
+    margin-bottom: -1px; transition: color .15s, border-color .15s;
+  }
+  .qtab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .qtab:hover:not(.active) { color: var(--ink); background: var(--bg-soft); }
+  .qtab-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 18px; height: 18px; border-radius: 99px; padding: 0 4px;
+    background: var(--accent); color: #fff;
+    font-size: 10px; font-weight: 700; font-family: var(--mono);
+  }
+
+  /* Ajuste de ganancia por ítem */
+  .q-adj { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+  .q-adj-lbl {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--ink-dimmer); margin-bottom: 6px; display: block;
+  }
+  .q-adj-row { display: flex; align-items: center; gap: 8px; }
+  .q-adj-row input[type=range] { flex: 1; }
+  .q-adj-pct {
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    min-width: 40px; text-align: right; transition: color .15s;
+  }
+  .q-adj-pct.pos { color: var(--green); }
+  .q-adj-pct.neg { color: var(--danger); }
+  .q-adj-pct.zer { color: var(--ink-dim); }
+  .q-profit-row {
+    display: flex; justify-content: space-between; align-items: center; margin-top: 7px;
+  }
+  .q-profit-info { font-size: 11.5px; color: var(--ink-dim); }
+  .q-profit-v { font-family: var(--mono); font-weight: 600; font-size: 11.5px; }
+  .q-profit-v.pos { color: var(--green); }
+  .q-profit-v.neg { color: var(--danger); }
+
+  /* Historial */
+  .q-hist-item {
+    background: var(--bg-soft); border-radius: 12px;
+    border: 1px solid var(--line); padding: 14px 16px; margin-bottom: 10px;
+    transition: border-color .15s;
+  }
+  .q-hist-item:hover { border-color: var(--line-2); }
+  .q-hist-hd { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .q-hist-num { font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
+  .q-hist-client { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .q-hist-total { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--ink); text-align: right; }
+  .q-hist-date { font-size: 10px; color: var(--ink-dimmer); text-align: right; margin-top: 2px; }
+  .q-hist-acts { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+  .q-hist-del-btn {
+    background: none; border: 1px solid var(--line-2); cursor: pointer;
+    color: var(--ink-dimmer); padding: 6px 10px; border-radius: 999px;
+    display: flex; align-items: center; transition: all .15s;
+  }
+  .q-hist-del-btn:hover { color: var(--danger); background: rgba(142,58,43,.07); border-color: rgba(142,58,43,.25); }
+
+  /* ── IMAGE ZONE ── */
+  .img-zone {
+    border: 1.5px dashed var(--line-2);
+    border-radius: 10px; cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative; overflow: hidden;
+    background: var(--bg-soft);
+    min-height: 76px;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 10px;
+  }
+  .img-zone:hover, .img-zone:focus-within { border-color: var(--accent); background: rgba(110,113,81,.05); outline: none; }
+  .img-zone.has-img { border-style: solid; border-color: var(--accent); min-height: auto; }
+  .img-zone-hint {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    color: var(--ink-dimmer); font-size: 12px; padding: 16px 20px;
+    pointer-events: none; text-align: center;
+  }
+  .img-zone-hint svg { opacity: .4; }
+  .img-preview-wrap { position: relative; width: 100%; }
+  .img-preview { width: 100%; max-height: 200px; object-fit: contain; display: block; }
+  .img-clear-btn {
+    position: absolute; top: 7px; right: 7px;
+    background: rgba(43,43,43,.72); color: #fff;
+    border: none; border-radius: 50%;
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 16px; line-height: 1;
+    transition: background .15s;
+  }
+  .img-clear-btn:hover { background: var(--danger); }
+
+  /* ── Q-ITEM IMAGE ── */
+  .q-item-img-wrap { border-radius: 8px; overflow: hidden; margin-bottom: 10px; border: 1px solid var(--line); background: var(--surface-2); }
+  .q-item-img { width: 100%; max-height: 180px; display: block; object-fit: cover; }
+
+  /* ── Q-ITEM DIMS ── */
+  .q-dims { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+  .q-dim-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
+  .q-dim-row .dim-field label { font-size: 10px; color: var(--ink-dimmer); margin-bottom: 2px; display: block; }
+  .q-dim-row input {
+    background: var(--surface); border: 1px solid var(--line-2);
+    border-radius: 6px; padding: 7px 8px;
+    font-family: var(--mono); font-size: 12px; color: var(--ink);
+    width: 100%; transition: border-color .15s;
+  }
+  .q-dim-row input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(110,113,81,.15); }
+
+  /* Kora internal calculator skin */
+  @font-face {
+    font-family: "Archivo";
+    src: url("../assets/fonts/Archivo-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Archivo";
+    src: url("../assets/fonts/Archivo-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Archivo";
+    src: url("../assets/fonts/Archivo-ExtraBold.ttf") format("truetype");
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+  }
+  :root {
+    --bg: #c4bbfe;
+    --bg-soft: #ffcfdb;
+    --surface: #ffffff;
+    --surface-2: #dbebf5;
+    --ink: #001233;
+    --ink-2: #404040;
+    --ink-dim: rgba(0,18,51,.68);
+    --ink-dimmer: rgba(0,18,51,.42);
+    --line: rgba(0,18,51,.16);
+    --line-2: #404040;
+    --accent: #fe7e01;
+    --accent-hover: #d96b00;
+    --accent-soft: #fbee64;
+    --olive: #fe7e01;
+    --green: #1f7a3c;
+    --warning: #8a6b1f;
+    --danger: #8e3a2b;
+    --mono: "Archivo", "Arial Narrow", Arial, sans-serif;
+  }
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Archivo", "Arial Narrow", Arial, sans-serif;
+  }
+  h1, h2, h3, h4 { letter-spacing: 0; }
+  .nav {
+    position: sticky;
+    top: 0;
+    padding: 15px 40px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--ink-2);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .logo { letter-spacing: 0; }
+  .nav-links a {
+    border-radius: 4px;
+    color: var(--ink-2);
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--ink); }
+  .panel.cream {
+    padding: 58px 0 78px;
+    background: var(--bg);
+  }
+  .container { max-width: 1200px; }
+  .eyebrow {
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .eyebrow::before { background: var(--accent); height: 3px; }
+  .sec-head {
+    align-items: center;
+    margin-bottom: 32px;
+    padding: 28px;
+    border: 1px solid var(--ink-2);
+    border-radius: 4px;
+    background: var(--accent-soft);
+  }
+  .sec-head h2 {
+    max-width: 690px;
+    color: var(--accent);
+    font-size: 40px;
+    line-height: .98;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  .sec-head h2 em {
+    color: var(--ink);
+    font-style: normal;
+    font-weight: 800;
+  }
+  .sec-head .side p {
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.38;
+  }
+  .calc { grid-template-columns: minmax(0, 1.32fr) minmax(360px, .68fr); }
+  .calc-form,
+  .calc-result,
+  .calc-card,
+  .res-metric,
+  .q-item,
+  .q-hist-item,
+  .delivery,
+  .img-zone,
+  .qdraw,
+  .qdraw-foot {
+    border-color: var(--ink-2);
+    border-radius: 4px;
+    box-shadow: none;
+  }
+  .calc-form,
+  .calc-result,
+  .qdraw { background: var(--surface); }
+  .calc-card,
+  .q-item,
+  .q-hist-item { background: var(--bg-soft); }
+  .calc-result { top: 92px; }
+  .cc-title {
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .04em;
+  }
+  .cc-title .num {
+    border-radius: 4px;
+    background: var(--accent);
+    color: var(--surface);
+  }
+  .field label { color: var(--ink); font-weight: 700; }
+  .field input,
+  .field select,
+  .field textarea,
+  .q-dim-row input {
+    border-color: #949596;
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus,
+  .q-dim-row input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(254,126,1,.22);
+  }
+  .btn,
+  .btn-sm,
+  .chip,
+  .badge,
+  .qfab,
+  .qbadge,
+  .q-hist-del-btn,
+  .img-clear-btn {
+    border-radius: 4px !important;
+  }
+  .btn-primary,
+  .btn-accent,
+  .qfab {
+    background: var(--accent);
+    color: var(--surface);
+  }
+  .btn-primary:hover,
+  .btn-accent:hover,
+  .qfab:hover { background: var(--accent-hover); }
+  .btn-ghost {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+  .btn-ghost:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--surface);
+  }
+  .chip,
+  .res-metric,
+  .delivery,
+  .info-box { background: var(--surface-2); }
+  .delivery { background: var(--accent-soft); }
+  .res-tag,
+  .res-final .cur,
+  .res-row.total .v,
+  .q-item-total,
+  .q-hist-num,
+  .q-hist-total,
+  .qtab.active { color: var(--accent); }
+  .res-tag::before,
+  input[type="range"]::-webkit-slider-thumb,
+  .delivery .bar-fill { background: var(--accent); }
+  .toast { background: var(--ink); color: var(--surface); border-radius: 4px; }
+  .qdraw-tabs { border-bottom-color: var(--ink-2); }
+  .qtab.active { border-bottom-color: var(--accent); }
+  @media (max-width: 720px) {
+    .nav { padding: 12px 16px; }
+    .sec-head { padding: 20px; }
+    .sec-head h2 { font-size: 34px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════ NAV ══════════════════════ -->
+<nav class="nav" id="nav">
+  <a href="../index.html" class="logo">
+    <img src="../assets/icon-06.svg" alt="Kora Studio" style="height: 57px; width: auto; display: block;">
+  </a>
+  <div class="nav-links" id="nav-links">
+    <a href="../index.html" style="font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform: rotate(180deg);"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      Volver al Inicio
+    </a>
+  </div>
+</nav>
+
+<!-- ══════════════════════ CALCULADORA ══════════════════════ -->
+<section class="panel cream" id="calculadora">
+  <div class="container">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow reveal">Calculadora</span>
+        <h2 class="reveal d1">¿Tienes tu archivo?<br/><em>Calcula el precio exacto.</em></h2>
+      </div>
+      <div class="side reveal d2">
+        <p>Carga los datos de tu slicer (peso y tiempo), elige material, ajusta cantidad y servicios. La calculadora estima precio, descuento por volumen y fecha de entrega en tiempo real.</p>
+      </div>
+    </div>
+
+    <div class="calc reveal d1">
+      <!-- LEFT: FORM -->
+      <div class="calc-form">
+
+        <!-- 1. Cliente -->
+        <div class="calc-card">
+          <div class="cc-title"><span class="num">1</span> Cliente y proyecto <span class="sub">(opcional)</span></div>
+          <div class="grid2">
+            <div class="field">
+              <label>Nombre del cliente</label>
+              <input type="text" id="client_name" placeholder="Ej: Juan Pérez">
+            </div>
+            <div class="field">
+              <label>Descripción</label>
+              <input type="text" id="project_name" placeholder="Ej: Maceta 100×100 mm">
+            </div>
+          </div>
+          <div class="field" style="margin-top:14px">
+            <label>Imagen de referencia <span style="font-weight:400;font-size:11px;color:var(--ink-dimmer)">(Pega con Ctrl+V · clic para subir)</span></label>
+            <div class="img-zone" id="img-zone" tabindex="0">
+              <input type="file" id="img-file" accept="image/*" style="display:none">
+              <div class="img-zone-hint" id="img-hint">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>Pega con Ctrl+V o haz clic para subir</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Slicer -->
+        <div class="calc-card">
+          <div class="cc-title"><span class="num">2</span> Datos del slicer <span class="sub">(Bambu Studio · Resultado del corte)</span></div>
+          <div class="info-box">
+            En tu slicer abre <strong>Resultado del corte → Resumen</strong> y copia el peso (g) y el tiempo (h). Para 4h 43m convierte a 4.72 h.
+          </div>
+          <div class="grid2">
+            <div class="field">
+              <label>Peso impreso (g)</label>
+              <input type="number" id="weight_g" class="big" value="80" min="1" step="1">
+              <span class="hint">Campo "g" del slicer</span>
+            </div>
+            <div class="field">
+              <label>Tiempo de impresión</label>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div>
+                  <input type="number" id="hours-h" class="big" value="1" min="0" step="1" placeholder="0">
+                  <span class="hint" style="display:block;margin-top:4px">horas</span>
+                </div>
+                <div>
+                  <input type="number" id="hours-m" class="big" value="0" min="0" max="59" step="1" placeholder="0">
+                  <span class="hint" style="display:block;margin-top:4px">minutos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="chips">
+            <span class="chip">Bambu A1 Combo · 220 W</span>
+            <span class="chip">Celsia · $746/kWh</span>
+            <span class="chip">Amortización · $1.000/h (fijo)</span>
+            <span class="chip">Reserva fallos · 10%</span>
+          </div>
+        </div>
+
+        <!-- 3. Material -->
+        <div class="calc-card">
+          <div class="cc-title"><span class="num">3</span> Material <span class="sub">(catálogo Zuluprints)</span></div>
+          <div class="field">
+            <label>Filamento</label>
+            <select id="filament_type">
+              <option value="70|PLA+|1.24">PLA+ — $70/g</option>
+              <option value="84|HT-PLA|1.24">HT-PLA (alta temp) — $84/g</option>
+              <option value="84|LW-PLA|0.64">LW-PLA (liviano) — $84/g</option>
+              <option value="89|PLA HS|1.24">PLA HS (alta velocidad) — $89/g</option>
+              <option value="95|HR-PLA|1.24">HR-PLA (alta resistencia) — $95/g</option>
+              <option value="90|PLA SILK|1.24">PLA SILK / Seda — $90/g</option>
+              <option value="120|PLA SILK Bi-color|1.24">PLA SILK Bi-color — $120/g</option>
+              <option value="90|PLA Glow|1.24">PLA Glow (brilla) — $90/g</option>
+              <option value="90|PLA Glitter|1.24">PLA Glitter — $90/g</option>
+              <option value="84|PLA Madera|1.28">PLA Madera — $84/g</option>
+              <option value="75|PETG|1.27">PETG — $75/g</option>
+              <option value="90|PETG Premium|1.27">PETG Premium — $90/g</option>
+              <option value="84|ABS+|1.04">ABS+ — $84/g</option>
+              <option value="95|ASA|1.07">ASA (exterior UV) — $95/g</option>
+              <option value="105|TPU|1.21">TPU (flexible) — $105/g</option>
+              <option value="95|PP|0.91">PP Polipropileno — $95/g</option>
+              <option value="120|POM|1.41">POM (acetal) — $120/g</option>
+              <option value="140|Fibra de Carbono|1.30">Fibra de Carbono — $140/g</option>
+              <option value="95|PCL|1.13">PCL (biodegradable) — $95/g</option>
+              <option value="0|Personalizado|1.24">✏️ Personalizado</option>
+            </select>
+          </div>
+          <div class="chips" id="mat-chips">
+            <span class="chip" id="chip-price">$70/g</span>
+            <span class="chip" id="chip-density">Densidad 1.24 g/cm³</span>
+            <span class="chip">Desperdicio soporte 15%</span>
+          </div>
+          <div id="custom-price-wrap" style="display:none; margin-top:12px">
+            <div class="field">
+              <label>Precio por gramo personalizado (COP)</label>
+              <input type="number" id="custom_price_g" value="70" min="1" step="1">
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Servicios -->
+        <div class="calc-card">
+          <div class="cc-title"><span class="num">4</span> Servicios adicionales <span class="sub">(deja en 0 si no aplica)</span></div>
+          <div class="grid2">
+            <div class="field">
+              <label>Modelado / Diseño 3D (COP)</label>
+              <input type="number" id="design_cost" value="0" min="0" step="1000">
+              <span class="hint">Si el cliente trae el archivo: $0</span>
+            </div>
+            <div class="field">
+              <label>Post-procesado (COP)</label>
+              <input type="number" id="post_cost" value="0" min="0" step="1000">
+              <span class="hint">Pintura, lijado, ensamble</span>
+            </div>
+            <div class="field">
+              <label>Empaque (COP)</label>
+              <input type="number" id="pack_cost" value="0" min="0" step="500">
+            </div>
+            <div class="field">
+              <label>Envío / domicilio (COP)</label>
+              <input type="number" id="ship_cost" value="0" min="0" step="1000">
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Cantidad -->
+        <div class="calc-card">
+          <div class="cc-title"><span class="num">5</span> Margen y cantidad</div>
+          <div class="grid2" style="margin-bottom:12px">
+            <div class="field">
+              <label>Margen de ganancia (%)</label>
+              <input type="number" id="margin" class="big" value="100" min="0" max="500" step="5">
+              <span class="hint">Recomendado: 35–50%</span>
+            </div>
+            <div class="field">
+              <label>Cantidad de unidades</label>
+              <input type="number" id="qty" class="big" value="1" min="1" step="1">
+              <span class="hint">Descuento por volumen automático</span>
+            </div>
+          </div>
+          <div class="chips">
+            <span class="chip">Margen mínimo · 15%</span>
+            <span class="chip">Ahorro al cliente · 60% del extra</span>
+          </div>
+          <div id="discount-alert" style="display:none; margin-top:12px"></div>
+
+          <div style="margin-top:18px; font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink-dim)">Curva de precios por cantidad</div>
+          <div style="overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 12px; width: 100%;">
+            <table class="disc-table" style="min-width: 500px;">
+              <thead>
+                <tr>
+                  <th>Cant.</th>
+                  <th>Costo/ud</th>
+                  <th>Precio sugerido</th>
+                  <th>Dto.</th>
+                  <th>Margen</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="disc-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 6. Entrega -->
+        <div class="calc-card">
+          <div class="cc-title"><span class="num">6</span> Tiempo de entrega estimado</div>
+          <div class="chips" style="margin-top:0; margin-bottom:14px">
+            <span class="chip">Jornada 12 h/día</span>
+            <span class="chip">1 descanso cada 6 días</span>
+            <span class="chip">Margen error 20%</span>
+          </div>
+          <div class="grid2">
+            <div class="res-metric"><div class="l">Horas totales</div><div class="v" id="t-total-hours">0 h</div></div>
+            <div class="res-metric"><div class="l">Con margen error</div><div class="v" id="t-total-hours-err">0 h</div></div>
+            <div class="res-metric"><div class="l">Días hábiles</div><div class="v" id="t-work-days">0</div></div>
+            <div class="res-metric"><div class="l">Días descanso</div><div class="v" id="t-rest-days">0</div></div>
+          </div>
+          <div class="delivery">
+            <div class="lab">Fecha estimada de entrega</div>
+            <div class="date" id="t-delivery-date">—</div>
+            <div class="meta" id="t-delivery-detail">—</div>
+            <div class="bar"><div class="bar-fill" id="t-bar"></div></div>
+          </div>
+          <div id="timeline-wrap" style="margin-top:14px">
+            <div style="font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink-dim)">Distribución de producción</div>
+            <div class="timeline" id="t-timeline"></div>
+            <div class="legend">
+              <span><span style="background:var(--accent)"></span>Día hábil</span>
+              <span><span style="background:var(--surface-2); border:1px solid var(--line-2)"></span>Descanso</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Advanced -->
+        <div class="calc-card">
+          <div class="adv-trigger" id="adv-trigger">
+            <div class="cc-title" style="margin-bottom:0"><span class="num">⚙</span> Configuración avanzada</div>
+            <span class="toggle-text" id="adv-label">Mostrar →</span>
+          </div>
+          <div class="adv-panel" id="adv-panel">
+            <div class="info-box" style="margin-top:18px">
+              Valores precargados con datos reales de tu operación. Modifícalos solo si cambian (nueva tarifa, distinta máquina).
+            </div>
+            <div class="grid3" style="margin-bottom:12px">
+              <div class="field"><label>Consumo Bambu A1 (W)</label><input type="number" id="adv_watts" value="220" min="50" step="10"><span class="hint">Promedio ~220 W</span></div>
+              <div class="field"><label>Tarifa kWh (COP)</label><input type="number" id="adv_kwh" value="746" min="1" step="1"><span class="hint">De tu factura</span></div>
+              <div class="field"><label>Amortización (COP/h)</label><div style="background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-family:var(--mono);font-size:13.5px;color:var(--ink-dim)">$1.000 <span style="font-size:10px;color:var(--ink-dimmer)">(fijo)</span></div></div>
+            </div>
+            <div class="grid3" style="margin-bottom:12px">
+              <div class="field"><label>% Desperdicio soporte</label><input type="number" id="adv_support" value="15" min="0" max="100" step="1"></div>
+              <div class="field"><label>% Reserva fallos</label><input type="number" id="adv_fail" value="10" min="0" max="60" step="1"></div>
+              <div class="field"><label>Margen mínimo (%)</label><input type="number" id="adv_minmargin" value="15" min="5" max="100" step="5"></div>
+            </div>
+            <div class="grid3">
+              <div class="field"><label>% Ahorro al cliente</label><input type="number" id="adv_share" value="60" min="0" max="100" step="5"></div>
+              <div class="field"><label>Margen error operativo (%)</label><input type="number" id="adv_timeerr" value="20" min="0" max="100" step="5"></div>
+              <div class="field"><label>Horas trabajo/día</label><input type="number" id="adv_workhours" value="12" min="1" max="24" step="1"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hidden values -->
+        <input type="hidden" id="fil_cost_g" value="70">
+        <input type="hidden" id="density" value="1.24">
+        <input type="hidden" id="support_pct" value="15">
+        <input type="hidden" id="watts" value="220">
+        <input type="hidden" id="kwh_cost" value="746">
+        <input type="hidden" id="depreciation" value="1000">
+        <input type="hidden" id="fail_pct" value="10">
+        <input type="hidden" id="min_margin" value="15">
+        <input type="hidden" id="share_factor_pct" value="60">
+        <input type="hidden" id="time_error_pct" value="20">
+        <input type="hidden" id="work_hours_day" value="12">
+        <input type="hidden" id="rest_every" value="6">
+
+      </div>
+
+      <!-- RIGHT: RESULTS -->
+      <div class="calc-result">
+        <div class="res-tag">Tu cotización en vivo</div>
+        <div class="res-list-price" id="r-list-price">$0</div>
+        <div class="res-final"><span class="cur">COP</span><span id="r-price">$0</span></div>
+        <div class="res-meta">
+          <span class="badge badge-ink" id="r-qty-badge">1 ud</span>
+          <span class="badge" id="r-disc-badge">Precio lista</span>
+          <span>Margen real: <strong id="r-eff-margin">0</strong>%</span>
+        </div>
+
+        <hr class="res-divider"/>
+
+        <div style="font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink-dim); margin-bottom:8px">Desglose por unidad</div>
+        <div class="res-row"><span class="k">Filamento (<span id="b-fil-g">0</span> g)</span><span class="v" id="b-filament">$0</span></div>
+        <div class="res-row"><span class="k">Energía</span><span class="v" id="b-energy">$0</span></div>
+        <div class="res-row"><span class="k">Desgaste máquina</span><span class="v" id="b-dep">$0</span></div>
+        <div class="res-row"><span class="k">Servicios + diseño/qty</span><span class="v" id="b-services">$0</span></div>
+        <div class="res-row"><span class="k">Envío</span><span class="v" id="b-ship">$0</span></div>
+        <div class="res-row"><span class="k">Reserva fallos</span><span class="v" id="b-fail">$0</span></div>
+        <div class="res-row" style="margin-top:8px; padding-top:10px; border-top:1px solid var(--line)"><span class="k">Costo real unitario</span><span class="v" id="b-unit-cost">$0</span></div>
+        <div class="res-row"><span class="k">Margen lista (<span id="b-margin-show">100</span>%)</span><span class="v" id="b-list-ref">$0</span></div>
+        <div class="res-row savings"><span class="k">Ahorro compartido</span><span class="v" id="b-savings-given">$0</span></div>
+        <div class="res-row total"><span class="k">Precio final / unidad</span><span class="v" id="b-unit-price">$0</span></div>
+
+        <div class="res-metrics">
+          <div class="res-metric"><div class="l">Total (<span id="r-qty-label">1</span> ud)</div><div class="v" id="r-total-price">$0</div></div>
+          <div class="res-metric"><div class="l">Ganancia neta</div><div class="v" style="color:var(--green)" id="r-profit">$0</div></div>
+          <div class="res-metric"><div class="l">COP/gramo</div><div class="v" id="r-per-g">$0</div></div>
+          <div class="res-metric"><div class="l">COP/hora</div><div class="v" id="r-per-h">$0</div></div>
+          <div class="res-metric"><div class="l">Precio mín. (sin perder)</div><div class="v" id="r-floor">$0</div></div>
+          <div class="res-metric"><div class="l">Entrega</div><div class="v" id="r-delivery-date" style="font-size:14px">—</div></div>
+        </div>
+
+        <div id="edit-mode-banner" style="display:none;background:rgba(110,113,81,.09);border:1.5px solid rgba(110,113,81,.3);border-radius:10px;padding:10px 14px;margin-bottom:10px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">✏ Editando ítem</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <span id="edit-mode-name" style="font-size:13px;font-weight:600;color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>
+            <button id="cancel-edit" style="background:none;border:1px solid var(--line-2);cursor:pointer;color:var(--ink-dim);font-size:11px;font-family:'Archivo','Arial Narrow',Arial,sans-serif;font-weight:500;padding:5px 10px;border-radius:999px;transition:all .15s;flex-shrink:0;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">✕ Cancelar</button>
+          </div>
+        </div>
+        <div class="res-actions">
+          <button class="btn btn-accent" id="add-to-quote">
+            Agregar al cotizador
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <button class="btn btn-ghost" id="save-quote">
+            Guardar
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ QUOTER OVERLAY ══════════════════════ -->
+<div class="qover" id="qover"></div>
+
+<!-- ══════════════════════ QUOTER DRAWER ══════════════════════ -->
+<div class="qdraw" id="qdraw">
+  <div class="qdraw-head">
+    <h3>Cotizador</h3>
+    <div class="hbtns">
+      <button class="btn btn-ghost btn-sm" id="q-clear">Limpiar</button>
+      <button class="btn btn-primary btn-sm" id="q-pdf">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Generar PDF
+      </button>
+      <button id="q-close" style="background:none;border:none;cursor:pointer;color:var(--ink-dim);padding:6px;border-radius:6px;display:flex;transition:background .15s;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="qdraw-tabs">
+    <button class="qtab active" id="tab-cot">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      En curso
+      <span class="qtab-badge" id="tab-cot-badge" style="display:none">0</span>
+    </button>
+    <button class="qtab" id="tab-hist">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Historial
+      <span class="qtab-badge" id="tab-hist-badge" style="display:none;background:var(--ink)">0</span>
+    </button>
+  </div>
+
+  <!-- Vista: cotizador en curso -->
+  <div class="qdraw-body" id="q-body-cot">
+    <div class="q-empty-state" id="q-empty">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <p>El cotizador está vacío.<br/>Calcula una pieza y presiona<br/><strong>Agregar al cotizador</strong>.</p>
+    </div>
+    <div id="q-list"></div>
+  </div>
+
+  <!-- Vista: historial -->
+  <div class="qdraw-body" id="q-body-hist" style="display:none">
+    <div class="q-empty-state" id="hist-empty">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <p>Aún no has generado<br/>ninguna cotización en PDF.<br/>El historial aparecerá aquí.</p>
+    </div>
+    <div id="hist-list"></div>
+  </div>
+
+  <!-- Footer cotizador -->
+  <div class="qdraw-foot" id="qdraw-foot">
+    <div class="qtot-row">
+      <span class="lab">Total ajustado (<span id="q-count">0</span> ítem<span id="q-plurals">s</span>)</span>
+      <span class="amt" id="q-grand">—</span>
+    </div>
+    <button class="btn btn-accent" id="q-pdf2" style="width:100%;justify-content:center;">
+      Generar cotización en PDF
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- Cart FAB -->
+<button class="qfab" id="qfab">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+  Ver cotizador
+  <span class="qbadge" id="qbadge">0</span>
+</button>
+
+<!-- ══════════════════════ SIMPLE FOOTER ══════════════════════ -->
+<footer style="padding: 40px 0; background: var(--ink); color: var(--bg); text-align: center; font-size: 12px; border-top: 1px solid rgba(255,255,255,.08);">
+  <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <span>© 2026 Kora Estudio · Todos los derechos reservados</span>
+    <span>Hecho con precisión en Cali · Bambu A1 Combo</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast">✓ Acción completada</div>
+
+<!-- ══════════════════════ SCRIPTS ══════════════════════ -->
+<script>
+/* ─── Reveal ─── */
+const io = new IntersectionObserver(es => {
+  es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
+}, { threshold: .12 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ─── Nav ─── */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  // Nav keeps background on standalone page since there is no hero element
+}, { passive: true });
+
+/* ════════════════════════════════════════════════════════
+   CALCULATOR (adapted from cotizador3d) — light theme
+   ════════════════════════════════════════════════════════ */
+function id(x){ return document.getElementById(x); }
+function set(x,v){ const e = id(x); if (e) e.textContent = v; }
+
+/* Parsea horas en múltiples formatos: 4h43m · 4:43 · 4.72 · 43m */
+function parseHoursInput(str) {
+  str = (str || '').trim().toLowerCase().replace(',', '.');
+  if (!str) return 0;
+  // 4h43m  /  4h 43m  /  4h43
+  const hm = str.match(/^(\d+(?:\.\d+)?)\s*h\s*(\d+(?:\.\d+)?)\s*m?$/);
+  if (hm) return parseFloat(hm[1]) + parseFloat(hm[2]) / 60;
+  // 4:43
+  const col = str.match(/^(\d+):(\d{1,2})$/);
+  if (col) return parseFloat(col[1]) + parseFloat(col[2]) / 60;
+  // 4h  (solo horas)
+  const hOnly = str.match(/^(\d+(?:\.\d+)?)\s*h$/);
+  if (hOnly) return parseFloat(hOnly[1]);
+  // 43m  (solo minutos)
+  const mOnly = str.match(/^(\d+(?:\.\d+)?)\s*m$/);
+  if (mOnly) return parseFloat(mOnly[1]) / 60;
+  // número plano
+  return parseFloat(str) || 0;
+}
+
+const fmt = n => '$' + Math.round(n).toLocaleString('es-CO');
+const fmtCOP = n => Math.round(n).toLocaleString('es-CO',{style:'currency',currency:'COP',minimumFractionDigits:0});
+
+function costAtQty(p, qty) {
+  const fixedPU = (p.desCost + p.packCost) / qty;
+  const base = p.filCost + p.energyCost + p.machCost + p.postCost + p.shipCost + fixedPU;
+  return base * (1 + p.failPct/100);
+}
+
+let displayPrice = 0, targetPrice = 0, rafId = null;
+function tweenPrice() {
+  cancelAnimationFrame(rafId);
+  const step = () => {
+    const diff = targetPrice - displayPrice;
+    if (Math.abs(diff) < 1) { displayPrice = targetPrice; id('r-price').textContent = fmtCOP(displayPrice); return; }
+    displayPrice += diff * 0.2;
+    id('r-price').textContent = fmtCOP(Math.round(displayPrice));
+    rafId = requestAnimationFrame(step);
+  };
+  step();
+}
+
+function calc() {
+  const hours      = (parseFloat(id('hours-h').value) || 0) + (parseFloat(id('hours-m').value) || 0) / 60;
+  const watts      = parseFloat(id('watts').value) || 0;
+  const kwhCost    = parseFloat(id('kwh_cost').value) || 0;
+  const filCostG   = parseFloat(id('fil_cost_g').value) || 0;
+  const weightG    = parseFloat(id('weight_g').value) || 0;
+  const supportPct = parseFloat(id('support_pct').value) || 0;
+  const desCost    = parseFloat(id('design_cost').value) || 0;
+  const postCost   = parseFloat(id('post_cost').value) || 0;
+  const packCost   = parseFloat(id('pack_cost').value) || 0;
+  const shipCost   = parseFloat(id('ship_cost').value) || 0;
+  const dep        = parseFloat(id('depreciation').value) || 0;
+  const failPct    = parseFloat(id('fail_pct').value) || 0;
+  const margin     = parseFloat(id('margin').value) || 100;
+  const qty        = Math.max(1, parseInt(id('qty').value) || 1);
+  const minMargin  = parseFloat(id('min_margin').value) || 15;
+  const sharePct   = parseFloat(id('share_factor_pct').value) || 60;
+
+  const totalWeightG = weightG * (1 + supportPct/100);
+  const filCost = filCostG * totalWeightG;
+  const kwhUsed = hours * (watts/1000);
+  const energyCost = kwhUsed * kwhCost;
+  const machCost = dep * hours;
+
+  const p = { filCost, energyCost, machCost, postCost, shipCost, desCost, packCost, failPct };
+  const unitCost1 = costAtQty(p, 1);
+  const listPrice = unitCost1 * (1 + margin/100);
+  const unitCostN = costAtQty(p, qty);
+  const floorN = unitCostN * (1 + minMargin/100);
+
+  const logFactor = qty > 1 ? Math.log10(qty) / Math.log10(1000) : 0;
+  const shareRatio = logFactor * (sharePct/100);
+  const room = Math.max(0, listPrice - floorN);
+  const discountAmt = room * Math.min(1, shareRatio);
+  const finalPrice = Math.max(floorN, listPrice - discountAmt);
+
+  const clientDiscPct = listPrice > 0 ? (listPrice - finalPrice)/listPrice*100 : 0;
+  const effectiveMargin = unitCostN > 0 ? (finalPrice - unitCostN)/unitCostN*100 : 0;
+  const totalPrice = finalPrice * qty;
+  const totalProfit = (finalPrice - unitCostN) * qty;
+
+  const fixedPU = (desCost + packCost) / qty;
+  const base = filCost + energyCost + machCost + postCost + shipCost + fixedPU;
+  const failRes = base * (failPct/100);
+
+  // Right column
+  id('r-list-price').textContent = fmtCOP(listPrice);
+  if (clientDiscPct < 0.5) id('r-list-price').style.display = 'none';
+  else id('r-list-price').style.display = '';
+  targetPrice = finalPrice; tweenPrice();
+  id('r-qty-badge').textContent = `${qty} ud`;
+  set('r-qty-label', qty);
+  set('r-total-price', fmtCOP(totalPrice));
+  set('r-profit', fmtCOP(Math.max(0, totalProfit)));
+  set('r-eff-margin', effectiveMargin.toFixed(1));
+
+  const dBadge = id('r-disc-badge');
+  if (clientDiscPct >= 10) { dBadge.className = 'badge badge-green'; dBadge.textContent = clientDiscPct.toFixed(1)+'% dto.'; }
+  else if (clientDiscPct >= 1) { dBadge.className = 'badge badge-amber'; dBadge.textContent = clientDiscPct.toFixed(1)+'% dto.'; }
+  else { dBadge.className = 'badge badge-ink'; dBadge.textContent = 'Precio lista'; }
+
+  set('b-energy', fmtCOP(energyCost));
+  set('b-fil-g', Math.round(totalWeightG));
+  set('b-filament', fmtCOP(filCost));
+  set('b-dep', fmtCOP(machCost));
+  set('b-services', fmtCOP(postCost + fixedPU));
+  set('b-ship', fmtCOP(shipCost));
+  set('b-fail', fmtCOP(failRes));
+  set('b-unit-cost', fmtCOP(unitCostN));
+  set('b-margin-show', Math.round(margin));
+  set('b-list-ref', fmtCOP(listPrice));
+  set('b-savings-given', discountAmt > 0 ? '-'+fmtCOP(discountAmt) : '$0');
+  set('b-unit-price', fmtCOP(finalPrice));
+  set('r-per-g', totalWeightG > 0 ? fmtCOP(finalPrice/totalWeightG) : '—');
+  set('r-per-h', hours > 0 ? fmtCOP(finalPrice/hours) : '—');
+  set('r-floor', fmtCOP(floorN));
+
+  // Alert
+  const alertEl = id('discount-alert');
+  if (effectiveMargin < minMargin - 0.5) {
+    alertEl.style.cssText = 'display:block; padding:10px 14px; background:rgba(176,51,27,.08); border:1px solid rgba(176,51,27,.25); border-radius:8px; font-size:12px; color:var(--danger)';
+    alertEl.innerHTML = `⚠ Margen efectivo (${effectiveMargin.toFixed(1)}%) menor al mínimo (${minMargin}%). Revisa los costos.`;
+  } else if (qty > 1 && clientDiscPct >= 0.5) {
+    alertEl.style.cssText = 'display:block; padding:10px 14px; background:rgba(31,122,77,.07); border:1px solid rgba(31,122,77,.25); border-radius:8px; font-size:12px; color:var(--green)';
+    alertEl.innerHTML = `✓ ${qty} ud: cliente recibe <strong>${clientDiscPct.toFixed(1)}% dto.</strong> vs lista. Margen real <strong>${effectiveMargin.toFixed(1)}%</strong> (mín ${minMargin}%).`;
+  } else {
+    alertEl.style.display = 'none';
+  }
+
+  // Table
+  const tableQtys = [1, 3, 5, 10, 20, 50, 100, 200, 500];
+  const tbody = id('disc-tbody'); tbody.innerHTML = '';
+  tableQtys.forEach(q => {
+    const ucN = costAtQty(p, q);
+    const fpN = ucN * (1 + minMargin/100);
+    const rm = Math.max(0, listPrice - fpN);
+    const lf = q > 1 ? Math.log10(q)/Math.log10(1000) : 0;
+    const sr = lf * (sharePct/100);
+    const da = rm * Math.min(1, sr);
+    const sp = Math.max(fpN, listPrice - da);
+    const dp = listPrice > 0 ? (listPrice - sp)/listPrice*100 : 0;
+    const em = ucN > 0 ? (sp - ucN)/ucN*100 : 0;
+    const isNow = q === qty;
+    let status;
+    if (em < minMargin) status = '<span class="badge badge-red">Piso</span>';
+    else if (dp >= 10)  status = '<span class="badge badge-green">Dto. alto</span>';
+    else if (dp >= 1)   status = '<span class="badge badge-amber">Con dto.</span>';
+    else                status = '<span class="badge badge-ink">Lista</span>';
+    const tr = document.createElement('tr');
+    if (isNow) tr.className = 'now';
+    tr.innerHTML = `
+      <td>${q}${isNow ? ' <span class="badge badge-amber">← actual</span>' : ''}</td>
+      <td style="color:var(--ink-dim)">${fmtCOP(ucN)}</td>
+      <td><strong>${fmtCOP(sp)}</strong></td>
+      <td style="color:${dp>=1?'var(--green)':'var(--ink-dim)'}">${dp>=0.5?dp.toFixed(1)+'%':'—'}</td>
+      <td style="color:${em>=minMargin?'var(--green)':'var(--danger)'}">${em.toFixed(1)}%</td>
+      <td>${status}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Delivery
+  const timeErrPct = parseFloat(id('time_error_pct').value) || 20;
+  const workHoursDay = parseFloat(id('work_hours_day').value) || 12;
+  const restEvery = Math.max(1, parseInt(id('rest_every').value) || 6);
+
+  const totalPrintH = hours * qty;
+  const totalWithErr = totalPrintH * (1 + timeErrPct/100);
+  const workDays = Math.ceil(totalWithErr / workHoursDay);
+  const restDays = Math.floor(workDays / restEvery);
+  const calDays = workDays + restDays;
+
+  const today = new Date();
+  const delivery = new Date(today);
+  delivery.setDate(today.getDate() + calDays);
+  const fmtDate = delivery.toLocaleDateString('es-CO', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  const fmtShort = delivery.toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' });
+
+  set('t-total-hours', totalPrintH.toFixed(1)+' h');
+  set('t-total-hours-err', totalWithErr.toFixed(1)+' h');
+  set('t-work-days', workDays+' día'+(workDays!==1?'s':''));
+  set('t-rest-days', restDays+' día'+(restDays!==1?'s':''));
+  set('t-delivery-date', fmtDate.charAt(0).toUpperCase()+fmtDate.slice(1));
+  set('t-delivery-detail', `${calDays} días calendario · ${workDays} hábiles + ${restDays} descanso${restDays!==1?'s':''}`);
+  set('r-delivery-date', fmtShort);
+  id('t-bar').style.width = calDays > 0 ? '8%' : '0%';
+
+  const tl = id('t-timeline'); tl.innerHTML = '';
+  const showDays = Math.min(calDays, 50);
+  let workCount = 0;
+  for (let i = 1; i <= showDays; i++) {
+    const isWork = (workCount % (restEvery+1)) < restEvery;
+    if (isWork) workCount++;
+    const d = document.createElement('div');
+    d.className = 'day' + (isWork ? '' : ' rest');
+    d.title = isWork ? `Día ${i} hábil` : `Día ${i} descanso`;
+    tl.appendChild(d);
+  }
+  if (calDays > 50) {
+    const m = document.createElement('span');
+    m.style.cssText = 'font-size:10px; color:var(--ink-dim); align-self:center; margin-left:6px';
+    m.textContent = `+${calDays-50} más`;
+    tl.appendChild(m);
+  }
+
+  return { unitCostN, listPrice, finalPrice, totalPrice, totalProfit, margin, effectiveMargin, clientDiscPct, qty, totalWeightG, hours, calDays, workDays, fmtShort };
+}
+
+// Filament change
+function onFilamentChange() {
+  const val = id('filament_type').value;
+  const parts = val.split('|');
+  const isCustom = parts[0] === '0';
+  if (!isCustom) {
+    id('fil_cost_g').value = parts[0];
+    id('density').value = parts[2] || '1.24';
+    id('chip-price').textContent = '$' + parts[0] + '/g · ' + parts[1];
+    id('chip-density').textContent = 'Densidad ' + (parts[2]||'1.24') + ' g/cm³';
+    id('custom-price-wrap').style.display = 'none';
+  } else {
+    id('density').value = '1.24';
+    id('custom-price-wrap').style.display = 'block';
+    id('chip-price').textContent = 'Precio personalizado';
+  }
+  calc();
+}
+id('filament_type').addEventListener('change', onFilamentChange);
+id('custom_price_g').addEventListener('input', () => { id('fil_cost_g').value = id('custom_price_g').value; calc(); });
+
+// Sync advanced
+function syncAdv() {
+  id('watts').value = id('adv_watts').value;
+  id('kwh_cost').value = id('adv_kwh').value;
+  // depreciation fijo en $1.000/h
+  id('support_pct').value = id('adv_support').value;
+  id('fail_pct').value = id('adv_fail').value;
+  id('min_margin').value = id('adv_minmargin').value;
+  id('share_factor_pct').value = id('adv_share').value;
+  id('time_error_pct').value = id('adv_timeerr').value;
+  id('work_hours_day').value = id('adv_workhours').value;
+  calc();
+}
+['adv_watts','adv_kwh','adv_support','adv_fail','adv_minmargin','adv_share','adv_timeerr','adv_workhours']
+  .forEach(k => id(k).addEventListener('input', syncAdv));
+
+// Advanced toggle
+id('adv-trigger').addEventListener('click', () => {
+  const p = id('adv-panel');
+  const open = !p.classList.contains('open');
+  p.classList.toggle('open', open);
+  id('adv-label').textContent = open ? '← Ocultar' : 'Mostrar →';
+});
+
+// Listeners
+['weight_g','hours-h','hours-m','design_cost','post_cost','pack_cost','ship_cost','margin','qty']
+  .forEach(k => id(k).addEventListener('input', calc));
+
+/* ─── Toast helper ─── */
+function showToast(msg) {
+  const t = id('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window.__toast);
+  window.__toast = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// Guardar en historial (funcionalidad existente)
+id('save-quote').addEventListener('click', () => {
+  const data = calc();
+  const list = JSON.parse(localStorage.getItem('kora_quotes') || '[]');
+  list.unshift({
+    date: new Date().toLocaleString('es-CO'),
+    client: id('client_name').value || 'Sin nombre',
+    project: id('project_name').value || 'Sin descripción',
+    material: id('filament_type').value.split('|')[1] || '—',
+    qty: data.qty,
+    finalPrice: data.finalPrice,
+    totalPrice: data.totalPrice,
+    deliveryDate: data.fmtShort
+  });
+  localStorage.setItem('kora_quotes', JSON.stringify(list.slice(0, 50)));
+  showToast(`✓ Guardado en historial — ${fmtCOP(data.totalPrice)}`);
+});
+
+/* ─── Imagen de referencia ─── */
+let currentImage = null;
+
+function imgToDataUrl(src, maxPx) {
+  return new Promise(resolve => {
+    const img = new Image();
+    let objUrl = null;
+    img.onload = () => {
+      if (objUrl) URL.revokeObjectURL(objUrl);
+      const s = Math.min(1, maxPx / Math.max(img.width, img.height, 1));
+      const c = document.createElement('canvas');
+      c.width  = Math.round(img.width  * s);
+      c.height = Math.round(img.height * s);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      resolve(c.toDataURL('image/jpeg', 0.78));
+    };
+    img.onerror = () => resolve(null);
+    if (src instanceof Blob || src instanceof File) {
+      objUrl = URL.createObjectURL(src);
+      img.src = objUrl;
+    } else {
+      img.src = src;
+    }
+  });
+}
+
+function renderImageZone() {
+  const zone = id('img-zone');
+  const hint = id('img-hint');
+  const prev = zone.querySelector('.img-preview-wrap');
+  if (prev) prev.remove();
+  if (currentImage) {
+    zone.classList.add('has-img');
+    if (hint) hint.style.display = 'none';
+    const wrap = document.createElement('div');
+    wrap.className = 'img-preview-wrap';
+    wrap.innerHTML = `<img src="${currentImage}" class="img-preview" alt="Referencia"><button class="img-clear-btn" title="Quitar imagen">×</button>`;
+    zone.appendChild(wrap);
+    wrap.querySelector('.img-clear-btn').addEventListener('click', e => {
+      e.stopPropagation(); currentImage = null; renderImageZone();
+    });
+  } else {
+    zone.classList.remove('has-img');
+    if (hint) hint.style.display = '';
+  }
+}
+
+id('img-zone').addEventListener('click', () => id('img-file').click());
+id('img-file').addEventListener('change', async e => {
+  const file = e.target.files[0]; if (!file) return;
+  currentImage = await imgToDataUrl(file, 500);
+  renderImageZone();
+  e.target.value = '';
+});
+
+document.addEventListener('paste', async e => {
+  const imgItem = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+  if (!imgItem) return;
+  currentImage = await imgToDataUrl(imgItem.getAsFile(), 500);
+  renderImageZone();
+  showToast('✓ Imagen pegada — se incluirá en la cotización');
+});
+
+/* ════════════════════════════════════════════════════════
+   COTIZADOR
+   ════════════════════════════════════════════════════════ */
+let qItems        = JSON.parse(localStorage.getItem('kora_q') || '[]');
+let qNum          = parseInt(localStorage.getItem('kora_qnum') || '1');
+let editingItemIdx = -1;
+
+function qSave() {
+  localStorage.setItem('kora_q',    JSON.stringify(qItems));
+  localStorage.setItem('kora_qnum', String(qNum));
+}
+
+function adjCalc(item) {
+  const pct   = item.adjPct || 0;
+  const unit  = item.unitPrice * (1 + pct / 100);
+  const total = unit * item.qty;
+  const prof  = unit - (item.unitCost || 0);
+  return { pct, unit, total, prof };
+}
+
+function qGrand() {
+  return qItems.reduce((s, i) => s + adjCalc(i).total, 0);
+}
+
+function loadItemToCalc(idx) {
+  const item = qItems[idx];
+  editingItemIdx = idx;
+
+  // Datos del cliente y proyecto
+  id('client_name').value  = item.client  || '';
+  id('project_name').value = item.project || '';
+
+  // Filamento: restaurar el select si se guardó
+  if (item._filamentValue) {
+    id('filament_type').value = item._filamentValue;
+  }
+  onFilamentChange();
+
+  // Peso: usar el valor raw guardado, o aproximar desde el total
+  if (item._rawWeightG !== undefined) {
+    id('weight_g').value = item._rawWeightG;
+  } else {
+    const sp = parseFloat(id('support_pct').value) || 15;
+    id('weight_g').value = Math.round(item.weightG / (1 + sp / 100));
+  }
+
+  // Horas: separar en h y min
+  const h = item.hours || 0;
+  id('hours-h').value = Math.floor(h);
+  id('hours-m').value = Math.round((h - Math.floor(h)) * 60);
+
+  // Cantidad, margen y servicios
+  id('qty').value         = item.qty;
+  id('margin').value      = item._margin   || 100;
+  id('design_cost').value = item._desCost  || 0;
+  id('post_cost').value   = item._postCost || 0;
+  id('pack_cost').value   = item._packCost || 0;
+  id('ship_cost').value   = item._shipCost || 0;
+
+  // Imagen
+  currentImage = item.image || null;
+  renderImageZone();
+
+  calc();
+  updateEditingUI();
+  qClose();
+  document.getElementById('calculadora').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  showToast('✏ Cargado — modifica los valores y presiona Actualizar ítem');
+}
+
+function updateEditingUI() {
+  const isEditing = editingItemIdx >= 0;
+  const banner    = id('edit-mode-banner');
+  const addBtn    = id('add-to-quote');
+  if (!banner || !addBtn) return;
+
+  if (isEditing) {
+    const item = qItems[editingItemIdx];
+    banner.style.display = '';
+    id('edit-mode-name').textContent = item.project || 'Sin nombre';
+    addBtn.innerHTML = `Actualizar ítem <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`;
+  } else {
+    banner.style.display = 'none';
+    addBtn.innerHTML = `Agregar al cotizador <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>`;
+  }
+}
+
+function recomputeItem(item) {
+  if (item._filCostG === undefined) return;
+  const filCost    = item._filCostG * item.weightG;
+  const energyMach = item._costPerH * item.hours;
+  const qty        = item.qty;
+  const fixedTotal = (item._desCost || 0) + (item._packCost || 0);
+
+  // Precio lista (referencia a qty=1)
+  const base1     = filCost + energyMach + (item._postCost||0) + (item._shipCost||0) + fixedTotal;
+  const uCost1    = base1 * (1 + item._failPct / 100);
+  const listPrice = uCost1 * (1 + item._margin / 100);
+
+  // Costo real a cantidad actual
+  const baseN  = filCost + energyMach + (item._postCost||0) + (item._shipCost||0) + fixedTotal / qty;
+  const uCostN = baseN * (1 + item._failPct / 100);
+  const floorN = uCostN * (1 + item._minMargin / 100);
+
+  // Descuento por volumen
+  const logF    = qty > 1 ? Math.log10(qty) / Math.log10(1000) : 0;
+  const shareR  = logF * (item._sharePct / 100);
+  const room    = Math.max(0, listPrice - floorN);
+  const discAmt = room * Math.min(1, shareR);
+  const price   = Math.max(floorN, listPrice - discAmt);
+
+  item.unitCost  = uCostN;
+  item.unitPrice = price;
+}
+
+function updateItemDisplay(i) {
+  const item = qItems[i];
+  const { pct, unit, total, prof } = adjCalc(item);
+  const pcls = prof >= 0 ? 'pos' : 'neg';
+  const sign = pct > 0 ? '+' : '';
+  const cls  = pct > 0 ? 'pos' : pct < 0 ? 'neg' : 'zer';
+  const chQ = id('qck-qty-' + i); if (chQ) chQ.textContent = item.qty + ' ud';
+  const chG = id('qck-g-'   + i); if (chG) chG.textContent = item.weightG + ' g';
+  const chH = id('qck-h-'   + i); if (chH) chH.textContent = item.hours + ' h';
+  const elPU = id('qpu-' + i); if (elPU) elPU.textContent = fmtCOP(unit);
+  const el1  = id('qap-' + i); if (el1) { el1.textContent = sign + pct + '%'; el1.className = 'q-adj-pct ' + cls; }
+  const el2  = id('qpv-' + i); if (el2) { el2.textContent = fmtCOP(prof) + '/ud'; el2.className = 'q-profit-v ' + pcls; }
+  const el3  = id('qtt-' + i); if (el3) el3.textContent = fmtCOP(total);
+  id('q-grand').textContent = fmtCOP(qGrand());
+}
+
+function qRender() {
+  const list  = id('q-list');
+  const empty = id('q-empty');
+  const count = qItems.length;
+
+  empty.style.display = count ? 'none' : 'flex';
+  list.innerHTML = '';
+
+  qItems.forEach((item, idx) => {
+    const { pct, unit, total, prof } = adjCalc(item);
+    const sign  = pct > 0 ? '+' : '';
+    const cls   = pct > 0 ? 'pos' : pct < 0 ? 'neg' : 'zer';
+    const pcls  = prof >= 0 ? 'pos' : 'neg';
+
+    const el = document.createElement('div');
+    el.className = 'q-item';
+    const hasDims = item.dims && (item.dims.l || item.dims.w || item.dims.h);
+    el.innerHTML = `
+      <div class="q-item-top">
+        <div class="q-item-name">${item.project || 'Sin descripción'}</div>
+        <div style="display:flex;gap:4px;align-items:center;flex-shrink:0">
+          <button class="q-item-edit" data-i="${idx}" title="Editar en calculadora"
+            style="background:none;border:1px solid var(--line-2);cursor:pointer;color:var(--ink-dim);padding:4px 9px;border-radius:6px;display:flex;align-items:center;gap:4px;font-family:'Archivo','Arial Narrow',Arial,sans-serif;font-size:11px;font-weight:500;transition:all .15s;"
+            onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+            onmouseout="this.style.borderColor='var(--line-2)';this.style.color='var(--ink-dim)'">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Editar
+          </button>
+          <button class="q-item-del" data-i="${idx}" title="Eliminar ítem">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      ${item.image ? `<div class="q-item-img-wrap"><img src="${item.image}" class="q-item-img" alt="Referencia del modelo"></div>` : ''}
+      <div class="chips" style="margin-top:0;margin-bottom:0">
+        <span class="chip">${item.material}</span>
+        <span class="chip" id="qck-qty-${idx}">${item.qty} ud</span>
+        <span class="chip" id="qck-g-${idx}">${item.weightG} g</span>
+        ${item.hours ? `<span class="chip" id="qck-h-${idx}">${item.hours} h</span>` : ''}
+        ${item.deliveryDate ? `<span class="chip">Entrega: ${item.deliveryDate}</span>` : ''}
+        ${hasDims ? `<span class="chip">&#128207; ${item.dims.l||'—'}\xd7${item.dims.w||'—'}\xd7${item.dims.h||'—'} mm</span>` : ''}
+      </div>
+
+      <div class="q-dims">
+        <span class="q-adj-lbl">Editar parámetros <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--ink-dimmer)">— recalcula el precio</span></span>
+        <div class="q-dim-row">
+          <div class="dim-field"><label>Unidades</label><input type="number" class="q-edit-qty" data-i="${idx}" value="${item.qty}" min="1" step="1"></div>
+          <div class="dim-field"><label>Peso (g)</label><input type="number" class="q-edit-g" data-i="${idx}" value="${item.weightG}" min="1" step="1"></div>
+          <div class="dim-field"><label>Horas (h)</label><input type="number" class="q-edit-h" data-i="${idx}" value="${item.hours}" min="0.01" step="0.1"></div>
+        </div>
+      </div>
+
+      <div class="q-dims">
+        <span class="q-adj-lbl">Medidas (mm) <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--ink-dimmer)">— opcional</span></span>
+        <div class="q-dim-row">
+          <div class="dim-field"><label>Largo</label><input type="number" class="q-dim-input" data-i="${idx}" data-d="l" value="${item.dims?.l||''}" placeholder="—" min="0" step="0.1"></div>
+          <div class="dim-field"><label>Ancho</label><input type="number" class="q-dim-input" data-i="${idx}" data-d="w" value="${item.dims?.w||''}" placeholder="—" min="0" step="0.1"></div>
+          <div class="dim-field"><label>Alto</label><input type="number" class="q-dim-input" data-i="${idx}" data-d="h" value="${item.dims?.h||''}" placeholder="—" min="0" step="0.1"></div>
+        </div>
+      </div>
+
+      <div class="q-adj">
+        <span class="q-adj-lbl">Ajuste de ganancia</span>
+        <div class="q-adj-row">
+          <input type="range" min="-90" max="100" step="1" value="${pct}" class="q-adj-slider" data-i="${idx}">
+          <span class="q-adj-pct ${cls}" id="qap-${idx}">${sign}${pct}%</span>
+        </div>
+        <div class="q-profit-row">
+          <span class="q-profit-info">
+            <span id="qpu-${idx}">${fmtCOP(unit)}</span>/ud · Ganancia:
+            <span class="q-profit-v ${pcls}" id="qpv-${idx}">${fmtCOP(prof)}/ud</span>
+          </span>
+          <span class="q-item-total" id="qtt-${idx}">${fmtCOP(total)}</span>
+        </div>
+      </div>`;
+    list.appendChild(el);
+  });
+
+  // Slider de ganancia
+  list.querySelectorAll('.q-adj-slider').forEach(sl => {
+    sl.addEventListener('input', () => {
+      const i = parseInt(sl.dataset.i);
+      qItems[i].adjPct = parseInt(sl.value);
+      qSave();
+      updateItemDisplay(i);
+    });
+  });
+
+  // Edición de parámetros: unidades, gramos, horas
+  list.querySelectorAll('.q-edit-qty').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const i = parseInt(inp.dataset.i);
+      qItems[i].qty = Math.max(1, parseInt(inp.value) || 1);
+      recomputeItem(qItems[i]);
+      qSave();
+      updateItemDisplay(i);
+    });
+  });
+  list.querySelectorAll('.q-edit-g').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const i = parseInt(inp.dataset.i);
+      qItems[i].weightG = Math.max(1, parseFloat(inp.value) || 1);
+      recomputeItem(qItems[i]);
+      qSave();
+      updateItemDisplay(i);
+    });
+  });
+  list.querySelectorAll('.q-edit-h').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const i = parseInt(inp.dataset.i);
+      qItems[i].hours = Math.max(0.01, parseFloat(inp.value) || 0.01);
+      recomputeItem(qItems[i]);
+      qSave();
+      updateItemDisplay(i);
+    });
+  });
+
+  // Dimensiones editables
+  list.querySelectorAll('.q-dim-input').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const i = parseInt(inp.dataset.i);
+      if (!qItems[i].dims) qItems[i].dims = { l: '', w: '', h: '' };
+      qItems[i].dims[inp.dataset.d] = inp.value;
+      qSave();
+    });
+  });
+
+  // Editar ítem en calculadora
+  list.querySelectorAll('.q-item-edit').forEach(btn => {
+    btn.addEventListener('click', () => {
+      loadItemToCalc(parseInt(btn.dataset.i));
+    });
+  });
+
+  // Eliminar ítem
+  list.querySelectorAll('.q-item-del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.i);
+      if (editingItemIdx === i) { editingItemIdx = -1; updateEditingUI(); }
+      qItems.splice(i, 1);
+      qSave(); qRender(); qFab();
+    });
+  });
+
+  // Badges y totales
+  const badge = id('tab-cot-badge');
+  if (badge) { badge.textContent = count; badge.style.display = count ? 'inline-flex' : 'none'; }
+  id('q-count').textContent   = count;
+  id('q-plurals').textContent = count !== 1 ? 's' : '';
+  id('q-grand').textContent   = count ? fmtCOP(qGrand()) : '—';
+}
+
+function qFab() {
+  const n = qItems.length;
+  id('qfab').classList.toggle('on', n > 0);
+  id('qbadge').textContent = n;
+}
+
+function qOpen()  {
+  id('qdraw').classList.add('open');
+  id('qover').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function qClose() {
+  id('qdraw').classList.remove('open');
+  id('qover').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+id('qfab').addEventListener('click', qOpen);
+id('q-close').addEventListener('click', qClose);
+id('qover').addEventListener('click', qClose);
+
+id('q-clear').addEventListener('click', () => {
+  if (!qItems.length || !confirm('¿Vaciar el cotizador? Se perderán todos los ítems.')) return;
+  qItems = []; qSave(); qRender(); qFab();
+});
+
+id('cancel-edit').addEventListener('click', () => {
+  editingItemIdx = -1;
+  updateEditingUI();
+  showToast('Edición cancelada');
+});
+
+id('add-to-quote').addEventListener('click', () => {
+  const data = calc();
+  const item = {
+    id:           Date.now(),
+    project:      id('project_name').value.trim() || 'Pieza sin nombre',
+    client:       id('client_name').value.trim()  || '',
+    material:     id('filament_type').value.split('|')[1] || '—',
+    qty:          data.qty,
+    unitPrice:    data.finalPrice,
+    totalPrice:   data.totalPrice,
+    weightG:      Math.round(parseFloat(id('weight_g').value) * (1 + parseFloat(id('support_pct').value) / 100)),
+    hours:        Math.round(((parseFloat(id('hours-h').value) || 0) + (parseFloat(id('hours-m').value) || 0) / 60) * 100) / 100,
+    deliveryDate: data.fmtShort,
+    unitCost:     data.unitCostN,
+    adjPct:       0,
+    image:        currentImage,
+    dims:         editingItemIdx >= 0 ? (qItems[editingItemIdx].dims || { l:'', w:'', h:'' }) : { l: '', w: '', h: '' },
+    // Parámetros para recalcular al editar en el drawer
+    _rawWeightG:    parseFloat(id('weight_g').value) || 0,
+    _filamentValue: id('filament_type').value,
+    _filCostG:  parseFloat(id('fil_cost_g').value) || 70,
+    _costPerH:  ((parseFloat(id('watts').value)||220) / 1000) * (parseFloat(id('kwh_cost').value)||746) + 1000,
+    _desCost:   parseFloat(id('design_cost').value) || 0,
+    _postCost:  parseFloat(id('post_cost').value)   || 0,
+    _packCost:  parseFloat(id('pack_cost').value)   || 0,
+    _shipCost:  parseFloat(id('ship_cost').value)   || 0,
+    _failPct:   parseFloat(id('fail_pct').value)    || 10,
+    _margin:    parseFloat(id('margin').value)      || 100,
+    _minMargin: parseFloat(id('min_margin').value)  || 15,
+    _sharePct:  parseFloat(id('share_factor_pct').value) || 60,
+  };
+
+  if (editingItemIdx >= 0) {
+    item.id     = qItems[editingItemIdx].id;
+    item.adjPct = qItems[editingItemIdx].adjPct || 0;
+    qItems[editingItemIdx] = item;
+    editingItemIdx = -1;
+    updateEditingUI();
+    showToast(`✓ "${item.project}" actualizado en el cotizador`);
+  } else {
+    qItems.push(item);
+    showToast(`✓ "${item.project}" agregado al cotizador`);
+  }
+
+  qSave(); qRender(); qFab();
+  switchTab('cot');
+  qOpen();
+});
+
+/* ════════════════════════════════════════════════════════
+   GENERACIÓN DE PDF
+   ════════════════════════════════════════════════════════ */
+function doGeneratePDF(saveToHist = true) {
+  if (!qItems.length) { showToast('⚠ Agrega ítems al cotizador primero'); return; }
+  if (typeof window.jspdf === 'undefined') { showToast('⚠ Librería PDF no disponible. Verifica tu conexión.'); return; }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const PW = 210, PH = 297, ML = 18, MR = 18;
+  const CW = PW - ML - MR;
+  const CE = PW - MR;
+
+  const BEIGE   = [245, 241, 234];
+  const OLIVE   = [110, 113,  81];
+  const OLIVE_D = [ 78,  81,  57];
+  const INK     = [ 43,  43,  43];
+  const INK_D   = [110, 110, 110];
+  const WHITE   = [255, 255, 255];
+  const CREAM   = [250, 247, 240];
+  const BORDER  = [215, 210, 200];
+  const OL_LT   = [210, 215, 185];
+
+  const quoteNum   = String(qNum).padStart(4, '0');
+  const now        = new Date();
+  const dateStr    = now.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
+  const monthYear  = now.toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
+  const clients    = [...new Set(qItems.map(i => i.client).filter(Boolean))].join(', ');
+  const grandTotal = qGrand();
+
+  // Columnas: IMAGEN(38) | DESCRIPCIÓN(58) | MATERIAL(22) | CANT.(12) | P/UNIDAD(22) | TOTAL(22)
+  const C_IMG  = ML;
+  const C_DESC = ML + 38;
+  const C_MAT  = ML + 96;
+  const C_QTY  = ML + 118;
+  const C_UNIT = ML + 130;
+  const C_TOT  = ML + 152;
+
+  const HDR_H      = 9;
+  const ROW_IMG    = 38;
+  const ROW_NO     = 14;
+  const FTR_H      = 20;
+  const CONTENT_BOT = PH - FTR_H - 6;
+
+  function bgPage() {
+    doc.setFillColor(...BEIGE);
+    doc.rect(0, 0, PW, PH, 'F');
+  }
+
+  function drawTableHeader(y) {
+    doc.setFillColor(...INK);
+    doc.rect(ML, y, CW, HDR_H, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(...WHITE);
+    doc.text('IMAGEN',      C_IMG  + 19,  y + 6, { align: 'center' });
+    doc.text('DESCRIPCIÓN', C_DESC + 29,  y + 6, { align: 'center' });
+    doc.text('MATERIAL',    C_MAT  + 11,  y + 6, { align: 'center' });
+    doc.text('CANT.',       C_QTY  + 6,   y + 6, { align: 'center' });
+    doc.text('P/UNIDAD',    C_UNIT + 11,  y + 6, { align: 'center' });
+    doc.text('TOTAL',       CE - 3,       y + 6, { align: 'right'  });
+    return y + HDR_H;
+  }
+
+  function drawFooter(pageNum, totalPages) {
+    const fy = PH - FTR_H;
+    doc.setFillColor(...OLIVE_D);
+    doc.rect(0, fy, PW, FTR_H, 'F');
+    doc.setFillColor(...OLIVE);
+    doc.rect(0, fy, 5, FTR_H, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...WHITE);
+    doc.text('KORA ESTUDIO', ML + 2, fy + 8);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(...OL_LT);
+    doc.text('kalogdesign@gmail.com  ·  Cali, Colombia  ·  Bambu Lab A1 Combo', ML + 2, fy + 15);
+    doc.text('Pág. ' + pageNum + ' de ' + totalPages, CE, fy + 8,  { align: 'right' });
+    doc.text(dateStr,                                  CE, fy + 15, { align: 'right' });
+  }
+
+  // ── Página 1 ──
+  bgPage();
+
+  // Logo – derecha (como en la referencia)
+  let logoOk = false;
+  const logoEl = document.querySelector('nav .logo img');
+  if (logoEl && logoEl.complete && logoEl.naturalWidth > 0) {
+    try {
+      const cv = document.createElement('canvas');
+      cv.width = logoEl.naturalWidth; cv.height = logoEl.naturalHeight;
+      cv.getContext('2d').drawImage(logoEl, 0, 0);
+      const lh = 22, lw = Math.min(lh * logoEl.naturalWidth / logoEl.naturalHeight, 62);
+      doc.addImage(cv.toDataURL('image/png'), 'PNG', CE - lw, 10, lw, lh);
+      logoOk = true;
+    } catch(e) {}
+  }
+  if (!logoOk) {
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
+    doc.setTextColor(...INK);
+    doc.text('KORA ESTUDIO', CE, 20, { align: 'right' });
+  }
+
+  // Título – izquierda (como en la referencia)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(24);
+  doc.setTextColor(...INK);
+  doc.text('COTIZACIÓN', ML, 24);
+
+  let y = 34;
+
+  // Cliente y fecha
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(...INK);
+  if (clients) { doc.text('Cliente: ' + clients, ML, y); y += 6.5; }
+  doc.text('Fecha: ' + monthYear, ML, y); y += 5;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(...INK_D);
+  doc.text('N° ' + quoteNum, ML, y); y += 7;
+
+  // Línea divisoria
+  doc.setDrawColor(...BORDER); doc.setLineWidth(0.5);
+  doc.line(ML, y, CE, y); y += 5;
+
+  // Cabecera de tabla
+  y = drawTableHeader(y);
+
+  // ── Filas de ítems ──
+  qItems.forEach((item, idx) => {
+    const { pct, unit: adjUnit, total: adjTotal } = adjCalc(item);
+    const hasImg = !!item.image;
+    const rh = hasImg ? ROW_IMG : ROW_NO;
+
+    // Nueva página si no cabe
+    if (y + rh > CONTENT_BOT) {
+      doc.addPage(); bgPage();
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+      doc.setTextColor(...INK_D);
+      doc.text('Cotización N° ' + quoteNum + ' — continuación', ML, 16);
+      doc.setDrawColor(...BORDER); doc.setLineWidth(0.35);
+      doc.line(ML, 20, CE, 20);
+      y = 26;
+      y = drawTableHeader(y);
+    }
+
+    // Fondo de fila
+    if (idx % 2 === 0) doc.setFillColor(...WHITE);
+    else               doc.setFillColor(...CREAM);
+    doc.rect(ML, y, CW, rh, 'F');
+
+    // Borde de fila
+    doc.setDrawColor(...BORDER); doc.setLineWidth(0.15);
+    doc.rect(ML, y, CW, rh);
+
+    // Imagen en primera columna
+    const ipad = 2, iw = 32, ih = rh - ipad * 2;
+    if (hasImg) {
+      try {
+        doc.addImage(item.image, item.image.startsWith('data:image/png') ? 'PNG' : 'JPEG',
+          C_IMG + ipad, y + ipad, iw, ih);
+      } catch(e) {
+        doc.setFillColor(...[220, 216, 208]);
+        doc.rect(C_IMG + ipad, y + ipad, iw, ih, 'F');
+      }
+    } else {
+      doc.setFillColor(...[232, 228, 220]);
+      doc.rect(C_IMG + ipad, y + ipad, iw, ih, 'F');
+    }
+
+    // Separadores verticales de columna
+    doc.setDrawColor(...BORDER); doc.setLineWidth(0.15);
+    [C_DESC - 2, C_MAT - 2, C_QTY - 2, C_UNIT - 2, C_TOT - 2].forEach(x =>
+      doc.line(x, y, x, y + rh));
+
+    // Descripción
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(...INK);
+    const descLines = doc.splitTextToSize(item.project || 'Sin descripción', C_MAT - C_DESC - 4);
+    doc.text(descLines[0], C_DESC + 2, y + 5.5);
+    if (hasImg && descLines[1]) {
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
+      doc.text(descLines[1], C_DESC + 2, y + 11);
+    }
+
+    // Sub-info (peso, horas, medidas, ajuste, entrega)
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setTextColor(...INK_D);
+    const adjLbl  = pct !== 0 ? (pct > 0 ? '+' : '') + pct + '% ajuste' : null;
+    const dimsLbl = item.dims && (item.dims.l || item.dims.w || item.dims.h)
+      ? (item.dims.l||'—') + '×' + (item.dims.w||'—') + '×' + (item.dims.h||'—') + ' mm' : null;
+    const subParts = [item.weightG + 'g · ' + item.hours + 'h', dimsLbl, adjLbl].filter(Boolean);
+
+    if (hasImg) {
+      subParts.forEach((s, i) => doc.text(s, C_DESC + 2, y + 17 + i * 5));
+      if (item.deliveryDate) {
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5); doc.setTextColor(...OLIVE);
+        doc.text('Entrega: ' + item.deliveryDate, C_DESC + 2, y + rh - 4);
+      }
+    } else {
+      const sub = [item.deliveryDate ? 'Entrega: ' + item.deliveryDate : null, ...subParts]
+        .filter(Boolean).join(' · ');
+      doc.text(sub, C_DESC + 2, y + 10.5);
+    }
+
+    // Material
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(...INK_D);
+    const matLines = doc.splitTextToSize(item.material, C_QTY - C_MAT - 3);
+    matLines.slice(0, 2).forEach((ln, i) =>
+      doc.text(ln, C_MAT + 11, y + rh / 2 - 1.5 + i * 5, { align: 'center' }));
+
+    // Cantidad
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(...INK);
+    doc.text(String(item.qty), C_QTY + 6, y + rh / 2 + 1.5, { align: 'center' });
+
+    // Precio unitario
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(...INK);
+    doc.text(fmtCOP(adjUnit), C_UNIT + 11, y + rh / 2 + 1.5, { align: 'center' });
+
+    // Total (resaltado en olivo)
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(...OLIVE);
+    doc.text(fmtCOP(adjTotal), CE - 3, y + rh / 2 + 1.5, { align: 'right' });
+
+    y += rh;
+  });
+
+  y += 8;
+
+  // ── Caja de total general ──
+  const TOTAL_H = 22, NOTES_H = 26;
+
+  // Nueva página si no caben total + notas
+  if (y + TOTAL_H + NOTES_H > CONTENT_BOT) {
+    doc.addPage(); bgPage(); y = 20;
+  }
+
+  // Etiqueta de cantidad de ítems
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(...INK_D);
+  doc.text(qItems.length + ' ítem' + (qItems.length !== 1 ? 's' : '') + ' en esta cotización',
+    ML, y + TOTAL_H / 2 + 2);
+
+  // Caja total
+  doc.setFillColor(...OLIVE);
+  doc.roundedRect(CE - 90, y, 90, TOTAL_H, 3, 3, 'F');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(...OL_LT);
+  doc.text('TOTAL ESTIMADO', CE - 5, y + 8, { align: 'right' });
+  doc.setFontSize(15); doc.setTextColor(...WHITE);
+  doc.text(fmtCOP(grandTotal), CE - 5, y + 18, { align: 'right' });
+
+  y += TOTAL_H + 8;
+
+  // ── Bloque de notas ──
+  if (y + NOTES_H <= CONTENT_BOT) {
+    doc.setFillColor(...CREAM); doc.setDrawColor(...BORDER); doc.setLineWidth(0.3);
+    doc.roundedRect(ML, y, CW, NOTES_H, 3, 3, 'FD');
+    doc.setFillColor(...OLIVE);
+    doc.roundedRect(ML, y, 5, NOTES_H, 2.5, 2.5, 'F');
+    doc.rect(ML + 2.5, y, 2.5, NOTES_H, 'F');
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(...INK_D);
+    ['· Esta cotización es válida por 30 días a partir de la fecha de emisión.',
+     '· Los precios incluyen material, energía y tiempo de máquina.',
+     '· Condiciones de pago: 50% al confirmar el pedido, 50% al entregar.']
+      .forEach((n, i) => doc.text(n, ML + 9, y + 8 + i * 7));
+  }
+
+  // ── Footer en todas las páginas ──
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let p = 1; p <= totalPages; p++) {
+    doc.setPage(p);
+    drawFooter(p, totalPages);
+  }
+
+  // Guardar en historial
+  if (saveToHist) {
+    const entry = {
+      num: quoteNum, date: dateStr,
+      client: clients || 'Sin cliente',
+      items: JSON.parse(JSON.stringify(qItems)),
+      grandTotal,
+    };
+    const hist = JSON.parse(localStorage.getItem('kora_quote_hist') || '[]');
+    hist.unshift(entry);
+    localStorage.setItem('kora_quote_hist', JSON.stringify(hist.slice(0, 30)));
+    histRender();
+    showToast('✓ PDF generado y guardado en historial');
+  }
+
+  qNum++;
+  qSave();
+  doc.save('Kora-Cotizacion-' + quoteNum + '.pdf');
+}
+
+id('q-pdf').addEventListener('click',  () => doGeneratePDF(true));
+id('q-pdf2').addEventListener('click', () => doGeneratePDF(true));
+
+/* ════════════════════════════════════════════════════════
+   HISTORIAL + TABS
+   ════════════════════════════════════════════════════════ */
+function switchTab(tab) {
+  const isCot = tab === 'cot';
+  id('tab-cot').classList.toggle('active',  isCot);
+  id('tab-hist').classList.toggle('active', !isCot);
+  id('q-body-cot').style.display  = isCot ? '' : 'none';
+  id('q-body-hist').style.display = isCot ? 'none' : '';
+  id('qdraw-foot').style.display  = isCot ? '' : 'none';
+  if (!isCot) histRender();
+}
+id('tab-cot').addEventListener('click',  () => switchTab('cot'));
+id('tab-hist').addEventListener('click', () => switchTab('hist'));
+
+function histRender() {
+  const hist  = JSON.parse(localStorage.getItem('kora_quote_hist') || '[]');
+  const cont  = id('hist-list');
+  const empty = id('hist-empty');
+  const badge = id('tab-hist-badge');
+  if (badge) { badge.textContent = hist.length; badge.style.display = hist.length ? 'inline-flex' : 'none'; }
+  empty.style.display = hist.length ? 'none' : 'flex';
+  cont.innerHTML = '';
+
+  hist.forEach((entry, idx) => {
+    const preview = entry.items.slice(0, 2).map(i => `<span class="chip">${i.project}</span>`).join('');
+    const more    = entry.items.length > 2 ? `<span class="chip">+${entry.items.length - 2} más</span>` : '';
+    const el = document.createElement('div');
+    el.className = 'q-hist-item';
+    el.innerHTML = `
+      <div class="q-hist-hd">
+        <div>
+          <div class="q-hist-num">Cotización N° ${entry.num}</div>
+          <div class="q-hist-client">${entry.client}</div>
+        </div>
+        <div>
+          <div class="q-hist-total">${fmtCOP(entry.grandTotal)}</div>
+          <div class="q-hist-date">${entry.date}</div>
+        </div>
+      </div>
+      <div class="chips" style="margin-top:8px;margin-bottom:10px">
+        <span class="chip">${entry.items.length} ítem${entry.items.length !== 1 ? 's' : ''}</span>
+        ${preview}${more}
+      </div>
+      <div class="q-hist-acts">
+        <button class="btn btn-ghost btn-sm h-load" data-idx="${idx}">Cargar y editar</button>
+        <button class="btn btn-ghost btn-sm h-pdf"  data-idx="${idx}">Regenerar PDF</button>
+        <button class="q-hist-del-btn h-del" data-idx="${idx}" title="Eliminar">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
+      </div>`;
+    cont.appendChild(el);
+  });
+
+  // Cargar para editar
+  cont.querySelectorAll('.h-load').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const entry = hist[parseInt(btn.dataset.idx)];
+      if (qItems.length && !confirm(`¿Reemplazar el cotizador actual (${qItems.length} ítem${qItems.length !== 1 ? 's' : ''}) con la cotización N° ${entry.num}?`)) return;
+      qItems = JSON.parse(JSON.stringify(entry.items));
+      qSave(); qRender(); qFab();
+      switchTab('cot');
+      showToast(`✓ Cotización N° ${entry.num} cargada — puedes editarla`);
+    });
+  });
+
+  // Regenerar PDF
+  cont.querySelectorAll('.h-pdf').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const entry = hist[parseInt(btn.dataset.idx)];
+      const backupItems = JSON.parse(JSON.stringify(qItems));
+      const backupNum   = qNum;
+      qItems = JSON.parse(JSON.stringify(entry.items));
+      qNum   = parseInt(entry.num) || qNum;
+      doGeneratePDF(false);
+      qItems = backupItems;
+      qNum   = backupNum;
+    });
+  });
+
+  // Eliminar
+  cont.querySelectorAll('.h-del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!confirm('¿Eliminar esta cotización del historial?')) return;
+      hist.splice(parseInt(btn.dataset.idx), 1);
+      localStorage.setItem('kora_quote_hist', JSON.stringify(hist));
+      histRender();
+    });
+  });
+}
+
+// Init
+histRender();
+qRender();
+qFab();
+onFilamentChange();
+calc();
+</script>
+</body>
+</html>
+
+

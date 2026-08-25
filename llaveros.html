@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kora Studio | Llaveros</title>
+    <meta
+      name="description"
+      content="Llaveros personalizados Kora con nombres, colores, formas y detalles únicos."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a class="brand" href="index.html" aria-label="Kora Studio inicio">
+          <img src="assets/llaveros-logo.svg" alt="Kora" />
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="nav-menu" id="nav-menu">
+          <a href="index.html">Inicio</a>
+          <a href="mascotas.html">Mascotas</a>
+          <a class="active" href="llaveros.html">Llaveros</a>
+          <a href="hazlotumismo.html">Hazlo tú mismo</a>
+          <a href="nosotros.html">Nosotros</a>
+          <a href="contacto.html">Contacto</a>
+        </div>
+
+        <div class="nav-actions" aria-label="Acciones de tienda">
+          <button type="button" aria-label="Favoritos" title="Favoritos">
+            <img src="assets/llaveros-favorite.svg" alt="" />
+          </button>
+          <button class="cart-button" type="button" aria-label="Carrito" title="Carrito">
+            <img src="assets/llaveros-cart.svg" alt="" />
+            <strong class="cart-count">0</strong>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="llaveros-page">
+      <section class="llaveros-hero" aria-labelledby="llaveros-title">
+        <img class="llaveros-hero-bg" src="assets/llaveros-image-01.png" alt="" />
+        <div class="llaveros-hero-card">
+          <p>Ahora desde $60.000</p>
+          <h1 id="llaveros-title">
+            <span>Llaveros</span>
+            <span>personalizados.</span>
+          </h1>
+          <p>
+            Crea un llavero que se sienta completamente tuyo. Combina nombres,
+            colores, formas y pequeños detalles para diseñar una pieza única que
+            represente tu estilo, tus recuerdos o a alguien especial.
+          </p>
+        </div>
+        <div class="llaveros-free-badge" aria-hidden="true">
+          <img src="assets/llaveros-star.svg" alt="" />
+          <strong>Envío<br />gratis</strong>
+        </div>
+      </section>
+
+      <section class="llaveros-catalog" aria-labelledby="llaveros-catalog-title">
+        <h2 class="sr-only" id="llaveros-catalog-title">Catálogo de llaveros</h2>
+        <div class="section-inner llaveros-catalog-toolbar">
+          <a class="button mascotas-dark-button" href="hazlotumismo.html?categoria=A%20medida">Ver tienda</a>
+          <span>Mostrar 3 modelos</span>
+        </div>
+
+        <div class="section-inner llaveros-product-grid">
+          <a class="llaveros-product-card" href="producto.html?id=llavero-coqueta-rosada">
+            <div class="llaveros-product-media">
+              <img src="assets/llaveros-image-03.jpeg" alt="Llavero coqueta rosada en morral morado" />
+            </div>
+            <div class="llaveros-card-info">
+              <div class="product-heading-row"><h3>Coqueta rosada</h3><span>A medida</span></div>
+              <div class="product-price"><strong>$70.000</strong><span>$80.000</span></div>
+              <span class="product-card-cta"><img src="assets/llaveros-cart.svg" alt="" />Ver en tienda</span>
+            </div>
+          </a>
+
+          <a class="llaveros-product-card" href="producto.html?id=llavero-playa-azul">
+            <div class="llaveros-product-media">
+              <img src="assets/llaveros-image-05.png" alt="Llavero Mantente salvaje con corazón rosado" />
+            </div>
+            <div class="llaveros-card-info">
+              <div class="product-heading-row"><h3>Mantente salvaje</h3><span>A medida</span></div>
+              <div class="product-price"><strong>$55.000</strong><span>$60.000</span></div>
+              <span class="product-card-cta"><img src="assets/llaveros-cart.svg" alt="" />Ver en tienda</span>
+            </div>
+          </a>
+
+          <a class="llaveros-product-card" href="producto.html?id=llavero-mantente-salvaje">
+            <div class="llaveros-product-media">
+              <img src="assets/llaveros-image-04.png" alt="Llavero Playa azul con corazón azul" />
+            </div>
+            <div class="llaveros-card-info">
+              <div class="product-heading-row"><h3>Playa azul</h3><span>A medida</span></div>
+              <div class="product-price"><strong>$55.000</strong><span>$60.000</span></div>
+              <span class="product-card-cta"><img src="assets/llaveros-cart.svg" alt="" />Ver en tienda</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section class="llaveros-custom" aria-labelledby="llaveros-custom-title">
+        <div class="llaveros-custom-card">
+          <h2 id="llaveros-custom-title">Personaliza el tuyo</h2>
+          <p>
+            Cuéntanos qué quieres crear y personaliza cada detalle a tu manera.
+            Elige el estilo, los colores y los elementos que harán de tu llavero
+            una pieza única y totalmente tuya.
+          </p>
+          <a class="button mascotas-dark-button" href="hazlotumismo.html?categoria=A%20medida">Empezar</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" id="contacto">
+      <div class="section-inner footer-grid">
+        <div>
+          <h2>Compañía</h2>
+          <a href="nosotros.html">Sobre nosotros</a>
+          <a href="hazlotumismo.html">Hazlo tú mismo</a>
+          <a href="mascotas.html">Mascota</a>
+          <a href="llaveros.html">Llaveros</a>
+          <a href="contacto.html">Contacto</a>
+        </div>
+        <div>
+          <h2>Síguenos o escríbenos</h2>
+          <a href="#">Instagram</a>
+          <a href="#">TikTok</a>
+          <a href="mailto:info@kora.co">info@kora.co</a>
+        </div>
+        <div>
+          <h2>Legal</h2>
+          <a href="#">Políticas de privacidad</a>
+          <a href="#">Términos y condiciones</a>
+          <a href="#">Términos de devolución</a>
+        </div>
+        <div class="footer-brand">
+          <img src="assets/llaveros-footer-logo.svg" alt="Kora" />
+          <p>Kora Studio 2026. Todos los derechos reservados.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="products.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

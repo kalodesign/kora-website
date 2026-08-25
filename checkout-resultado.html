@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kora Studio | Resultado del pago</title>
+    <meta name="description" content="Resultado del pago de tu pedido Kora." />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="checkout-result-page">
+    <header class="site-header">
+      <div class="promo-bar">
+        <a href="hazlotumismo.html">Personaliza tu recuerdo favorito hoy <span aria-hidden="true">→</span></a>
+      </div>
+
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a class="brand" href="index.html" aria-label="Kora Studio inicio">
+          <img src="assets/icon-06.svg" alt="Kora" />
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="nav-menu" id="nav-menu">
+          <a href="index.html">Inicio</a>
+          <a href="mascotas.html">Mascotas</a>
+          <a href="llaveros.html">Llaveros</a>
+          <a href="hazlotumismo.html">Hazlo tú mismo</a>
+          <a href="nosotros.html">Nosotros</a>
+          <a href="contacto.html">Contacto</a>
+        </div>
+
+        <div class="nav-actions" aria-label="Acciones de tienda">
+          <button type="button" aria-label="Favoritos" title="Favoritos">
+            <img src="assets/icon-03.svg" alt="" />
+          </button>
+          <button class="cart-button" type="button" aria-label="Carrito" title="Carrito">
+            <img src="assets/icon-01.svg" alt="" />
+            <strong class="cart-count">0</strong>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="checkout-result">
+      <section class="section-inner checkout-result-card" aria-labelledby="checkout-result-title">
+        <p>Pedido recibido</p>
+        <h1 id="checkout-result-title">Gracias por comprar en Kora</h1>
+        <span>
+          Si tu pago fue aprobado, Wompi nos avisará automáticamente y prepararemos tu pedido.
+          También puedes escribirnos si quieres confirmar algún detalle de producción o entrega.
+        </span>
+        <div class="checkout-result-actions">
+          <a class="button button-primary" href="hazlotumismo.html">Ir a tienda</a>
+          <a class="button button-secondary" href="contacto.html">Contactar a Kora</a>
+        </div>
+      </section>
+    </main>
+
+    <script src="products.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

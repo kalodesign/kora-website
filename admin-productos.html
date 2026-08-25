@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Kora Studio | Admin productos</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="admin-page">
+    <header class="site-header">
+      <nav class="main-nav" aria-label="Navegación privada">
+        <a class="brand" href="index.html" aria-label="Kora Studio inicio">
+          <img src="assets/icon-06.svg" alt="Kora" />
+        </a>
+        <div class="nav-menu">
+          <a href="index.html">Volver al sitio</a>
+          <a class="active" href="admin-productos.html">Admin productos</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="admin-shell">
+      <section class="admin-hero">
+        <p>Privado</p>
+        <h1>Administrador de productos</h1>
+        <span>Agrega, edita y exporta los productos que alimentan Hazlo tú mismo.</span>
+      </section>
+
+      <section class="admin-grid">
+        <form class="admin-form" id="product-admin-form">
+          <input type="hidden" id="admin-product-id" />
+          <label>
+            Título
+            <input id="admin-title" type="text" placeholder="Dije corazón rojo" required />
+          </label>
+          <label>
+            Categoría
+            <input id="admin-category" type="text" placeholder="Dijes" required />
+          </label>
+          <label>
+            Imagen
+            <input id="admin-image" type="text" placeholder="assets/image-12.png" required />
+          </label>
+          <label>
+            Subir imagen como dato local
+            <input id="admin-image-file" type="file" accept="image/*" />
+          </label>
+          <label>
+            Descripción breve
+            <textarea id="admin-description" rows="4" placeholder="Texto corto para la tarjeta y el detalle" required></textarea>
+          </label>
+          <div class="admin-row">
+            <label>
+              Medida
+              <input id="admin-size" type="text" placeholder="30x34 mm" />
+            </label>
+            <label>
+              Stock
+              <input id="admin-stock" type="number" min="0" value="0" />
+            </label>
+          </div>
+          <div class="admin-row">
+            <label>
+              Precio
+              <input id="admin-price" type="number" min="0" step="500" required />
+            </label>
+            <label>
+              Precio antes
+              <input id="admin-compare" type="number" min="0" step="500" />
+            </label>
+          </div>
+          <div class="admin-actions">
+            <button class="button button-primary" type="submit">Guardar producto</button>
+            <button class="button mascotas-dark-button" type="button" id="admin-reset">Nuevo</button>
+          </div>
+          <p class="admin-status" id="admin-status"></p>
+        </form>
+
+        <div class="admin-list-panel">
+          <div class="admin-list-head">
+            <h2>Productos cargados</h2>
+            <button class="button mascotas-dark-button" type="button" id="admin-export">Exportar JSON</button>
+          </div>
+          <div class="admin-list" id="admin-products-list"></div>
+        </div>
+      </section>
+    </main>
+
+    <script src="products.js"></script>
+    <script src="admin-products.js"></script>
+  </body>
+</html>

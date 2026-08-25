@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kora Studio | Mascotas</title>
+    <meta
+      name="description"
+      content="Conoce la forma en que Kora crea llaveros personalizados para mascotas."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a class="brand" href="index.html" aria-label="Kora Studio inicio">
+          <img src="assets/mascotas-logo.svg" alt="Kora" />
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="nav-menu" id="nav-menu">
+          <a href="index.html">Inicio</a>
+          <a class="active" href="mascotas.html">Mascotas</a>
+          <a href="llaveros.html">Llaveros</a>
+          <a href="hazlotumismo.html">Hazlo tú mismo</a>
+          <a href="nosotros.html">Nosotros</a>
+          <a href="contacto.html">Contacto</a>
+        </div>
+
+        <div class="nav-actions" aria-label="Acciones de tienda">
+          <button type="button" aria-label="Favoritos" title="Favoritos">
+            <img src="assets/mascotas-favorite.svg" alt="" />
+          </button>
+          <button class="cart-button" type="button" aria-label="Carrito" title="Carrito">
+            <img src="assets/mascotas-cart.svg" alt="" />
+            <strong class="cart-count">0</strong>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="mascotas-page">
+      <section class="mascotas-hero" aria-labelledby="mascotas-title">
+        <div class="section-inner mascotas-hero-inner">
+          <h1 id="mascotas-title">
+            <span>Nuestra forma</span>
+            <span>de crear</span>
+          </h1>
+
+          <div class="mascotas-hero-photo">
+            <img src="assets/mascotas-image-01.png" alt="Persona con perro blanco para llavero personalizado" />
+          </div>
+
+          <div class="mascotas-copy-grid">
+            <article>
+              <h2>Cuidamos cada detalle</h2>
+              <p>
+                Desde la elección de los colores hasta la impresión y el ensamblaje final,
+                prestamos atención a cada parte del proceso.
+              </p>
+              <p>
+                Trabajamos con materiales ligeros y resistentes y cuidamos cada acabado para
+                crear piezas bonitas, únicas y listas para acompañarte todos los días.
+              </p>
+            </article>
+
+            <article>
+              <h2>Hecho especialmente para ti</h2>
+              <p>
+                No creemos en que todo tenga que verse igual. Nuestros diseños personalizados
+                nacen de tus ideas, tus fotos y tus elecciones para crear una pieza única,
+                hecha especialmente para ti.
+              </p>
+              <p>
+                Desde un nombre hasta la carita de tu mascota, buscamos transformar aquello
+                que amas en algo que puedas llevar contigo.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="mascotas-create" aria-labelledby="mascotas-create-title">
+        <div class="mascotas-create-card">
+          <img class="mascotas-create-pets mascotas-create-pets-left" src="assets/mascotas-image-04.png" alt="" />
+          <img class="mascotas-create-pets mascotas-create-pets-right" src="assets/mascotas-image-03.png" alt="" />
+          <h2 id="mascotas-create-title">
+            <span>Crea el llavero</span>
+            <span>perfecto para ti</span>
+          </h2>
+          <p>
+            Cuéntanos qué quieres crear y personaliza cada detalle a tu manera. Elige el estilo,
+            los colores y los elementos que harán de tu llavero una pieza única y totalmente tuya.
+          </p>
+          <button class="button mascotas-dark-button" type="button" data-open-pet-modal>Empezar</button>
+        </div>
+      </section>
+
+      <section class="mascotas-love" aria-labelledby="mascotas-love-title">
+        <div class="section-inner mascotas-love-inner">
+          <h2 id="mascotas-love-title">
+            <span>Creado con amor por</span>
+            <span>quienes dejan huella</span>
+          </h2>
+          <div class="mascotas-love-art">
+            <img src="assets/mascotas-image-02.png" alt="Ilustración de mascotas Kora" />
+          </div>
+          <div class="mascotas-love-copy">
+            <p>
+              Sabemos que una mascota es mucho más que una mascota. Es compañía, recuerdos,
+              momentos especiales y una parte importante de nuestra historia.
+            </p>
+            <p>
+              Por eso creamos piezas personalizadas que buscan capturar aquello que las hace únicas.
+              Cada diseño nace de una fotografía y se transforma en un pequeño recuerdo que puedes
+              llevar contigo todos los días.
+            </p>
+            <p>Porque algunas conexiones merecen convertirse en algo que dure.</p>
+            <p>Crea un recuerdo único</p>
+            <button class="button mascotas-dark-button" type="button" data-open-pet-modal>Empezar a crear</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="pet-modal-overlay" id="pet-modal" aria-hidden="true">
+      <div class="pet-modal" role="dialog" aria-modal="true" aria-labelledby="pet-modal-title">
+        <button class="pet-modal-close" type="button" data-close-pet-modal aria-label="Cerrar modal">×</button>
+        <form class="pet-modal-form">
+          <p class="pet-modal-eyebrow">Mascotas</p>
+          <h2 id="pet-modal-title">Empecemos tu llavero personalizado</h2>
+          <div class="pet-modal-field">
+            <label for="pet-client-name">Tu nombre</label>
+            <input id="pet-client-name" name="client-name" type="text" autocomplete="name" placeholder="Escribe tu nombre" required />
+          </div>
+          <div class="pet-modal-field">
+            <label for="pet-name">Nombre de tu mascota</label>
+            <input id="pet-name" name="pet-name" type="text" placeholder="Ej. Luna" required />
+          </div>
+          <div class="pet-modal-row">
+            <div class="pet-modal-field">
+              <label for="pet-type">Tipo de mascota</label>
+              <select id="pet-type" name="pet-type" required>
+                <option value="">Selecciona</option>
+                <option>Perro</option>
+                <option>Gato</option>
+                <option>Otro</option>
+              </select>
+            </div>
+            <div class="pet-modal-field">
+              <label for="pet-color">Color principal</label>
+              <input id="pet-color" name="pet-color" type="text" placeholder="Ej. Negro y miel" />
+            </div>
+          </div>
+          <div class="pet-photo-instructions">
+            <div class="pet-photo-instructions-copy">
+              <h3>Instrucciones para la foto de tu mascotica:</h3>
+              <ol>
+                <li>Trata que la carita de tu perrito este lo más cerca a la cámara.</li>
+                <li>Ten buena iluminación.</li>
+              </ol>
+            </div>
+            <img src="assets/instrucciones-mascota.svg" alt="Muestra de foto recomendada para mascota" />
+          </div>
+          <div class="pet-modal-field">
+            <label for="pet-photo">Foto de referencia</label>
+            <input id="pet-photo" name="pet-photo" type="file" accept="image/*" />
+          </div>
+          <div class="pet-modal-field">
+            <label for="pet-details">Detalles importantes</label>
+            <textarea id="pet-details" name="pet-details" rows="4" placeholder="Cuéntanos rasgos, colores o accesorios que quieras incluir"></textarea>
+          </div>
+          <button class="button mascotas-dark-button pet-modal-submit" type="submit">Enviar solicitud</button>
+        </form>
+      </div>
+    </div>
+
+    <footer class="footer" id="contacto">
+      <div class="section-inner footer-grid">
+        <div>
+          <h2>Compañía</h2>
+          <a href="nosotros.html">Sobre nosotros</a>
+          <a href="hazlotumismo.html">Hazlo tú mismo</a>
+          <a href="mascotas.html">Mascota</a>
+          <a href="llaveros.html">Llaveros</a>
+          <a href="contacto.html">Contacto</a>
+        </div>
+        <div>
+          <h2>Síguenos o escríbenos</h2>
+          <a href="#">Instagram</a>
+          <a href="#">TikTok</a>
+          <a href="mailto:info@kora.co">info@kora.co</a>
+        </div>
+        <div>
+          <h2>Legal</h2>
+          <a href="#">Políticas de privacidad</a>
+          <a href="#">Términos y condiciones</a>
+          <a href="#">Términos de devolución</a>
+        </div>
+        <div class="footer-brand">
+          <img src="assets/mascotas-footer-logo.svg" alt="Kora" />
+          <p>Kora Studio 2026. Todos los derechos reservados.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="products.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

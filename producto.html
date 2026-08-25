@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kora Studio | Detalle de producto</title>
+    <meta name="description" content="Conoce todos los detalles de tu producto Kora." />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="product-detail-page">
+    <header class="site-header">
+      <div class="promo-bar">
+        <a href="hazlotumismo.html">Personaliza tu recuerdo favorito hoy <span aria-hidden="true">→</span></a>
+      </div>
+
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a class="brand" href="index.html" aria-label="Kora Studio inicio">
+          <img src="assets/icon-06.svg" alt="Kora" />
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="nav-menu" id="nav-menu">
+          <a href="index.html">Inicio</a>
+          <a href="mascotas.html">Mascotas</a>
+          <a href="llaveros.html">Llaveros</a>
+          <a class="active" href="hazlotumismo.html">Hazlo tú mismo</a>
+          <a href="nosotros.html">Nosotros</a>
+          <a href="contacto.html">Contacto</a>
+        </div>
+
+        <div class="nav-actions" aria-label="Acciones de tienda">
+          <button type="button" aria-label="Favoritos" title="Favoritos">
+            <img src="assets/icon-03.svg" alt="" />
+          </button>
+          <button class="cart-button" type="button" aria-label="Carrito" title="Carrito">
+            <img src="assets/icon-01.svg" alt="" />
+            <strong class="cart-count">0</strong>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main id="product-detail-root">
+      <nav class="section-inner product-breadcrumb" aria-label="Ruta del producto">
+        <a id="product-breadcrumb-category" href="hazlotumismo.html">Tienda</a>
+        <span aria-hidden="true">›</span>
+        <strong id="product-breadcrumb-title">Producto</strong>
+      </nav>
+
+      <section class="section-inner product-detail-layout" aria-labelledby="product-detail-title">
+        <div class="product-detail-gallery">
+          <div class="product-detail-media">
+            <img id="product-detail-image" src="" alt="" />
+          </div>
+          <div class="product-gallery-dots" aria-hidden="true">
+            <span class="active"></span>
+            <span></span>
+          </div>
+        </div>
+
+        <div class="product-detail-copy">
+          <p class="product-detail-category" id="product-detail-category"></p>
+          <h1 id="product-detail-title">Cargando producto</h1>
+          <div class="product-detail-price">
+            <strong id="product-detail-price"></strong>
+            <span id="product-detail-compare"></span>
+          </div>
+
+          <div class="product-quantity" aria-label="Cantidad">
+            <button type="button" id="product-quantity-minus" aria-label="Restar una unidad">−</button>
+            <output id="product-quantity-value" aria-live="polite">1</output>
+            <button type="button" id="product-quantity-plus" aria-label="Sumar una unidad">+</button>
+          </div>
+
+          <div class="product-detail-actions">
+            <button class="product-detail-add" type="button" id="product-detail-add">
+              <img src="assets/llaveros-cart.svg" alt="" />
+              <span>Agregar al carrito</span>
+            </button>
+            <button class="product-favorite" type="button" id="product-favorite" aria-label="Agregar a favoritos" aria-pressed="false">
+              <span aria-hidden="true">♡</span>
+            </button>
+          </div>
+
+          <p class="product-delivery">Entregas nacionales de 6 a 8 días hábiles.</p>
+
+          <ul class="product-benefits" aria-label="Beneficios del producto">
+            <li>Envío gratuito por compras superiores a $50.000</li>
+            <li>Diseño creado con atención al detalle</li>
+            <li>Material resistente al sol y al agua</li>
+            <li>Piezas listas para llevar todos los días</li>
+          </ul>
+
+          <div class="product-description-block">
+            <h2>Descripción</h2>
+            <p id="product-detail-description"></p>
+          </div>
+
+          <dl class="product-specs" id="product-detail-specs"></dl>
+
+          <section class="product-components" id="product-components" aria-labelledby="product-components-title" hidden>
+            <h2 id="product-components-title">Piezas incluidas</h2>
+            <div class="product-components-grid" id="product-components-grid"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="product-related" aria-labelledby="product-related-title">
+        <div class="section-inner">
+          <div class="product-related-head">
+            <div>
+              <h2 id="product-related-title"><span>Hazlo</span><span>tú mismo</span></h2>
+              <p>Descubre productos relacionados y encuentra nuevas piezas para complementar tu selección.</p>
+            </div>
+            <strong id="product-related-count"></strong>
+          </div>
+          <div class="product-grid product-related-grid" id="product-related-grid"></div>
+          <a class="button button-primary product-store-link" href="hazlotumismo.html">Ir a tienda</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" id="contacto">
+      <div class="section-inner footer-grid">
+        <div>
+          <h2>Compañía</h2>
+          <a href="nosotros.html">Sobre nosotros</a>
+          <a href="hazlotumismo.html">Hazlo tú mismo</a>
+          <a href="mascotas.html">Mascotas</a>
+          <a href="llaveros.html">Llaveros</a>
+          <a href="contacto.html">Contacto</a>
+        </div>
+        <div>
+          <h2>Síguenos o escríbenos</h2>
+          <a href="#">Instagram</a>
+          <a href="#">TikTok</a>
+          <a href="mailto:info@kora.co">info@kora.co</a>
+        </div>
+        <div>
+          <h2>Legal</h2>
+          <a href="#">Políticas de privacidad</a>
+          <a href="#">Términos y condiciones</a>
+          <a href="#">Términos de devolución</a>
+        </div>
+        <div class="footer-brand">
+          <img src="assets/icon-08.svg" alt="Kora" />
+          <p>Kora Studio 2026. Todos los derechos reservados.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="products.js"></script>
+    <script src="script.js"></script>
+    <script src="product-detail.js"></script>
+  </body>
+</html>

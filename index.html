@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kora Studio | E-commerce personalizado</title>
+    <meta
+      name="description"
+      content="Kora Studio transforma recuerdos, mascotas e ideas en llaveros y dijes personalizados."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="promo-bar">
+        <a href="hazlotumismo.html">Personaliza tu recuerdo favorito hoy <span aria-hidden="true">→</span></a>
+      </div>
+
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a class="brand" href="index.html" aria-label="Kora Studio inicio">
+          <img src="assets/icon-06.svg" alt="Kora" />
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="nav-menu" id="nav-menu">
+          <a class="active" href="#">Inicio</a>
+          <a href="mascotas.html">Mascotas</a>
+          <a href="llaveros.html">Llaveros</a>
+          <a href="hazlotumismo.html">Hazlo tú mismo</a>
+          <a href="nosotros.html">Nosotros</a>
+          <a href="contacto.html">Contacto</a>
+        </div>
+
+        <div class="nav-actions" aria-label="Acciones de tienda">
+          <button type="button" aria-label="Favoritos" title="Favoritos">
+            <img src="assets/icon-03.svg" alt="" />
+          </button>
+          <button class="cart-button" type="button" aria-label="Carrito" title="Carrito">
+            <img src="assets/icon-01.svg" alt="" />
+            <strong class="cart-count">0</strong>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <h1 id="hero-title">
+            <span>Llévalo contigo</span>
+            <span>siempre.</span>
+          </h1>
+          <p>
+            Transformamos tus recuerdos favoritos en algo único para ti.
+          </p>
+          <a class="button button-primary" href="hazlotumismo.html">Crea el tuyo</a>
+        </div>
+        <div class="hero-media" aria-label="Espacio para fotografía principal">
+          <div class="wavy-border" aria-hidden="true"></div>
+          <img class="section-photo" src="assets/image-01.png" alt="Llaveros personalizados de Kora" />
+        </div>
+      </section>
+
+      <section class="benefits dark-section" aria-labelledby="benefits-title">
+        <h2 class="sr-only" id="benefits-title">Beneficios de Kora</h2>
+        <div class="section-inner benefit-grid">
+          <article class="benefit-card">
+            <span class="line-icon"><img src="assets/icon-07.svg" alt="" /></span>
+            <h3>Envío gratis</h3>
+            <p>Recibe tu pedido sin costo adicional en compras seleccionadas.</p>
+          </article>
+          <article class="benefit-card">
+            <span class="line-icon"><img src="assets/icon-05.svg" alt="" /></span>
+            <h3>Ligero y resistente</h3>
+            <p>Fabricado para crear piezas cómodas, duraderas y llenas de detalle.</p>
+          </article>
+          <article class="benefit-card">
+            <span class="line-icon"><img src="assets/icon-02.svg" alt="" /></span>
+            <h3>Cuidamos cada detalle</h3>
+            <p>Desde el diseño hasta el ensamblaje, cada pieza recibe atención especial.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="story-split" id="mascotas" aria-labelledby="pets-title">
+        <div class="story-panel story-copy">
+          <h2 class="sr-only" id="pets-title">Llaveros personalizados inspirados en mascotas</h2>
+          <p>
+            Convierte esa foto que tanto amas en un llavero personalizado inspirado en tu mascota.
+          </p>
+          <p>
+            Creamos cada pieza cuidando sus rasgos, colores y detalles para transformar su carita en
+            un recuerdo único que puedes llevar en tus llaves, bolso o mochila.
+          </p>
+          <a class="button button-primary" href="mascotas.html">Empezar a crear</a>
+        </div>
+        <div class="story-panel story-image">
+          <img class="section-photo" src="assets/image-03.png" alt="Llavero personalizado de mascota en un jean" />
+        </div>
+      </section>
+
+      <section class="story-split reverse" id="llaveros" aria-labelledby="keychain-title">
+        <div class="story-panel story-image">
+          <img class="section-photo" src="assets/image-05.png" alt="Llavero colorido personalizado colgado en un bolso" />
+        </div>
+        <div class="story-panel story-copy accent">
+          <h2 class="sr-only" id="keychain-title">Llaveros personalizados</h2>
+          <p>
+            Personaliza tu llavero con nombres, colores, formas y detalles que representen tu estilo,
+            una persona especial o simplemente algo que amas.
+          </p>
+          <a class="button button-primary" href="hazlotumismo.html?categoria=A%20medida">Ir a la tienda</a>
+        </div>
+      </section>
+
+      <section class="product-section" id="crear" aria-labelledby="create-title">
+        <div class="section-inner">
+          <h2 class="section-title" id="create-title">
+            <span>Hazlo</span>
+            <span>tú mismo</span>
+          </h2>
+          <p class="section-lead">
+            Elige, combina y crea algo totalmente tuyo. Encuentra tus dijes favoritos,
+            mezcla colores, formas y estilos, y arma un llavero que hable de ti.
+          </p>
+
+          <div class="product-grid home-product-grid" id="productos-destacados">
+            <a class="product-card" href="producto.html?id=dije-corazon-rojo">
+              <div class="product-media"><img src="assets/image-12.png" alt="Dije corazón rojo" /></div>
+              <div class="product-info">
+                <div class="product-heading-row"><h3>Dije corazón rojo</h3><span>30x34 mm</span></div>
+                <div class="product-price"><strong>$18.000</strong><span>$24.000</span></div>
+                <span class="product-card-cta"><img src="assets/llaveros-cart.svg" alt="" />Ver en tienda</span>
+              </div>
+            </a>
+            <a class="product-card" href="producto.html?id=dije-concha-dorada">
+              <div class="product-media"><img src="assets/image-10.png" alt="Dije concha dorada" /></div>
+              <div class="product-info">
+                <div class="product-heading-row"><h3>Dije concha dorada</h3><span>18x24 mm</span></div>
+                <div class="product-price"><strong>$16.000</strong><span>$20.000</span></div>
+                <span class="product-card-cta"><img src="assets/llaveros-cart.svg" alt="" />Ver en tienda</span>
+              </div>
+            </a>
+            <a class="product-card" href="producto.html?id=dije-hongo-rojo">
+              <div class="product-media"><img src="assets/image-08.png" alt="Dije hongo rojo" /></div>
+              <div class="product-info">
+                <div class="product-heading-row"><h3>Dije hongo rojo</h3><span>24x28 mm</span></div>
+                <div class="product-price"><strong>$15.000</strong><span>$19.000</span></div>
+                <span class="product-card-cta"><img src="assets/llaveros-cart.svg" alt="" />Ver en tienda</span>
+              </div>
+            </a>
+            <a class="product-card" href="producto.html?id=dije-redondo-gratitud">
+              <div class="product-media"><img src="assets/image-09.png" alt="Dije redondo colorido" /></div>
+              <div class="product-info">
+                <div class="product-heading-row"><h3>Dije redondo gratitud</h3><span>32 mm</span></div>
+                <div class="product-price"><strong>$17.000</strong><span>$22.000</span></div>
+                <span class="product-card-cta"><img src="assets/llaveros-cart.svg" alt="" />Ver en tienda</span>
+              </div>
+            </a>
+          </div>
+          <a class="button shop-button" href="hazlotumismo.html">Ir a la tienda</a>
+        </div>
+      </section>
+
+      <section class="about-band" id="nosotros" aria-labelledby="about-title">
+        <div class="section-inner about-grid">
+          <h2 id="about-title">Creado con amor por quienes dejan huella</h2>
+          <div class="about-art">
+            <img class="brand-illustration" src="assets/image-11.png" alt="Ilustración de mascotas Kora" />
+          </div>
+          <div class="about-copy">
+            <p>
+              Sabemos que una mascota es mucho más que una mascota. Es compañía,
+              recuerdos, momentos especiales y una parte importante de nuestra historia.
+            </p>
+            <p>
+              Por eso creamos piezas personalizadas que buscan capturar aquello que las hace únicas.
+              Cada diseño nace de una fotografía y se transforma en un pequeño recuerdo.
+            </p>
+            <a class="button button-primary" href="hazlotumismo.html">Empezar a crear</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" id="contacto">
+      <div class="section-inner footer-grid">
+        <div>
+          <h2>Compañía</h2>
+          <a href="nosotros.html">Sobre nosotros</a>
+          <a href="hazlotumismo.html">Hazlo tú mismo</a>
+          <a href="mascotas.html">Mascotas</a>
+          <a href="llaveros.html">Llaveros</a>
+          <a href="contacto.html">Contacto</a>
+        </div>
+        <div>
+          <h2>Síguenos o escríbenos</h2>
+          <a href="#">Instagram</a>
+          <a href="#">TikTok</a>
+          <a href="mailto:info@kora.co">info@kora.co</a>
+        </div>
+        <div>
+          <h2>Legal</h2>
+          <a href="#">Políticas de privacidad</a>
+          <a href="#">Términos y condiciones</a>
+          <a href="#">Términos de devolución</a>
+        </div>
+        <div class="footer-brand">
+          <img src="assets/icon-08.svg" alt="Kora" />
+          <p>Kora Studio 2026. Todos los derechos reservados.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="products.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

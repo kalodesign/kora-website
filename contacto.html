@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kora Studio | Contacto y cotizaciones</title>
+    <meta
+      name="description"
+      content="Cuéntanos sobre tu proyecto empresarial, producción especial o idea 3D y solicita una cotización con Kora Studio."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="contact-page">
+    <header class="site-header">
+      <div class="promo-bar">
+        <a href="hazlotumismo.html">Personaliza tu recuerdo favorito hoy <span aria-hidden="true">→</span></a>
+      </div>
+
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a class="brand" href="index.html" aria-label="Kora Studio inicio">
+          <img src="assets/icon-06.svg" alt="Kora" />
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="nav-menu" id="nav-menu">
+          <a href="index.html">Inicio</a>
+          <a href="mascotas.html">Mascotas</a>
+          <a href="llaveros.html">Llaveros</a>
+          <a href="hazlotumismo.html">Hazlo tú mismo</a>
+          <a href="nosotros.html">Nosotros</a>
+          <a class="active" href="contacto.html">Contacto</a>
+        </div>
+
+        <div class="nav-actions" aria-label="Acciones de tienda">
+          <button type="button" aria-label="Favoritos" title="Favoritos">
+            <img src="assets/icon-03.svg" alt="" />
+          </button>
+          <button class="cart-button" type="button" aria-label="Carrito" title="Carrito">
+            <img src="assets/icon-01.svg" alt="" />
+            <strong class="cart-count">0</strong>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="contact-intro" aria-labelledby="contact-title">
+        <div class="section-inner">
+          <p>Proyectos especiales</p>
+          <h1 id="contact-title">Cuéntanos qué quieres crear</h1>
+          <span>
+            Trabajamos propuestas para empresas, producciones especiales y piezas 3D.
+            Comparte tu idea y prepararemos una cotización para ti.
+          </span>
+        </div>
+      </section>
+
+      <section class="contact-workspace" aria-labelledby="quote-title">
+        <div class="section-inner contact-panel">
+          <aside class="contact-project-visual">
+            <img src="assets/image-01.png" alt="Muestra de productos personalizados creados por Kora" />
+            <div>
+              <h2>Ideas que toman forma</h2>
+              <p>Cuéntanos el objetivo, la cantidad y el estilo. Nosotros te ayudamos a aterrizar el resto.</p>
+              <a href="mailto:info@kora.co">info@kora.co</a>
+            </div>
+          </aside>
+
+          <form class="contact-form" id="contact-project-form" novalidate>
+            <header>
+              <h2 id="quote-title">Solicita una cotización</h2>
+              <p>Escríbenos lo esencial de tu proyecto. Te responderemos en uno o dos días hábiles.</p>
+            </header>
+
+            <div class="contact-form-grid">
+              <label class="contact-field">
+                <span>Nombre *</span>
+                <input type="text" name="name" autocomplete="name" required />
+              </label>
+
+              <label class="contact-field">
+                <span>Correo electrónico *</span>
+                <input type="email" name="email" autocomplete="email" required />
+              </label>
+
+              <label class="contact-field">
+                <span>Empresa</span>
+                <input type="text" name="company" autocomplete="organization" />
+              </label>
+
+              <label class="contact-field">
+                <span>Tipo de proyecto *</span>
+                <select name="projectType" required>
+                  <option value="">Selecciona una opción</option>
+                  <option value="empresa">Proyecto para empresa</option>
+                  <option value="3d">Diseño o impresión 3D</option>
+                  <option value="produccion">Producción especial</option>
+                  <option value="otro">Otro proyecto</option>
+                </select>
+              </label>
+
+              <label class="contact-field">
+                <span>Cantidad aproximada</span>
+                <input type="number" name="quantity" min="1" inputmode="numeric" />
+              </label>
+
+              <label class="contact-field">
+                <span>Presupuesto estimado</span>
+                <select name="budget">
+                  <option value="">Aún no lo sé</option>
+                  <option value="menos-500">Menos de $500.000</option>
+                  <option value="500-1m">$500.000 a $1.000.000</option>
+                  <option value="1m-3m">$1.000.000 a $3.000.000</option>
+                  <option value="mas-3m">Más de $3.000.000</option>
+                </select>
+              </label>
+
+              <label class="contact-field contact-field-full">
+                <span>Cuéntanos sobre el proyecto *</span>
+                <textarea
+                  name="details"
+                  rows="6"
+                  placeholder="Qué deseas crear, para quién es y cualquier detalle importante."
+                  required
+                ></textarea>
+              </label>
+
+              <label class="contact-upload contact-field-full" for="contact-reference">
+                <span class="contact-upload-icon" aria-hidden="true">↑</span>
+                <span class="contact-upload-copy">
+                  <strong>Adjuntar una referencia</strong>
+                  <small>PNG, JPG, PDF, STL u OBJ · máximo 15 MB</small>
+                </span>
+                <span class="contact-file-name" id="contact-file-name">Seleccionar archivo</span>
+                <input
+                  id="contact-reference"
+                  type="file"
+                  name="reference"
+                  accept=".png,.jpg,.jpeg,.pdf,.stl,.obj"
+                />
+              </label>
+            </div>
+
+            <button class="button button-primary contact-submit" type="submit">Enviar solicitud</button>
+            <p class="contact-form-status" id="contact-form-status" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" id="contacto">
+      <div class="section-inner footer-grid">
+        <div>
+          <h2>Compañía</h2>
+          <a href="nosotros.html">Sobre nosotros</a>
+          <a href="hazlotumismo.html">Hazlo tú mismo</a>
+          <a href="mascotas.html">Mascotas</a>
+          <a href="llaveros.html">Llaveros</a>
+          <a href="contacto.html">Contacto</a>
+        </div>
+        <div>
+          <h2>Síguenos o escríbenos</h2>
+          <a href="#">Instagram</a>
+          <a href="#">TikTok</a>
+          <a href="mailto:info@kora.co">info@kora.co</a>
+        </div>
+        <div>
+          <h2>Legal</h2>
+          <a href="#">Políticas de privacidad</a>
+          <a href="#">Términos y condiciones</a>
+          <a href="#">Términos de devolución</a>
+        </div>
+        <div class="footer-brand">
+          <img src="assets/icon-08.svg" alt="Kora" />
+          <p>Kora Studio 2026. Todos los derechos reservados.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="products.js"></script>
+    <script src="script.js"></script>
+    <script src="contact.js"></script>
+  </body>
+</html>
