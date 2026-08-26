@@ -154,7 +154,7 @@ npx supabase secrets set KORA_CPHP_NOTIFICATION_URL="https://kora3d.co/api/notif
 
 4. Prueba la URL en el navegador. Si el token coincide, debe devolver `{"ok":true}`.
 
-La funcion de Supabase intentara enviar con Resend, despues con este endpoint de cPanel y por ultimo con Google Apps Script. Para usar solo cPanel, revoca la llave expuesta de Resend y no configures Google Apps Script.
+La funcion de Supabase intentara enviar primero con este endpoint de cPanel, despues con Resend y por ultimo con Google Apps Script. Para usar solo cPanel, revoca la llave expuesta de Resend y no configures Google Apps Script.
 
 ## Catalogo y almacenamiento en version 1
 

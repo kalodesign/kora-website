@@ -21,6 +21,13 @@ export const formatCop = (value: unknown) =>
   }).format(Number(value || 0));
 
 export const sendKoraEmail = async (message: EmailMessage) => {
+  try {
+    const sent = await sendWithCpanelPhp(message);
+    if (sent) return true;
+  } catch (error) {
+    console.error("cPanel email notification failed", error);
+  }
+
   const apiKey = Deno.env.get("RESEND_API_KEY");
   if (apiKey) {
     try {
@@ -29,13 +36,6 @@ export const sendKoraEmail = async (message: EmailMessage) => {
     } catch (error) {
       console.error("Resend notification failed", error);
     }
-  }
-
-  try {
-    const sent = await sendWithCpanelPhp(message);
-    if (sent) return true;
-  } catch (error) {
-    console.error("cPanel email notification failed", error);
   }
 
   return sendWithGoogleAppsScript(message);
