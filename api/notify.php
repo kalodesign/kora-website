@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 // Cambia este valor por el mismo token largo que guardaras en Supabase.
-$webhookToken = 'REEMPLAZA_ESTE_TOKEN_LARGO';
+$webhookToken = 'PaX7xWoeLeM68XkNbxoCKCB5qLGnc664H0foJ9okXoVnQ5hq';
 $recipient = 'info@kora3d.co';
 $sender = 'Kora <info@kora3d.co>';
 
@@ -19,6 +19,22 @@ if (!hash_equals($webhookToken, $token)) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    if (($_GET['test'] ?? '') === '1') {
+        $sent = mail(
+            $recipient,
+            'Prueba de notificaciones Kora',
+            '<p>El correo de cPanel para Kora está funcionando.</p>',
+            implode("\r\n", [
+                'MIME-Version: 1.0',
+                'Content-Type: text/html; charset=UTF-8',
+                'From: ' . $sender,
+            ])
+        );
+        if (!$sent) {
+            respond(502, ['ok' => false, 'error' => 'cPanel no pudo aceptar el correo de prueba']);
+        }
+        respond(200, ['ok' => true, 'message' => 'Correo de prueba aceptado por cPanel']);
+    }
     respond(200, ['ok' => true]);
 }
 
