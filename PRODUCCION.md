@@ -140,6 +140,22 @@ npx supabase secrets set GOOGLE_APPS_SCRIPT_WEBHOOK_URL="https://script.google.c
 
 Este metodo envia a `info@kora3d.co` desde la cuenta de Google propietaria del script. Es adecuado para alertas internas de la version 1; no es un sustituto para correos masivos o de marketing.
 
+### Alternativa directa desde cPanel
+
+Puedes evitar proveedores externos y usar el correo del hosting. Sube `api/notify.php` por FileZilla a una carpeta publica `api/` en la raiz de `kora3d.co`.
+
+1. En el archivo PHP cambia `REEMPLAZA_ESTE_TOKEN_LARGO` por una cadena larga y privada.
+2. Confirma que `info@kora3d.co` existe como cuenta de correo en cPanel.
+3. Guarda la misma URL con token como secreto de Supabase:
+
+```powershell
+npx supabase secrets set KORA_CPHP_NOTIFICATION_URL="https://kora3d.co/api/notify.php?token=TU_TOKEN_LARGO"
+```
+
+4. Prueba la URL en el navegador. Si el token coincide, debe devolver `{"ok":true}`.
+
+La funcion de Supabase intentara enviar con Resend, despues con este endpoint de cPanel y por ultimo con Google Apps Script. Para usar solo cPanel, revoca la llave expuesta de Resend y no configures Google Apps Script.
+
 ## Catalogo y almacenamiento en version 1
 
 Los productos continuan en `data/products.json` y las imagenes en `assets/`, alojados en tu hosting. No se suben al Storage de Supabase.

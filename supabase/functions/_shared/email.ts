@@ -31,6 +31,13 @@ export const sendKoraEmail = async (message: EmailMessage) => {
     }
   }
 
+  try {
+    const sent = await sendWithCpanelPhp(message);
+    if (sent) return true;
+  } catch (error) {
+    console.error("cPanel email notification failed", error);
+  }
+
   return sendWithGoogleAppsScript(message);
 };
 
@@ -74,6 +81,22 @@ const sendWithGoogleAppsScript = async (message: EmailMessage) => {
 
   const result = await response.json().catch(() => ({ ok: false }));
   if (!result.ok) throw new Error("Google Apps Script no pudo enviar el correo");
+  return true;
+};
+
+const sendWithCpanelPhp = async (message: EmailMessage) => {
+  const url = Deno.env.get("KORA_CPHP_NOTIFICATION_URL");
+  if (!url) return false;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(message)
+  });
+  if (!response.ok) throw new Error(`cPanel email endpoint ${response.status}`);
+
+  const result = await response.json().catch(() => ({ ok: false }));
+  if (!result.ok) throw new Error("cPanel no pudo enviar el correo");
   return true;
 };
 
