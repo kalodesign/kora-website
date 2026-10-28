@@ -1,4 +1,7 @@
 .env
+importador-local.env
+data/whatsapp-orders-local.json
+data/analisis-whatsapp-state.json
+data/analisis-whatsapp-pendientes.json
 supabase/.temp/
-data/contact-uploads/
-data/pet-uploads/
+api/
