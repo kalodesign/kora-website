@@ -62,7 +62,22 @@
         </div>
         <div class="hero-media" aria-label="Espacio para fotografía principal">
           <div class="wavy-border" aria-hidden="true"></div>
-          <img class="section-photo" src="assets/image-01.png" alt="Llaveros personalizados de Kora" />
+          <picture>
+            <source
+              srcset="assets/home-navidad-2026-mobile.jpg 940w, assets/home-navidad-2026-desktop.jpg 1672w"
+              sizes="(max-width: 760px) 100vw, 50vw"
+              type="image/jpeg"
+            />
+            <img
+              class="section-photo"
+              src="assets/home-navidad-2026-desktop.jpg"
+              alt="Colección navideña de charms y llaveros personalizados de Kora"
+              width="1672"
+              height="941"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </picture>
         </div>
       </section>
 
