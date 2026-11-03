@@ -103,6 +103,13 @@
       ruta: 'assets/mic/',
       realceOscuro: .35,
       realceClaro: .16,
+      // Referencias temporales: se usan solo mientras falten capas finales alineadas.
+      referencias: {
+        cuerpo:'referencia-cuerpo-cilindrico.png',
+        cabeza:'referencia-cabeza-textura.png',
+        placa:'referencia-placa-rectangular.png',
+        zonaLogo:{ x:.34, y:.48, w:.32, h:.08 }
+      },
       tamanos: {
         grande: {
           cuerpo: 'cuerpo_grande.png',
@@ -223,6 +230,20 @@
       return promesa;
     }
 
+    // Si aún no existe una capa final, la referencia publicada mantiene la vista visible.
+    async function cargarCapa(capa) {
+      try {
+        return { imagen:await cargarImagen(capa.archivo), referencia:false };
+      } catch {
+        const referencia=ASSETS.referencias[capa.id];
+        try {
+          return { imagen:await cargarImagen(referencia), referencia:true };
+        } catch {
+          throw new Error(`${capa.archivo} o ${referencia}`);
+        }
+      }
+    }
+
     function capasActivas() {
       const tamano=ASSETS.tamanos[tamanoActual()];
       const placa=tamano.placas[formaActual()];
@@ -314,23 +335,44 @@
       aviso.innerHTML=`<strong>Faltan capas PNG para mostrar esta vista previa.</strong><span>Agrega estos archivos en <code>/assets/mic/</code>:<br><code>${archivos.map(escapeHtml).join('</code><br><code>')}</code></span>`;
     }
 
+    // Composición temporal para las tres referencias publicadas, que no comparten un lienzo.
+    function dibujarReferencias(contexto,capas,fuentes) {
+      const ancho=1200, alto=1500;
+      const posiciones={
+        cuerpo:{ x:418, y:430, w:364, h:910 },
+        cabeza:{ x:310, y:68, w:580, h:580 },
+        placa:{ x:126, y:505, w:948, h:420 }
+      };
+      capas.forEach((capa,indice)=>{
+        const posicion=posiciones[capa.id];
+        contexto.drawImage(crearCapaRecolorada(capa,fuentes[indice].imagen),posicion.x,posicion.y,posicion.w,posicion.h);
+      });
+      dibujarZonaLogo(contexto,ASSETS.referencias.zonaLogo,ancho,alto,hexVista(state.colores.logo));
+    }
+
     // Orden: cuerpo, cabeza, placa, zona de logo y, al final, brillos opcionales.
     async function dibujarMicrofono() {
       const ciclo=++vistaPrevia.ciclo;
       const configuracion=capasActivas();
-      const resultados=await Promise.allSettled(configuracion.capas.map((capa)=>cargarImagen(capa.archivo)));
+      const resultados=await Promise.allSettled(configuracion.capas.map((capa)=>cargarCapa(capa)));
       if (ciclo!==vistaPrevia.ciclo) return;
       const faltantes=resultados.filter((resultado)=>resultado.status==='rejected').map((resultado)=>resultado.reason.message);
       if (faltantes.length) { mostrarAvisoAssets(faltantes); return; }
-      const imagenes=resultados.map((resultado)=>resultado.value);
+      const fuentes=resultados.map((resultado)=>resultado.value);
+      const imagenes=fuentes.map((fuente)=>fuente.imagen);
       const primera=imagenes[0];
       const incompatibles=imagenes.filter((imagen)=>imagen.naturalWidth!==primera.naturalWidth || imagen.naturalHeight!==primera.naturalHeight);
-      if (incompatibles.length) { mostrarAvisoAssets(['Los PNG deben tener exactamente el mismo tamaño de lienzo.']); return; }
-      const brillos=await Promise.all(configuracion.capas.map((capa)=>cargarImagen(archivoBrillo(capa.archivo),true)));
-      if (ciclo!==vistaPrevia.ciclo) return;
       const lienzo=$('#microphone');
       lienzo.hidden=false;
       $('#preview-assets-warning').hidden=true;
+      const usarReferencias=fuentes.some((fuente)=>fuente.referencia) || incompatibles.length;
+      if (usarReferencias) {
+        const contexto=prepararLienzo(1200,1500);
+        dibujarReferencias(contexto,configuracion.capas,fuentes);
+        return;
+      }
+      const brillos=await Promise.all(configuracion.capas.map((capa)=>cargarImagen(archivoBrillo(capa.archivo),true)));
+      if (ciclo!==vistaPrevia.ciclo) return;
       const contexto=prepararLienzo(primera.naturalWidth,primera.naturalHeight);
       configuracion.capas.forEach((capa,indice)=>contexto.drawImage(crearCapaRecolorada(capa,imagenes[indice]),0,0));
       dibujarZonaLogo(contexto,configuracion.zonaLogo,primera.naturalWidth,primera.naturalHeight,hexVista(state.colores.logo));
