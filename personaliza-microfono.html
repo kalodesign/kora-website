@@ -5,441 +5,528 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Personaliza tu micrófono | Kora</title>
   <style>
-    :root { --azul:#171d67; --tinta:#111b45; --lila:#e8e1ff; --rosa:#ffe5ee; --verde:#d7f3c0; --borde:#d4d3df; --radio:6px; --fondo:#fff; }
+    :root { --azul:#171d67; --tinta:#111b45; --lila:#e8e1ff; --rosa:#ffe5ee; --borde:#d4d3df; --radio:6px; }
     * { box-sizing:border-box; }
-    body { margin:0; color:var(--tinta); background:var(--fondo); font:16px/1.45 Arial, sans-serif; }
+    [hidden] { display:none !important; }
+    body { margin:0; color:var(--tinta); background:white; font:16px/1.45 Arial, sans-serif; }
     button, select { font:inherit; }
     button { cursor:pointer; }
     :focus-visible { outline:3px solid #fe7e01; outline-offset:3px; }
-    .topbar { min-height:64px; display:flex; align-items:center; justify-content:space-between; gap:20px; padding:12px max(20px, calc((100% - 1200px)/2)); border-bottom:1px solid #e9e8ed; }
-    .brand { color:var(--azul); font-size:23px; font-weight:900; text-decoration:none; }
-    .help { width:42px; height:42px; border:1px solid var(--azul); border-radius:var(--radio); background:white; color:var(--azul); font-size:22px; font-weight:bold; }
+    .topbar { min-height:64px; display:flex; align-items:center; justify-content:space-between; padding:10px max(20px, calc((100% - 1160px)/2)); border-bottom:1px solid #e9e8ed; }
+    .brand img { display:block; width:106px; height:auto; }
+    .help, .tool { height:42px; border:1px solid var(--borde); border-radius:var(--radio); color:var(--azul); background:white; }
+    .help { width:42px; font-size:20px; font-weight:bold; }
     main { max-width:1200px; margin:auto; padding:25px 20px 60px; }
-    .intro { margin-bottom:20px; }
-    h1,h2,h3,p { margin-top:0; }
-    h1 { margin-bottom:7px; font-size:30px; line-height:1.1; color:var(--azul); }
-    .intro p { margin:0; color:#4b5065; }
-    .workspace { display:grid; gap:26px; }
+    h1,h2,p { margin:0; }
+    h1,h2,legend,.field-label { color:var(--azul); }
+    h1 { font-size:clamp(30px,3.3vw,40px); line-height:1.12; letter-spacing:-.035em; }
+    h2 { font-size:22px; line-height:1.22; }
+    .intro { margin-bottom:22px; }
+    .intro p, .notice { color:#50536a; }
+    .intro p { margin-top:6px; }
+    .workspace { display:grid; gap:28px; }
     .preview { min-width:0; }
-    .preview-stage { position:relative; background:var(--lila); border-radius:var(--radio); display:grid; place-items:center; min-height:360px; overflow:hidden; }
-    #microphone { display:block; width:min(100%, 420px); max-height:510px; }
-    .asset-warning { width:min(86%,420px); margin:20px; padding:16px; border:1px solid var(--azul); border-radius:var(--radio); background:#fffdf3; color:var(--azul); text-align:center; font-size:14px; line-height:1.45; }
-    .asset-warning strong { display:block; margin-bottom:6px; }
-    .asset-warning code { overflow-wrap:anywhere; color:#68284e; font-size:12px; }
-    .preview-note { margin:12px 0; font-size:14px; }
-    .notice { color:#50536a; font-size:13px; }
-    .controls h2 { font-size:22px; color:var(--azul); margin:0 0 18px; }
-    fieldset { border:0; padding:0; margin:0 0 24px; min-width:0; }
-    legend, .field-label { display:block; margin-bottom:8px; font-weight:700; color:var(--azul); }
-    select { width:100%; height:44px; padding:0 12px; border:1px solid #a8a8b7; border-radius:var(--radio); background:white; color:var(--tinta); }
+    .preview-stage { position:relative; aspect-ratio:1; overflow:hidden; isolation:isolate; border:1px solid #e4dfef; border-radius:var(--radio); background:#f8f7fb; }
+    #microphone, #poster { position:absolute; inset:0; display:block; width:100%; height:100%; }
+    #microphone { touch-action:pan-y pinch-zoom; cursor:grab; }
+    #microphone:active { cursor:grabbing; }
+    #microphone:focus-visible { outline-offset:-4px; }
+    #poster { object-fit:contain; }
+    .view-badge { pointer-events:none; position:absolute; top:13px; left:13px; margin:0; padding:4px 9px; background:#fff; border:1px solid #e4dfef; border-radius:var(--radio); color:var(--azul); font-weight:700; font-size:12px; }
+    .view-tools { display:flex; gap:6px; align-items:center; }
+    .view-tools .tool { padding:0 10px; min-width:42px; }
+    .view-tools .zoom { font-size:21px; }
+    .preview-caption { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin-top:10px; }
+    .notice { font-size:14px; }
+    .controls h2 { margin:0 0 20px; }
+    fieldset { border:0; padding:0; margin:0 0 22px; min-width:0; }
+    legend, .field-label { display:block; margin-bottom:8px; font-weight:700; }
+    select { width:100%; height:42px; padding:0 12px; border:1px solid #a8a8b7; border-radius:var(--radio); background:white; color:var(--tinta); }
     .segments { display:flex; flex-wrap:wrap; gap:8px; }
     .segments label { position:relative; }
-    .segments input { position:absolute; opacity:0; }
-    .segments span { display:block; min-width:95px; text-align:center; padding:10px 14px; border:1px solid #a8a8b7; border-radius:var(--radio); background:white; cursor:pointer; }
+    .segments input { position:absolute; width:1px; height:1px; opacity:0; }
+    .segments span { min-height:42px; display:grid; place-items:center; padding:8px 16px; border:1px solid #a8a8b7; border-radius:var(--radio); background:white; cursor:pointer; }
     .segments input:checked + span { color:white; border-color:var(--azul); background:var(--azul); }
     .segments input:focus-visible + span { outline:3px solid #fe7e01; outline-offset:3px; }
-    .palette { display:flex; flex-wrap:wrap; gap:9px; }
-    .swatch { display:grid; place-items:center; width:34px; height:34px; padding:0; border:2px solid white; border-radius:50%; background:var(--swatch); box-shadow:0 0 0 1px #8e8e9c; color:var(--check); font-size:20px; font-weight:900; }
-    .swatch[aria-pressed="true"] { box-shadow:0 0 0 3px var(--azul); }
-    .swatch:disabled { cursor:not-allowed; opacity:.38; background-image:linear-gradient(135deg,transparent 46%,#5b5b5b 47%,#5b5b5b 53%,transparent 54%); }
-    .selection { min-height:22px; margin:8px 0 0; font-size:13px; color:#4a4d60; }
-    .neon { font-size:12px; margin:8px 0 0; color:#575b6b; }
-    .warning { background:#5b4600; color:#fff293; padding:10px 12px; border-radius:var(--radio); font-size:14px; }
-    .summary { border-top:1px solid var(--borde); padding-top:20px; }
-    .summary h2 { margin-bottom:12px; }
-    .summary dl { display:grid; grid-template-columns:minmax(90px,1fr) 2fr; gap:8px 12px; margin:0 0 18px; font-size:14px; }
+    .summary { border-top:1px solid var(--borde); padding-top:16px; }
+    .summary h2 { margin-bottom:10px; }
+    dl { display:grid; grid-template-columns:minmax(92px,1fr) 2fr; gap:7px 12px; margin:0 0 18px; }
     dt { font-weight:bold; } dd { margin:0; overflow-wrap:anywhere; }
     .actions { display:grid; gap:10px; }
-    .button { min-height:42px; padding:10px 16px; border-radius:var(--radio); font-weight:700; }
+    .button { min-height:42px; padding:8px 16px; border-radius:var(--radio); font-weight:700; }
     .primary { color:white; background:var(--azul); border:1px solid var(--azul); }
     .secondary { color:var(--azul); background:white; border:1px solid var(--azul); }
+    button:disabled { cursor:default; opacity:.55; }
+    #status { margin-top:8px; }
     .modal { position:fixed; inset:0; z-index:10; display:grid; place-items:center; padding:16px; background:rgba(12,18,49,.68); }
-    .modal[hidden], [hidden] { display:none !important; }
     .dialog { width:min(100%,520px); max-height:calc(100dvh - 32px); overflow:auto; background:white; border-radius:var(--radio); padding:24px; box-shadow:0 20px 55px #1115; }
     .dialog-top { display:flex; justify-content:space-between; align-items:start; gap:20px; }
-    .dialog h2 { color:var(--azul); font-size:24px; line-height:1.15; }
     .close { border:0; background:transparent; color:var(--azul); font-size:28px; line-height:1; }
-    .steps { list-style:none; display:grid; gap:12px; padding:0; margin:4px 0 24px; }
+    .steps { list-style:none; display:grid; gap:12px; padding:0; margin:18px 0 24px; }
     .steps li { display:flex; align-items:center; gap:12px; }
-    .step-icon { width:38px; height:38px; flex:none; display:grid; place-items:center; border-radius:50%; background:var(--rosa); color:var(--azul); font-weight:bold; }
+    .step-icon { width:32px; height:32px; flex:none; display:grid; place-items:center; border-radius:50%; background:var(--rosa); color:var(--azul); font-weight:bold; }
     .dialog .button { width:100%; }
-    @media (min-width:900px) { .workspace { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:60px; align-items:start; } .preview { position:sticky; top:20px; } .preview-stage { min-height:570px; } h1 { font-size:38px; } }
+    @media (min-width:900px) { .workspace { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:52px; align-items:start; } .preview { position:sticky; top:18px; } }
   </style>
 </head>
 <body>
-  <header class="topbar"><a class="brand" href="index.html" aria-label="Kora, inicio">KORA</a><button class="help" id="help" type="button" aria-label="Ver instrucciones">?</button></header>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Kora, inicio"><img src="assets/llaveros-logo.svg" width="114" height="26" alt="Kora"></a>
+    <button class="help" id="help" type="button" aria-label="Ver instrucciones">?</button>
+  </header>
   <main>
-    <div class="intro"><h1>Personaliza tu micrófono</h1><p>Elige los detalles de una pieza tan única como tu voz.</p></div>
+    <div class="intro"><h1>Personaliza tu micrófono</h1><p>Arma la carcasa para tu micrófono inalámbrico y revisa cómo encajan las piezas.</p></div>
     <div class="workspace">
       <section class="preview" aria-label="Vista previa del micrófono">
-        <div class="preview-stage"><canvas id="microphone" role="img" aria-label="Vista previa de tu micrófono personalizado"></canvas><div class="asset-warning" id="preview-assets-warning" role="alert" hidden></div></div>
-        <p class="preview-note">Tu logo se colocará aquí. Nos lo envías después de solicitar tu diseño.</p>
-        <p class="notice">Vista previa referencial. El color y relieve final pueden variar ligeramente en la impresión 3D.</p>
+        <div class="preview-stage">
+          <img id="poster" src="assets/mic/v1/cuadrada-espuma.png" alt="Micrófono ensamblado con carcasa cuadrada y cabeza de espuma" width="800" height="800">
+          <canvas id="microphone" role="img" aria-label="Ensamble en 3D" aria-describedby="view-hint" tabindex="0" hidden></canvas>
+          <span class="view-badge" id="view-badge" role="status">Vista del ensamble</span>
+        </div>
+        <div class="preview-caption">
+          <p class="notice" id="view-hint">Vista inicial del ensamble.</p>
+          <div class="view-tools" id="view-tools" role="group" aria-label="Controles de la vista 3D" hidden>
+            <button class="tool zoom" type="button" id="zoom-out" aria-label="Alejar">−</button>
+            <button class="tool zoom" type="button" id="zoom-in" aria-label="Acercar">+</button>
+            <button class="tool" type="button" id="reset-view">Centrar</button>
+          </div>
+        </div>
       </section>
       <section class="controls" aria-labelledby="controls-title">
         <h2 id="controls-title">Diseña el tuyo</h2>
         <fieldset><label class="field-label" for="model">Micrófono inalámbrico</label><select id="model"></select></fieldset>
-        <fieldset id="shape-field"><legend>Forma de la placa</legend><div class="segments" id="shapes"></div></fieldset>
+        <fieldset id="shape-field"><legend>Forma de la carcasa</legend><div class="segments" id="shapes"></div></fieldset>
         <fieldset><legend>Tipo de cabeza</legend><div class="segments" id="heads"></div></fieldset>
-        <div id="palettes"></div>
-        <p class="warning" id="contrast-warning" role="status" hidden>El color del logo y el de la placa tienen poco contraste. Prueba otra combinación para que tu logo se vea mejor.</p>
         <section class="summary" aria-labelledby="summary-title"><h2 id="summary-title">Tu diseño</h2><dl id="summary"></dl></section>
-        <div class="actions"><button class="button secondary" id="download" type="button">Descargar vista previa</button><button class="button primary" id="request" type="button">Solicitar este diseño</button></div>
-        <p class="notice" id="status" role="status" aria-live="polite"></p>
+        <div class="actions">
+          <button class="button secondary" id="download" type="button" disabled>Descargar vista previa</button>
+          <button class="button primary" id="request" type="button">Solicitar este diseño</button>
+        </div>
+        <p class="notice" id="status" role="status"></p>
       </section>
     </div>
   </main>
   <div class="modal" id="instructions" hidden>
     <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="instructions-title">
-      <div class="dialog-top"><h2 id="instructions-title">Crea tu micrófono en 4 pasos</h2><button type="button" class="close" id="close-instructions" aria-label="Cerrar instrucciones">×</button></div>
-      <ol class="steps"><li><span class="step-icon" aria-hidden="true">1</span>Elige tu micrófono inalámbrico.</li><li><span class="step-icon" aria-hidden="true">2</span>Elige forma, cabeza y colores.</li><li><span class="step-icon" aria-hidden="true">3</span>Revisa dónde irá tu logo.</li><li><span class="step-icon" aria-hidden="true">4</span>Solicita tu diseño y envíanos tu logo por WhatsApp.</li></ol>
+      <div class="dialog-top"><h2 id="instructions-title">Arma tu micrófono en 3 pasos</h2><button type="button" class="close" id="close-instructions" aria-label="Cerrar instrucciones">×</button></div>
+      <ol class="steps">
+        <li><span class="step-icon" aria-hidden="true">1</span>Elige tu micrófono inalámbrico.</li>
+        <li><span class="step-icon" aria-hidden="true">2</span>Elige la carcasa y el tipo de cabeza.</li>
+        <li><span class="step-icon" aria-hidden="true">3</span>Revisa el ensamble y solicita tu diseño por WhatsApp.</li>
+      </ol>
       <button type="button" class="button primary" id="start">Empezar</button>
     </section>
   </div>
   <script>
-    // ASSETS DE LA VISTA PREVIA. Todos los PNG deben compartir el mismo lienzo y alineación.
-    // Ajusta zonaLogo cuando tengas los PNG finales: x, y, w y h son porcentajes (0 a 1) del lienzo.
-    const ASSETS = {
-      ruta: 'assets/mic/',
-      realceOscuro: .35,
-      realceClaro: .16,
-      // Referencias temporales: se usan solo mientras falten capas finales alineadas.
-      referencias: {
-        cuerpo:'referencia-cuerpo-cilindrico.png',
-        cabeza:'referencia-cabeza-textura.png',
-        placa:'referencia-placa-rectangular.png',
-        zonaLogo:{ x:.34, y:.48, w:.32, h:.08 }
-      },
-      tamanos: {
-        grande: {
-          cuerpo: 'cuerpo_grande.png',
-          cabezas: { espuma:'cabeza_espuma_grande.png', malla:'cabeza_malla_grande.png' },
-          placas: { rectangular:{ archivo:'placa_grande.png', zonaLogo:{ x:.364, y:.438, w:.271, h:.131 } } }
-        },
-        pequeno: {
-          cuerpo: 'cuerpo_pequeno.png',
-          cabezas: { espuma:'cabeza_espuma_pequeno.png', malla:'cabeza_malla_pequeno.png' },
-          placas: {
-            cuadrada:{ archivo:'placa_cuadrada.png', zonaLogo:{ x:.395, y:.442, w:.210, h:.119 } },
-            estrella:{ archivo:'placa_estrella.png', zonaLogo:{ x:.438, y:.460, w:.124, h:.073 } },
-            corazon:{ archivo:'placa_corazon.png', zonaLogo:{ x:.424, y:.458, w:.152, h:.083 } }
-          }
-        }
-      }
-    };
-
-    // CONFIGURACIÓN: edita aquí los modelos, colores, WhatsApp y contraste.
+    // Ensamble V1. Las cotas de montaje están en metros, igual que las piezas GLB.
     const CONFIG = {
       whatsapp: '573137151054',
-      contrasteMinimo: 3,
+      carpeta: 'assets/mic/v1/',
       modelos: [
         { nombre:'DJI Mic', tamano:'pequeno' }, { nombre:'DJI Mic 2', tamano:'pequeno' },
         { nombre:'Hollyland Lark 2', tamano:'pequeno' }, { nombre:'Hollyland Lark M2', tamano:'pequeno' },
         { nombre:'Otro modelo', tamano:'grande' }
       ],
-      colores: [
-        { nombre:'Rojo', hex:'#D62828', disponible:true }, { nombre:'Negro', hex:'#1A1A1A', disponible:true },
-        { nombre:'Blanco', hex:'#F8F8F5', disponible:true }, { nombre:'Amarillo', hex:'#FFC800', disponible:true },
-        { nombre:'Amarillo claro', hex:'#FFE97A', disponible:true }, { nombre:'Fucsia', hex:'#E6007E', disponible:true, neon:true },
-        { nombre:'Rosado', hex:'#F7A8C8', disponible:true }, { nombre:'Lila', hex:'#C9A7EB', disponible:true },
-        { nombre:'Morado', hex:'#6B3FA0', disponible:true }, { nombre:'Gris', hex:'#8D8D8D', disponible:true },
-        { nombre:'Café', hex:'#6B4226', disponible:true }, { nombre:'Azul claro', hex:'#8FD3F4', disponible:true },
-        { nombre:'Azul oscuro', hex:'#1B3A6B', disponible:true }, { nombre:'Vinotinto', hex:'#6D1A2B', disponible:true },
-        { nombre:'Verde claro', hex:'#9BE08A', disponible:true }, { nombre:'Verde oscuro', hex:'#1F5E3B', disponible:true },
-        { nombre:'Verde fluorescente', hex:'#39FF14', disponible:true, neon:true }, { nombre:'Beige', hex:'#E8D5B5', disponible:true },
-        { nombre:'Naranja', hex:'#FF7A1A', disponible:true }
-      ]
+      formas: {
+        cuadrada: { nombre:'Cuadrada', entradaMango:.002, entradaCabeza:.0006 },
+        estrella: { nombre:'Estrella', entradaMango:.009, entradaCabeza:.0008 },
+        corazon: { nombre:'Corazón', entradaMango:.0058, entradaCabeza:.0062 },
+        rectangular: { nombre:'Rectangular grande', entradaMango:.0015, entradaCabeza:.0006 }
+      },
+      cabezas: { espuma:'Espuma', malla:'Malla' }
     };
-
-    // Estado único del configurador. Los colores se guardan como nombres de la paleta.
-    const state = { modelo:CONFIG.modelos[0].nombre, forma:'cuadrada', cabeza:'espuma', colores:{ cabeza:'Negro', cuerpo:'Negro', placa:'Lila', logo:'Azul oscuro' } };
-    const primerColorDisponible = CONFIG.colores.find((item) => item.disponible);
-    if (!primerColorDisponible) throw new Error('La paleta necesita al menos un color disponible.');
-    Object.keys(state.colores).forEach((parte) => {
-      if (!CONFIG.colores.some((item) => item.nombre === state.colores[parte] && item.disponible)) state.colores[parte] = primerColorDisponible.nombre;
-    });
-    const formas = { cuadrada:'Cuadrada', estrella:'Estrella', corazon:'Corazón', rectangular:'Rectangular grande' };
-    const partes = { cabeza:'Cabeza', cuerpo:'Cuerpo', placa:'Placa', logo:'Color del logo' };
+    const state = { modelo:CONFIG.modelos[0].nombre, forma:'cuadrada', cabeza:'espuma' };
     const $ = (selector) => document.querySelector(selector);
-    const color = (nombre) => CONFIG.colores.find((item) => item.nombre === nombre);
-    const modeloActual = () => CONFIG.modelos.find((item) => item.nombre === state.modelo);
-    const tamanoActual = () => modeloActual().tamano;
-    const formaActual = () => tamanoActual() === 'grande' ? 'rectangular' : state.forma;
-    const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const lienzo = $('#microphone');
+    const poster = $('#poster');
+    const etapa = $('.preview-stage');
 
-    // Luminancia relativa WCAG para advertir combinaciones con poco contraste.
-    function luminancia(hex) {
-      const rgb = hex.match(/[\da-f]{2}/gi).map((part) => parseInt(part,16)/255).map((n) => n <= .04045 ? n/12.92 : ((n+.055)/1.055)**2.4);
-      return rgb[0]*.2126 + rgb[1]*.7152 + rgb[2]*.0722;
-    }
-    function contraste(a,b) { const l1=luminancia(a), l2=luminancia(b); return (Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05); }
-    function opciones(grupo, values, seleccionado) {
-      return values.map(([valor,nombre]) => `<label><input type="radio" name="${grupo}" value="${valor}" ${valor===seleccionado?'checked':''}><span>${nombre}</span></label>`).join('');
-    }
+    // Visor WebGL nativo. Las tres superficies del producto proceden siempre de los STL.
+    const VERTEX = `
+      attribute vec3 aPosition;
+      attribute vec3 aNormal;
+      attribute vec4 aLight;
+      uniform mat3 uView;
+      uniform vec2 uFrame;
+      uniform float uCenter, uOffset, uKind;
+      varying vec3 vLocal, vNormal;
+      varying float vLight;
+      void main() {
+        vLocal = aPosition;
+        vNormal = uView * aNormal;
+        vLight = aLight.r;
+        if (uKind < -0.5) {
+          gl_Position = vec4(aPosition.xy, 0.999, 1.0);
+        } else {
+          vec3 q = uView * (aPosition + vec3(0.0, uOffset - uCenter, 0.0));
+          gl_Position = vec4(q.xy * uFrame, -q.z / 0.20, 1.0 - q.z / 0.48);
+        }
+      }`;
+    const FRAGMENT = `
+      precision highp float;
+      varying vec3 vLocal, vNormal;
+      varying float vLight;
+      uniform vec3 uTint, uShadow;
+      uniform float uKind;
+      float hash(vec3 p) {
+        p = fract(p * 0.1031);
+        p += dot(p, p.yzx + 33.33);
+        return fract((p.x + p.y) * p.z);
+      }
+      void main() {
+        if (uKind < -0.5) {
+          vec2 floorUV = (vLocal.xy - vec2(0.0, uShadow.x)) / uShadow.yz;
+          float shadow = 0.13 * exp(-dot(floorUV, floorUV)) + 0.17 * exp(-dot(floorUV*2.4, floorUV*2.4));
+          float edge = clamp(dot(vLocal.xy, vLocal.xy)*0.26, 0.0, 1.0);
+          gl_FragColor = vec4(mix(vec3(.993,.989,1.0), vec3(.945,.937,.966), edge) - shadow, 1.0);
+          return;
+        }
+        vec3 n = normalize(vNormal) * (gl_FrontFacing ? 1.0 : -1.0);
+        vec3 key = normalize(vec3(-0.68,0.85,0.95));
+        vec3 fill = normalize(vec3(0.8,0.28,0.42));
+        float diffuse = max(dot(n,key),0.0);
+        float softbox = max(dot(n,normalize(key+vec3(0.0,0.0,1.0))),0.0);
+        float rim = pow(1.0-abs(n.z),3.0);
+        float grain = hash(floor(vLocal*4300.0)) - 0.5;
+        float finish = 1.0;
+        float spec = 0.0;
+        if (uKind < 0.5) {
+          finish += grain * 0.23;
+          spec = pow(softbox,8.0)*0.027;
+        } else if (uKind < 1.5) {
+          spec = pow(softbox,26.0)*0.23 + pow(max(dot(n,normalize(fill+vec3(0.0,0.0,1.0))),0.0),38.0)*0.11;
+        } else {
+          finish += sin(vLocal.y*9400.0)*0.011 + grain*0.016;
+          spec = pow(softbox,26.0)*0.083;
+        }
+        float lighting = 0.43 + 0.50*diffuse + 0.17*max(dot(n,fill),0.0) + 0.06*n.y;
+        float ambient = mix(0.32,1.0,vLight);
+        vec3 reflected = uTint * lighting * finish + vec3(spec + 0.045*rim);
+        gl_FragColor = vec4(reflected * ambient,1.0);
+      }`;
 
-    // Implementación anterior, conservada como referencia y sin uso por el canvas PNG.
-    function dibujarMicrofonoSVGNoUsado() {
-      const grande = tamanoActual()==='grande';
-      const forma = formaActual();
-      const c = Object.fromEntries(Object.entries(state.colores).map(([k,v]) => [k, color(v).hex]));
-      const placa = {
-        cuadrada:'M140 202 Q140 193 149 193 H271 Q280 193 280 202 V324 Q280 333 271 333 H149 Q140 333 140 324 Z',
-        rectangular:'M105 195 Q105 185 115 185 H305 Q315 185 315 195 V328 Q315 338 305 338 H115 Q105 338 105 328 Z',
-        estrella:'M210 175 L231 227 L288 230 L244 265 L259 322 L210 292 L161 322 L176 265 L132 230 L189 227 Z',
-        corazon:'M210 331 C197 319 132 280 132 237 C132 198 181 187 210 220 C239 187 288 198 288 237 C288 280 223 319 210 331 Z'
-      }[forma];
-      const area = forma==='estrella' ? {x:184,y:239,w:52,h:38,fs:6} : forma==='corazon' ? {x:178,y:238,w:64,h:43,fs:7} : forma==='rectangular' ? {x:153,y:228,w:114,h:68,fs:10} : {x:166,y:230,w:88,h:62,fs:8};
-      const {x,y,w,h,fs}=area;
-      const iconY=y+h*.2, labelY=y+h*.78;
-      const svg = `<defs>
-        <pattern id="foam" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.15" fill="#fff" opacity=".2"/><circle cx="6" cy="6" r="1" fill="#000" opacity=".22"/></pattern>
-        <pattern id="mesh" width="7" height="7" patternUnits="userSpaceOnUse"><path d="M0 0L7 7M7 0L0 7" stroke="#fff" opacity=".38" stroke-width=".8"/></pattern>
-        <linearGradient id="shade" x1="0" x2="1" y1="0" y2="0"><stop stop-color="#000" stop-opacity=".27"/><stop offset=".28" stop-color="#fff" stop-opacity=".18"/><stop offset=".7" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".24"/></linearGradient>
-        <filter id="shadow" x="-35%" y="-35%" width="170%" height="180%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity=".2"/></filter>
-        <filter id="relief" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="1" stdDeviation=".5" flood-color="#000" flood-opacity=".35"/></filter>
-      </defs>
-      <ellipse cx="210" cy="490" rx="82" ry="11" fill="#171d67" opacity=".10"/>
-      <g filter="url(#shadow)"><rect x="${grande?181:188}" y="135" width="${grande?58:44}" height="342" rx="${grande?25:20}" fill="${c.cuerpo}"/><rect x="${grande?181:188}" y="135" width="${grande?58:44}" height="342" rx="20" fill="url(#shade)"/></g>
-      <g filter="url(#shadow)"><path d="${placa}" transform="translate(3 7)" fill="${c.placa}" stroke="#000" stroke-opacity=".27" stroke-width="4"/><path d="${placa}" fill="${c.placa}" stroke="#000" stroke-opacity=".25" stroke-width="3" stroke-linejoin="round"/><path d="${placa}" fill="url(#shade)" opacity=".45"/></g>
-      <g fill="none" stroke="${c.logo}" stroke-width="1.5" filter="url(#relief)"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" stroke-dasharray="4 3"/><rect x="${210-w*.095}" y="${iconY}" width="${w*.19}" height="${h*.22}" rx="1"/><circle cx="${210-w*.04}" cy="${iconY+h*.06}" r="1" fill="${c.logo}" stroke="none"/><path d="M${210-w*.09} ${iconY+h*.18} l${w*.06} -${h*.06} l${w*.04} ${h*.035} l${w*.04} -${h*.06} l${w*.04} ${h*.085}"/></g>
-      <text x="210" y="${labelY}" fill="${c.logo}" text-anchor="middle" font-family="Arial,sans-serif" font-size="${fs}" font-weight="bold" filter="url(#relief)">TU LOGO AQUÍ</text>
-      <g filter="url(#shadow)"><rect x="${grande?163:174}" y="49" width="${grande?94:72}" height="144" rx="${grande?47:36}" fill="${c.cabeza}"/><rect x="${grande?163:174}" y="49" width="${grande?94:72}" height="144" rx="${grande?47:36}" fill="url(#${state.cabeza==='espuma'?'foam':'mesh'})"/><rect x="${grande?163:174}" y="49" width="${grande?94:72}" height="144" rx="${grande?47:36}" fill="url(#shade)"/>${state.cabeza==='malla'?`<rect x="${grande?165:176}" y="160" width="${grande?90:68}" height="14" rx="6" fill="#b7b9bd" stroke="#64676a" stroke-width="2"/>`:''}</g>`;
-      $('#microphone').innerHTML=svg;
-    }
+    function iniciarVisor() {
+      const gl = lienzo.getContext('webgl', { alpha:false, antialias:true, powerPreference:'low-power' });
+      if (!gl) return null;
+      function compilar(tipo, fuente) {
+        const shader = gl.createShader(tipo);
+        gl.shaderSource(shader, fuente);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw Error(gl.getShaderInfoLog(shader));
+        return shader;
+      }
+      const programa = gl.createProgram();
+      gl.attachShader(programa, compilar(gl.VERTEX_SHADER, VERTEX));
+      gl.attachShader(programa, compilar(gl.FRAGMENT_SHADER, FRAGMENT));
+      gl.linkProgram(programa);
+      if (!gl.getProgramParameter(programa, gl.LINK_STATUS)) throw Error(gl.getProgramInfoLog(programa));
+      gl.useProgram(programa);
+      const uniform = Object.fromEntries(['View','Frame','Center','Offset','Kind','Tint','Shadow']
+        .map((key) => [key, gl.getUniformLocation(programa, 'u'+key)]));
+      const attr = Object.fromEntries(['Position','Normal','Light']
+        .map((key) => [key, gl.getAttribLocation(programa, 'a'+key)]));
+      const indices32 = gl.getExtension('OES_element_index_uint');
+      const cache = new Map();
+      const camara = { giro:.195, altura:.112, zoom:1 };
+      let escena = null;
+      let altoTotal = 0;
 
-    // Vista previa fotográfica: se apilan PNG transparentes ya renderizados.
-    // El caché evita recolorear una capa cuyo color no cambió.
-    const vistaPrevia = { imagenes:new Map(), capas:new Map(), ciclo:0 };
-    const COLORES_OSCUROS = new Set(['negro','azul oscuro','vinotinto','verde oscuro','café','morado']);
-    const hexVista = (nombre) => color(nombre).hexVista || color(nombre).hex;
-    const archivoBrillo = (archivo) => archivo.replace(/\.png$/i,'_brillo.png');
-    const rutaAsset = (archivo) => `${ASSETS.ruta}${archivo}`;
+      function buffer(tipo, datos) {
+        const id = gl.createBuffer();
+        gl.bindBuffer(tipo, id);
+        gl.bufferData(tipo, datos, gl.STATIC_DRAW);
+        return id;
+      }
+      const fondo = buffer(gl.ARRAY_BUFFER, new Float32Array([-1,-1,0,3,-1,0,-1,3,0]));
 
-    function cargarImagen(archivo, opcional=false) {
-      const ruta=rutaAsset(archivo);
-      const key=`${opcional?'opcional:':'requerido:'}${ruta}`;
-      if (vistaPrevia.imagenes.has(key)) return vistaPrevia.imagenes.get(key);
-      const promesa=new Promise((resolve,reject)=>{
-        const imagen=new Image();
-        imagen.decoding='async';
-        imagen.onload=()=>resolve(imagen);
-        imagen.onerror=()=>opcional ? resolve(null) : reject(new Error(archivo));
-        imagen.src=ruta;
-      });
-      vistaPrevia.imagenes.set(key,promesa);
-      return promesa;
-    }
+      // Cada GLB producido por el conversor tiene una sola malla indexada y buffers contiguos.
+      async function cargarGLB(nombre) {
+        const respuesta = await fetch(CONFIG.carpeta + nombre + '.glb');
+        if (!respuesta.ok) throw Error('Pieza pendiente: '+nombre);
+        const datos = await respuesta.arrayBuffer();
+        const cabecera = new DataView(datos);
+        if (cabecera.getUint32(0,true)!==0x46546c67 || cabecera.getUint32(4,true)!==2) throw Error('GLB inválido');
+        const largo = cabecera.getUint32(12,true);
+        const doc = JSON.parse(new TextDecoder().decode(new Uint8Array(datos,20,largo)));
+        const base = 28 + largo;
+        const primitiva = doc.meshes[0].primitives[0];
+        const indices = doc.accessors[primitiva.indices];
+        if (indices.componentType===gl.UNSIGNED_INT && !indices32) throw Error('Esta malla requiere índices de 32 bits');
+        function subir(index, target) {
+          const acceso = doc.accessors[index];
+          const vista = doc.bufferViews[acceso.bufferView];
+          const bytes = new Uint8Array(datos, base+(vista.byteOffset||0), vista.byteLength);
+          return { id:buffer(target,bytes), tipo:acceso.componentType, offset:acceso.byteOffset||0,
+            stride:vista.byteStride||0, normalizado:!!acceso.normalized };
+        }
+        const ids = primitiva.attributes;
+        return {
+          posicion:subir(ids.POSITION, gl.ARRAY_BUFFER), normal:subir(ids.NORMAL, gl.ARRAY_BUFFER),
+          luz:subir(ids.COLOR_0, gl.ARRAY_BUFFER), indices:subir(primitiva.indices,gl.ELEMENT_ARRAY_BUFFER),
+          cantidad:indices.count, alto:doc.accessors[ids.POSITION].max[1]
+        };
+      }
+      function pieza(nombre) {
+        if (!cache.has(nombre)) cache.set(nombre,cargarGLB(nombre).catch((error) => { cache.delete(nombre); throw error; }));
+        return cache.get(nombre);
+      }
+      function conectar(localizacion, dato, dimension) {
+        gl.bindBuffer(gl.ARRAY_BUFFER,dato.id);
+        gl.enableVertexAttribArray(localizacion);
+        gl.vertexAttribPointer(localizacion,dimension,dato.tipo,dato.normalizado,dato.stride,dato.offset);
+      }
 
-    // Si aún no existe una capa final, la referencia publicada mantiene la vista visible.
-    async function cargarCapa(capa) {
-      try {
-        return { imagen:await cargarImagen(capa.archivo), referencia:false };
-      } catch {
-        const referencia=ASSETS.referencias[capa.id];
-        try {
-          return { imagen:await cargarImagen(referencia), referencia:true };
-        } catch {
-          throw new Error(`${capa.archivo} o ${referencia}`);
+      function dibujar() {
+        if (!escena || gl.isContextLost()) return;
+        const dpr = Math.min(window.devicePixelRatio||1,2);
+        const ancho = Math.max(1,Math.round(etapa.clientWidth*dpr));
+        const alto = Math.max(1,Math.round(etapa.clientHeight*dpr));
+        if (lienzo.width!==ancho || lienzo.height!==alto) { lienzo.width=ancho; lienzo.height=alto; }
+        gl.viewport(0,0,ancho,alto);
+        gl.enable(gl.DEPTH_TEST);
+        gl.clear(gl.DEPTH_BUFFER_BIT);
+        const s = Math.sin(camara.giro), c = Math.cos(camara.giro);
+        const t = Math.sin(camara.altura), h = Math.cos(camara.altura);
+        gl.uniformMatrix3fv(uniform.View, false, [c,-s*t,s*h, 0,h,t, -s,-c*t,c*h]);
+        const centro = altoTotal*.50;
+        const escalaY = 2*camara.zoom/Math.max(altoTotal*1.21, .08*alto/ancho);
+        const escalaX = escalaY*alto/ancho;
+        gl.uniform2f(uniform.Frame,escalaX,escalaY);
+        gl.uniform1f(uniform.Center,centro);
+        gl.uniform3f(uniform.Shadow,-centro*h*escalaY/(1+centro*t/.48),.024*escalaX,.0022*escalaY);
+        gl.uniform1f(uniform.Kind,-1);
+        gl.bindBuffer(gl.ARRAY_BUFFER,fondo);
+        gl.enableVertexAttribArray(attr.Position);
+        gl.vertexAttribPointer(attr.Position,3,gl.FLOAT,false,0,0);
+        gl.disableVertexAttribArray(attr.Normal);
+        gl.disableVertexAttribArray(attr.Light);
+        gl.drawArrays(gl.TRIANGLES,0,3);
+        for (const parte of escena) {
+          const m = parte.malla;
+          gl.uniform1f(uniform.Offset,parte.base);
+          gl.uniform1f(uniform.Kind,parte.material);
+          gl.uniform3fv(uniform.Tint,parte.tinte);
+          conectar(attr.Position,m.posicion,3);
+          conectar(attr.Normal,m.normal,3);
+          conectar(attr.Light,m.luz,4);
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,m.indices.id);
+          gl.drawElements(gl.TRIANGLES,m.cantidad,m.indices.tipo,m.indices.offset);
         }
       }
-    }
-
-    function capasActivas() {
-      const tamano=ASSETS.tamanos[tamanoActual()];
-      const placa=tamano.placas[formaActual()];
-      return {
-        capas:[
-          { id:'cuerpo', archivo:tamano.cuerpo, color:state.colores.cuerpo },
-          { id:'cabeza', archivo:tamano.cabezas[state.cabeza], color:state.colores.cabeza },
-          { id:'placa', archivo:placa.archivo, color:state.colores.placa }
-        ],
-        zonaLogo:placa.zonaLogo
-      };
-    }
-
-    function crearCapaRecolorada(capa, imagen) {
-      const hex=hexVista(capa.color);
-      const clave=`${capa.id}|${capa.archivo}|${hex}`;
-      if (vistaPrevia.capas.has(clave)) return vistaPrevia.capas.get(clave);
-      const temporal=document.createElement('canvas');
-      temporal.width=imagen.naturalWidth;
-      temporal.height=imagen.naturalHeight;
-      const contexto=temporal.getContext('2d');
-      // PNG neutro -> multiply -> destination-in: cambia color sin perder transparencia.
-      contexto.drawImage(imagen,0,0);
-      contexto.globalCompositeOperation='multiply';
-      contexto.fillStyle=hex;
-      contexto.fillRect(0,0,temporal.width,temporal.height);
-      contexto.globalCompositeOperation='destination-in';
-      contexto.drawImage(imagen,0,0);
-      // El original recupera las microtexturas del impreso 3D en tonos extremos.
-      const esOscuro=COLORES_OSCUROS.has(capa.color.toLocaleLowerCase('es-CO'));
-      const esClaro=luminancia(hex)>.58;
-      contexto.globalCompositeOperation='soft-light';
-      contexto.globalAlpha=esOscuro ? ASSETS.realceOscuro : (esClaro ? ASSETS.realceClaro : .24);
-      contexto.drawImage(imagen,0,0);
-      contexto.globalAlpha=1;
-      contexto.globalCompositeOperation='source-over';
-      vistaPrevia.capas.set(clave,temporal);
-      return temporal;
-    }
-
-    function prepararLienzo(ancho,alto) {
-      const lienzo=$('#microphone');
-      const dpr=Math.min(window.devicePixelRatio || 1,2);
-      lienzo.width=Math.round(ancho*dpr);
-      lienzo.height=Math.round(alto*dpr);
-      lienzo.style.aspectRatio=`${ancho} / ${alto}`;
-      const contexto=lienzo.getContext('2d');
-      contexto.setTransform(dpr,0,0,dpr,0,0);
-      contexto.clearRect(0,0,ancho,alto);
-      return contexto;
-    }
-
-    // Se dibuja solo el área reservada del logo; nunca una forma sustituta del micrófono.
-    function dibujarZonaLogo(contexto,zona,ancho,alto,hex) {
-      const x=zona.x*ancho, y=zona.y*alto, w=zona.w*ancho, h=zona.h*alto;
-      const centroX=x+w/2;
-      const icono=Math.max(14,Math.min(w,h)*.28);
-      contexto.save();
-      contexto.strokeStyle=hex;
-      contexto.fillStyle=hex;
-      contexto.lineWidth=Math.max(1.25,Math.min(w,h)*.025);
-      contexto.setLineDash([Math.max(4,w*.045),Math.max(3,w*.032)]);
-      contexto.shadowColor='rgba(12,18,49,.30)';
-      contexto.shadowBlur=Math.max(2,w*.025);
-      contexto.shadowOffsetY=1;
-      contexto.strokeRect(x,y,w,h);
-      contexto.setLineDash([]);
-      const iconoX=centroX-icono/2, iconoY=y+h*.19;
-      contexto.strokeRect(iconoX,iconoY,icono,icono*.72);
-      contexto.beginPath();
-      contexto.arc(iconoX+icono*.72,iconoY+icono*.20,icono*.07,0,Math.PI*2);
-      contexto.moveTo(iconoX+icono*.13,iconoY+icono*.59);
-      contexto.lineTo(iconoX+icono*.40,iconoY+icono*.34);
-      contexto.lineTo(iconoX+icono*.57,iconoY+icono*.49);
-      contexto.lineTo(iconoX+icono*.76,iconoY+icono*.30);
-      contexto.lineTo(iconoX+icono*.93,iconoY+icono*.59);
-      contexto.stroke();
-      contexto.font=`700 ${Math.max(9,Math.min(w*.13,h*.22))}px Arial, sans-serif`;
-      contexto.textAlign='center';
-      contexto.textBaseline='alphabetic';
-      contexto.fillText('TU LOGO AQUÍ',centroX,y+h*.84);
-      contexto.restore();
-    }
-
-    function mostrarAvisoAssets(archivos) {
-      const aviso=$('#preview-assets-warning');
-      $('#microphone').hidden=true;
-      aviso.hidden=false;
-      aviso.innerHTML=`<strong>Faltan capas PNG para mostrar esta vista previa.</strong><span>Agrega estos archivos en <code>/assets/mic/</code>:<br><code>${archivos.map(escapeHtml).join('</code><br><code>')}</code></span>`;
-    }
-
-    // Composición temporal para las tres referencias publicadas, que no comparten un lienzo.
-    function dibujarReferencias(contexto,capas,fuentes) {
-      const ancho=1200, alto=1500;
-      const posiciones={
-        cuerpo:{ x:418, y:430, w:364, h:910 },
-        cabeza:{ x:310, y:68, w:580, h:580 },
-        placa:{ x:126, y:505, w:948, h:420 }
-      };
-      capas.forEach((capa,indice)=>{
-        const posicion=posiciones[capa.id];
-        contexto.drawImage(crearCapaRecolorada(capa,fuentes[indice].imagen),posicion.x,posicion.y,posicion.w,posicion.h);
-      });
-      dibujarZonaLogo(contexto,ASSETS.referencias.zonaLogo,ancho,alto,hexVista(state.colores.logo));
-    }
-
-    // Orden: cuerpo, cabeza, placa, zona de logo y, al final, brillos opcionales.
-    async function dibujarMicrofono() {
-      const ciclo=++vistaPrevia.ciclo;
-      const configuracion=capasActivas();
-      const resultados=await Promise.allSettled(configuracion.capas.map((capa)=>cargarCapa(capa)));
-      if (ciclo!==vistaPrevia.ciclo) return;
-      const faltantes=resultados.filter((resultado)=>resultado.status==='rejected').map((resultado)=>resultado.reason.message);
-      if (faltantes.length) { mostrarAvisoAssets(faltantes); return; }
-      const fuentes=resultados.map((resultado)=>resultado.value);
-      const imagenes=fuentes.map((fuente)=>fuente.imagen);
-      const primera=imagenes[0];
-      const incompatibles=imagenes.filter((imagen)=>imagen.naturalWidth!==primera.naturalWidth || imagen.naturalHeight!==primera.naturalHeight);
-      const lienzo=$('#microphone');
-      lienzo.hidden=false;
-      $('#preview-assets-warning').hidden=true;
-      const usarReferencias=fuentes.some((fuente)=>fuente.referencia) || incompatibles.length;
-      if (usarReferencias) {
-        const contexto=prepararLienzo(1200,1500);
-        dibujarReferencias(contexto,configuracion.capas,fuentes);
-        return;
+      function montar([mango,carcasa,cabeza], forma, modo) {
+        const encaje = CONFIG.formas[forma];
+        const baseCarcasa = mango.alto - encaje.entradaMango;
+        const baseCabeza = baseCarcasa + carcasa.alto - encaje.entradaCabeza;
+        const rosa = forma==='corazon' || forma==='estrella';
+        escena = [
+          { malla:mango, base:0, material:2, tinte:[.17,.176,.193] },
+          { malla:carcasa, base:baseCarcasa, material:3, tinte:rosa ? [.95,.34,.63] : [1,.46,.075] },
+          { malla:cabeza, base:baseCabeza, material:modo==='malla' ? 1 : 0,
+            tinte:modo==='espuma' ? [.175,.177,.195] : (rosa ? [.22,.22,.24] : [.74,.76,.80]) }
+        ];
+        altoTotal = baseCabeza+cabeza.alto;
+        dibujar();
       }
-      const brillos=await Promise.all(configuracion.capas.map((capa)=>cargarImagen(archivoBrillo(capa.archivo),true)));
-      if (ciclo!==vistaPrevia.ciclo) return;
-      const contexto=prepararLienzo(primera.naturalWidth,primera.naturalHeight);
-      configuracion.capas.forEach((capa,indice)=>contexto.drawImage(crearCapaRecolorada(capa,imagenes[indice]),0,0));
-      dibujarZonaLogo(contexto,configuracion.zonaLogo,primera.naturalWidth,primera.naturalHeight,hexVista(state.colores.logo));
-      brillos.forEach((brillo)=>{ if (brillo) contexto.drawImage(brillo,0,0); });
+      function mover(dx,dy,factor=1) {
+        camara.giro += dx;
+        camara.altura = Math.max(-.70,Math.min(.92,camara.altura+dy));
+        camara.zoom = Math.max(.72,Math.min(1.85,camara.zoom*factor));
+        dibujar();
+      }
+      function centrar() { Object.assign(camara,{ giro:.195, altura:.112, zoom:1 }); dibujar(); }
+      return { pieza, montar, dibujar, mover, centrar };
     }
+
+    function init3D() {
+      try { return iniciarVisor(); }
+      catch (error) { console.warn('Vista 3D de Kora:',error.message); return null; }
+    }
+    let visor = init3D();
+    let version = 0, claveActual = '';
+    let listo3D = false, posterListo = false, cargando3D = false, cargandoPoster = false;
+
+    function seleccion() {
+      const modelo = CONFIG.modelos.find((item) => item.nombre===state.modelo);
+      const forma = modelo.tamano==='grande' ? 'rectangular' : state.forma;
+      return { modelo:modelo.nombre, tamano:modelo.tamano, forma, cabeza:state.cabeza };
+    }
+    function resumen(sel) {
+      return { modelo:sel.modelo, tamano:sel.tamano==='pequeno' ? 'Pequeño' : 'Grande',
+        forma:CONFIG.formas[sel.forma].nombre, cabeza:CONFIG.cabezas[sel.cabeza] };
+    }
+    function mostrarVista() {
+      lienzo.hidden = !listo3D;
+      poster.hidden = listo3D || !posterListo;
+      $('#view-tools').hidden = !listo3D;
+      $('#download').disabled = !listo3D && !posterListo;
+      let letrero = 'Vista del ensamble', ayuda = 'Vista inicial del ensamble.';
+      if (listo3D) {
+        letrero = 'Vista 3D';
+        ayuda = 'Arrastra o usa las flechas para girar.';
+      } else if (cargando3D || cargandoPoster) {
+        letrero = 'Cargando vista…';
+      } else if (!posterListo) {
+        letrero = 'Vista no disponible';
+        ayuda = 'Revisa tu conexión y vuelve a cargar la página.';
+      }
+      $('#view-badge').textContent = letrero;
+      $('#view-hint').textContent = ayuda;
+    }
+    function cargarEnsamble(sel, forzar=false) {
+      const clave = sel.forma+'-'+sel.cabeza;
+      if (clave===claveActual && !forzar) return;
+      claveActual = clave;
+      const turno = ++version;
+      listo3D = posterListo = false;
+      cargando3D = !!visor;
+      cargandoPoster = true;
+      mostrarVista();
+      const descripcion = 'Micrófono con carcasa '+CONFIG.formas[sel.forma].nombre.toLowerCase()
+        +' y cabeza de '+sel.cabeza;
+      lienzo.setAttribute('aria-label', descripcion+'. Vista 3D interactiva.');
+      poster.alt = descripcion;
+      poster.src = CONFIG.carpeta+clave+'.png';
+      // La imagen frontal procede del mismo ensamble. También permite descargar sin WebGL.
+      poster.decode().then(() => {
+        if (turno===version) posterListo = true;
+      }).catch(() => {}).finally(() => {
+        if (turno===version) { cargandoPoster=false; mostrarVista(); }
+      });
+      if (!visor) return;
+      const actual = visor;
+      Promise.all(['mango',sel.forma,sel.cabeza+'-'+sel.tamano].map(actual.pieza))
+        .then((piezas) => {
+          if (turno!==version) return;
+          actual.montar(piezas,sel.forma,sel.cabeza);
+          listo3D=true;
+        }).catch((error) => {
+          if (turno===version) console.warn('Vista frontal de Kora:',error.message);
+        }).finally(() => {
+          if (turno===version) { cargando3D=false; mostrarVista(); }
+        });
+    }
+
+    function crearRadios(grupo, opciones) {
+      const contenedor = grupo==='forma' ? $('#shapes') : $('#heads');
+      for (const [valor,nombre] of opciones) {
+        const etiqueta = document.createElement('label');
+        const input = document.createElement('input');
+        const texto = document.createElement('span');
+        input.type='radio'; input.name=grupo; input.value=valor;
+        texto.textContent=nombre;
+        etiqueta.append(input,texto);
+        contenedor.append(etiqueta);
+      }
+    }
+    for (const modelo of CONFIG.modelos) {
+      const tamano = modelo.tamano==='pequeno' ? 'Pequeño' : 'Grande';
+      $('#model').add(new Option(modelo.nombre+' · '+tamano,modelo.nombre));
+    }
+    crearRadios('forma', Object.entries(CONFIG.formas).filter(([k]) => k!=='rectangular')
+      .map(([k,forma]) => [k,forma.nombre]));
+    crearRadios('cabeza', Object.entries(CONFIG.cabezas));
 
     function render() {
-      $('#model').innerHTML=CONFIG.modelos.map((m)=>`<option value="${escapeHtml(m.nombre)}" ${m.nombre===state.modelo?'selected':''}>${escapeHtml(m.nombre)}${m.tamano==='pequeno'?' · Pequeño':' · Grande'}</option>`).join('');
-      $('#shape-field').hidden=tamanoActual()==='grande';
-      $('#shapes').innerHTML=opciones('forma',Object.entries(formas).filter(([key])=>key!=='rectangular'),state.forma);
-      $('#heads').innerHTML=opciones('cabeza',[['espuma','Espuma'],['malla','Malla']],state.cabeza);
-      $('#palettes').innerHTML=Object.entries(partes).map(([key,label]) => {
-        const selected=color(state.colores[key]);
-        return `<fieldset><legend>${label}</legend><div class="palette" role="group" aria-label="Colores de ${label.toLowerCase()}">${CONFIG.colores.map((c)=>`<button type="button" class="swatch" data-parte="${key}" data-color="${escapeHtml(c.nombre)}" style="--swatch:${c.hex};--check:${luminancia(c.hex)>.4?'#111':'#fff'}" aria-pressed="${c.nombre===selected.nombre}" aria-label="${escapeHtml(c.nombre)}${c.disponible?'':', agotado'}${c.neon?', color neón':''}" title="${escapeHtml(c.nombre)}${c.disponible?'':' · Agotado'}${c.neon?' · Los colores neón se ven distintos en pantalla.':''}" ${c.disponible?'':'disabled'}>${c.nombre===selected.nombre?'✓':''}</button>`).join('')}</div><p class="selection">Seleccionado: <strong>${escapeHtml(selected.nombre)}</strong> · ${selected.hex}</p><p class="neon">Fucsia y verde fluorescente: los colores neón se ven distintos en pantalla.</p></fieldset>`;
-      }).join('');
-      $('#contrast-warning').hidden=contraste(color(state.colores.logo).hex,color(state.colores.placa).hex)>=CONFIG.contrasteMinimo;
-      const entries=[['Modelo',state.modelo],['Tamaño',tamanoActual()==='pequeno'?'Pequeño':'Grande'],['Forma',formas[formaActual()]],['Cabeza',state.cabeza==='espuma'?'Espuma':'Malla'],...Object.entries(partes).map(([k,label])=>[label,`${color(state.colores[k]).nombre} (${color(state.colores[k]).hex})`])];
-      $('#summary').innerHTML=entries.map(([k,v])=>`<dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd>`).join('');
-      dibujarMicrofono();
+      const sel = seleccion(), info = resumen(sel);
+      $('#shape-field').hidden = sel.tamano==='grande';
+      for (const input of document.querySelectorAll('.segments input')) input.checked=input.value===state[input.name];
+      const filas=[['Modelo',info.modelo],['Tamaño',info.tamano],['Forma',info.forma],['Cabeza',info.cabeza]];
+      const nodos=filas.flatMap(([etiqueta,valor]) => {
+        const nombre=document.createElement('dt'), dato=document.createElement('dd');
+        nombre.textContent=etiqueta; dato.textContent=valor;
+        return [nombre,dato];
+      });
+      $('#summary').replaceChildren(...nodos);
+      $('#status').textContent='';
+      cargarEnsamble(sel);
     }
+    $('#model').addEventListener('change',(e) => { state.modelo=e.target.value; render(); });
+    for (const id of ['#shapes','#heads']) $(id).addEventListener('change',(e) => {
+      state[e.target.name]=e.target.value;
+      render();
+    });
 
-    // Eventos del formulario y restauración del foco tras actualizar los controles.
-    $('#model').addEventListener('change',(event)=>{ state.modelo=event.target.value; render(); $('#model').focus(); });
-    $('#shapes').addEventListener('change',(event)=>{ state.forma=event.target.value; render(); $(`#shapes input[value="${state.forma}"]`).focus(); });
-    $('#heads').addEventListener('change',(event)=>{ state.cabeza=event.target.value; render(); $(`#heads input[value="${state.cabeza}"]`).focus(); });
-    $('#palettes').addEventListener('click',(event)=>{ const button=event.target.closest('[data-parte]'); if (!button) return; state.colores[button.dataset.parte]=button.dataset.color; render(); [...document.querySelectorAll('[data-parte]')].find((item)=>item.dataset.parte===button.dataset.parte && item.dataset.color===button.dataset.color)?.focus(); });
+    // La página solo dibuja al cambiar la vista o el modelo.
+    let frame=0;
+    function redimensionar() {
+      cancelAnimationFrame(frame);
+      frame=requestAnimationFrame(() => { if (listo3D) visor.dibujar(); });
+    }
+    if ('ResizeObserver' in window) new ResizeObserver(redimensionar).observe(etapa);
+    window.addEventListener('resize',redimensionar);
+    lienzo.addEventListener('webglcontextlost',(e) => {
+      e.preventDefault(); visor=null; cargarEnsamble(seleccion(),true);
+    });
+    lienzo.addEventListener('webglcontextrestored',() => {
+      visor=init3D(); cargarEnsamble(seleccion(),true);
+    });
+    let arrastre=null;
+    lienzo.addEventListener('pointerdown',(e) => {
+      if (!listo3D || !e.isPrimary || e.button!==0) return;
+      arrastre={id:e.pointerId,x:e.clientX,y:e.clientY};
+      lienzo.setPointerCapture(e.pointerId);
+    });
+    lienzo.addEventListener('pointermove',(e) => {
+      if (e.pointerId!==arrastre?.id || !listo3D) return;
+      visor.mover((arrastre.x-e.clientX)*.012,(e.clientY-arrastre.y)*.009);
+      arrastre.x=e.clientX; arrastre.y=e.clientY;
+    });
+    for (const evento of ['pointerup','pointercancel','lostpointercapture']) {
+      lienzo.addEventListener(evento,(e) => { if (e.pointerId===arrastre?.id) arrastre=null; });
+    }
+    lienzo.addEventListener('keydown',(e) => {
+      const giros={ ArrowLeft:[-.18,0], ArrowRight:[.18,0], ArrowUp:[0,.14], ArrowDown:[0,-.14] };
+      if (listo3D && giros[e.key]) { e.preventDefault(); visor.mover(...giros[e.key]); }
+    });
+    $('#zoom-out').addEventListener('click',() => visor?.mover(0,0,1/1.15));
+    $('#zoom-in').addEventListener('click',() => visor?.mover(0,0,1.15));
+    $('#reset-view').addEventListener('click',() => visor?.centrar());
 
-    // Descarga local de la vista previa, sin subir información a ningún servidor.
-    $('#download').addEventListener('click',()=>{
-      const lienzo=$('#microphone');
-      if (lienzo.hidden || !lienzo.width || !lienzo.height) {
-        $('#status').textContent='La vista previa se podrá descargar cuando estén cargadas todas las capas PNG.';
-        return;
-      }
-      lienzo.toBlob((archivo)=>{
-        if (!archivo) { $('#status').textContent='No fue posible descargar la imagen. Inténtalo de nuevo.'; return; }
-        const enlace=document.createElement('a');
-        const url=URL.createObjectURL(archivo);
-        enlace.download='microfono-kora.png';
-        enlace.href=url;
-        enlace.click();
-        setTimeout(()=>URL.revokeObjectURL(url),0);
+    $('#download').addEventListener('click',() => {
+      const link=document.createElement('a');
+      link.download='microfono-kora-'+claveActual+'.png';
+      if (!listo3D && posterListo) { link.href=poster.src; link.click(); return; }
+      if (!listo3D) return;
+      visor.dibujar();
+      lienzo.toBlob((blob) => {
+        if (!blob) { $('#status').textContent='No se pudo descargar la imagen. Inténtalo de nuevo.'; return; }
+        link.href=URL.createObjectURL(blob);
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href),1000);
       },'image/png');
     });
 
-    // Hook para conectar un formulario o backend; recibe tanto objeto como JSON.
-    function alSolicitarDiseno(configuracion, json) {
+    function alSolicitarDiseno(configuracion,json) {
       window.dispatchEvent(new CustomEvent('kora:solicitud-microfono',{detail:{configuracion,json}}));
     }
-    $('#request').addEventListener('click',()=>{
-      const configuracion={modelo:state.modelo,tamano:tamanoActual()==='pequeno'?'Pequeño':'Grande',forma:formas[formaActual()],cabeza:state.cabeza==='espuma'?'Espuma':'Malla',colores:Object.fromEntries(Object.entries(state.colores).map(([k,v])=>[k,{nombre:v,hex:color(v).hex}]))};
-      const json=JSON.stringify(configuracion,null,2);
-      alSolicitarDiseno(configuracion,json);
-      const lineas=['Hola, quiero solicitar este diseño de micrófono:',`Modelo: ${configuracion.modelo}`,`Tamaño: ${configuracion.tamano}`,`Forma: ${configuracion.forma}`,`Cabeza: ${configuracion.cabeza}`,...Object.entries(partes).map(([k,label])=>`${label}: ${configuracion.colores[k].nombre} (${configuracion.colores[k].hex})`),'','Te envío mi logo en este chat (SVG o PNG transparente, 1-2 colores).'];
-      window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(lineas.join('\n'))}`,'_blank','noopener,noreferrer');
+    $('#request').addEventListener('click',() => {
+      const info=resumen(seleccion());
+      alSolicitarDiseno(info,JSON.stringify(info,null,2));
+      const mensaje=['Hola, quiero solicitar este diseño de micrófono:',
+        'Modelo: '+info.modelo, 'Tamaño: '+info.tamano, 'Forma: '+info.forma, 'Cabeza: '+info.cabeza].join('\n');
+      window.open('https://wa.me/'+CONFIG.whatsapp+'?text='+encodeURIComponent(mensaje),'_blank','noopener,noreferrer');
       $('#status').textContent='Continúa tu solicitud en WhatsApp.';
     });
 
-    // Instrucciones accesibles y reabribles.
     const modal=$('#instructions');
-    function cerrarInstrucciones(){ modal.hidden=true; $('#help').focus(); }
-    function abrirInstrucciones(){ modal.hidden=false; $('#start').focus(); }
-    $('#start').addEventListener('click',cerrarInstrucciones);
-    $('#close-instructions').addEventListener('click',cerrarInstrucciones);
-    $('#help').addEventListener('click',abrirInstrucciones);
-    modal.addEventListener('keydown',(event)=>{ if(event.key==='Escape') cerrarInstrucciones(); if(event.key==='Tab'){ const controls=[...modal.querySelectorAll('button')]; const first=controls[0], last=controls[controls.length-1]; if(event.shiftKey && document.activeElement===first){event.preventDefault();last.focus();} else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();} } });
-    render(); abrirInstrucciones();
+    function instrucciones(abiertas) {
+      modal.hidden=!abiertas;
+      $('main').inert=abiertas;
+      $('.topbar').inert=abiertas;
+      (abiertas ? $('#start') : $('#help')).focus();
+    }
+    $('#start').addEventListener('click',() => instrucciones(false));
+    $('#close-instructions').addEventListener('click',() => instrucciones(false));
+    $('#help').addEventListener('click',() => instrucciones(true));
+    modal.addEventListener('keydown',(e) => {
+      if (e.key==='Escape') instrucciones(false);
+      if (e.key!=='Tab') return;
+      const primero=$('#close-instructions'), ultimo=$('#start');
+      if (e.shiftKey && document.activeElement===primero) { e.preventDefault(); ultimo.focus(); }
+      else if (!e.shiftKey && document.activeElement===ultimo) { e.preventDefault(); primero.focus(); }
+    });
+    render();
+    instrucciones(true);
   </script>
 </body>
 </html>
