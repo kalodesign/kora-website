@@ -21,8 +21,11 @@
     .intro p { margin:0; color:#4b5065; }
     .workspace { display:grid; gap:26px; }
     .preview { min-width:0; }
-    .preview-stage { background:var(--lila); border-radius:var(--radio); display:grid; place-items:center; min-height:360px; overflow:hidden; }
+    .preview-stage { position:relative; background:var(--lila); border-radius:var(--radio); display:grid; place-items:center; min-height:360px; overflow:hidden; }
     #microphone { display:block; width:min(100%, 420px); max-height:510px; }
+    .asset-warning { width:min(86%,420px); margin:20px; padding:16px; border:1px solid var(--azul); border-radius:var(--radio); background:#fffdf3; color:var(--azul); text-align:center; font-size:14px; line-height:1.45; }
+    .asset-warning strong { display:block; margin-bottom:6px; }
+    .asset-warning code { overflow-wrap:anywhere; color:#68284e; font-size:12px; }
     .preview-note { margin:12px 0; font-size:14px; }
     .notice { color:#50536a; font-size:13px; }
     .controls h2 { font-size:22px; color:var(--azul); margin:0 0 18px; }
@@ -69,7 +72,7 @@
     <div class="intro"><h1>Personaliza tu micrófono</h1><p>Elige los detalles de una pieza tan única como tu voz.</p></div>
     <div class="workspace">
       <section class="preview" aria-label="Vista previa del micrófono">
-        <div class="preview-stage"><svg id="microphone" viewBox="0 0 420 520" role="img" aria-label="Vista previa de tu micrófono personalizado" xmlns="http://www.w3.org/2000/svg"></svg></div>
+        <div class="preview-stage"><canvas id="microphone" role="img" aria-label="Vista previa de tu micrófono personalizado"></canvas><div class="asset-warning" id="preview-assets-warning" role="alert" hidden></div></div>
         <p class="preview-note">Tu logo se colocará aquí. Nos lo envías después de solicitar tu diseño.</p>
         <p class="notice">Vista previa referencial. El color y relieve final pueden variar ligeramente en la impresión 3D.</p>
       </section>
@@ -94,6 +97,30 @@
     </section>
   </div>
   <script>
+    // ASSETS DE LA VISTA PREVIA. Todos los PNG deben compartir el mismo lienzo y alineación.
+    // Ajusta zonaLogo cuando tengas los PNG finales: x, y, w y h son porcentajes (0 a 1) del lienzo.
+    const ASSETS = {
+      ruta: 'assets/mic/',
+      realceOscuro: .35,
+      realceClaro: .16,
+      tamanos: {
+        grande: {
+          cuerpo: 'cuerpo_grande.png',
+          cabezas: { espuma:'cabeza_espuma_grande.png', malla:'cabeza_malla_grande.png' },
+          placas: { rectangular:{ archivo:'placa_grande.png', zonaLogo:{ x:.364, y:.438, w:.271, h:.131 } } }
+        },
+        pequeno: {
+          cuerpo: 'cuerpo_pequeno.png',
+          cabezas: { espuma:'cabeza_espuma_pequeno.png', malla:'cabeza_malla_pequeno.png' },
+          placas: {
+            cuadrada:{ archivo:'placa_cuadrada.png', zonaLogo:{ x:.395, y:.442, w:.210, h:.119 } },
+            estrella:{ archivo:'placa_estrella.png', zonaLogo:{ x:.438, y:.460, w:.124, h:.073 } },
+            corazon:{ archivo:'placa_corazon.png', zonaLogo:{ x:.424, y:.458, w:.152, h:.083 } }
+          }
+        }
+      }
+    };
+
     // CONFIGURACIÓN: edita aquí los modelos, colores, WhatsApp y contraste.
     const CONFIG = {
       whatsapp: '573137151054',
@@ -143,8 +170,8 @@
       return values.map(([valor,nombre]) => `<label><input type="radio" name="${grupo}" value="${valor}" ${valor===seleccionado?'checked':''}><span>${nombre}</span></label>`).join('');
     }
 
-    // SVG por capas: mango detrás de placa, cabeza y detalles encima.
-    function dibujarMicrofono() {
+    // Implementación anterior, conservada como referencia y sin uso por el canvas PNG.
+    function dibujarMicrofonoSVGNoUsado() {
       const grande = tamanoActual()==='grande';
       const forma = formaActual();
       const c = Object.fromEntries(Object.entries(state.colores).map(([k,v]) => [k, color(v).hex]));
@@ -173,6 +200,143 @@
       $('#microphone').innerHTML=svg;
     }
 
+    // Vista previa fotográfica: se apilan PNG transparentes ya renderizados.
+    // El caché evita recolorear una capa cuyo color no cambió.
+    const vistaPrevia = { imagenes:new Map(), capas:new Map(), ciclo:0 };
+    const COLORES_OSCUROS = new Set(['negro','azul oscuro','vinotinto','verde oscuro','café','morado']);
+    const hexVista = (nombre) => color(nombre).hexVista || color(nombre).hex;
+    const archivoBrillo = (archivo) => archivo.replace(/\.png$/i,'_brillo.png');
+    const rutaAsset = (archivo) => `${ASSETS.ruta}${archivo}`;
+
+    function cargarImagen(archivo, opcional=false) {
+      const ruta=rutaAsset(archivo);
+      const key=`${opcional?'opcional:':'requerido:'}${ruta}`;
+      if (vistaPrevia.imagenes.has(key)) return vistaPrevia.imagenes.get(key);
+      const promesa=new Promise((resolve,reject)=>{
+        const imagen=new Image();
+        imagen.decoding='async';
+        imagen.onload=()=>resolve(imagen);
+        imagen.onerror=()=>opcional ? resolve(null) : reject(new Error(archivo));
+        imagen.src=ruta;
+      });
+      vistaPrevia.imagenes.set(key,promesa);
+      return promesa;
+    }
+
+    function capasActivas() {
+      const tamano=ASSETS.tamanos[tamanoActual()];
+      const placa=tamano.placas[formaActual()];
+      return {
+        capas:[
+          { id:'cuerpo', archivo:tamano.cuerpo, color:state.colores.cuerpo },
+          { id:'cabeza', archivo:tamano.cabezas[state.cabeza], color:state.colores.cabeza },
+          { id:'placa', archivo:placa.archivo, color:state.colores.placa }
+        ],
+        zonaLogo:placa.zonaLogo
+      };
+    }
+
+    function crearCapaRecolorada(capa, imagen) {
+      const hex=hexVista(capa.color);
+      const clave=`${capa.id}|${capa.archivo}|${hex}`;
+      if (vistaPrevia.capas.has(clave)) return vistaPrevia.capas.get(clave);
+      const temporal=document.createElement('canvas');
+      temporal.width=imagen.naturalWidth;
+      temporal.height=imagen.naturalHeight;
+      const contexto=temporal.getContext('2d');
+      // PNG neutro -> multiply -> destination-in: cambia color sin perder transparencia.
+      contexto.drawImage(imagen,0,0);
+      contexto.globalCompositeOperation='multiply';
+      contexto.fillStyle=hex;
+      contexto.fillRect(0,0,temporal.width,temporal.height);
+      contexto.globalCompositeOperation='destination-in';
+      contexto.drawImage(imagen,0,0);
+      // El original recupera las microtexturas del impreso 3D en tonos extremos.
+      const esOscuro=COLORES_OSCUROS.has(capa.color.toLocaleLowerCase('es-CO'));
+      const esClaro=luminancia(hex)>.58;
+      contexto.globalCompositeOperation='soft-light';
+      contexto.globalAlpha=esOscuro ? ASSETS.realceOscuro : (esClaro ? ASSETS.realceClaro : .24);
+      contexto.drawImage(imagen,0,0);
+      contexto.globalAlpha=1;
+      contexto.globalCompositeOperation='source-over';
+      vistaPrevia.capas.set(clave,temporal);
+      return temporal;
+    }
+
+    function prepararLienzo(ancho,alto) {
+      const lienzo=$('#microphone');
+      const dpr=Math.min(window.devicePixelRatio || 1,2);
+      lienzo.width=Math.round(ancho*dpr);
+      lienzo.height=Math.round(alto*dpr);
+      lienzo.style.aspectRatio=`${ancho} / ${alto}`;
+      const contexto=lienzo.getContext('2d');
+      contexto.setTransform(dpr,0,0,dpr,0,0);
+      contexto.clearRect(0,0,ancho,alto);
+      return contexto;
+    }
+
+    // Se dibuja solo el área reservada del logo; nunca una forma sustituta del micrófono.
+    function dibujarZonaLogo(contexto,zona,ancho,alto,hex) {
+      const x=zona.x*ancho, y=zona.y*alto, w=zona.w*ancho, h=zona.h*alto;
+      const centroX=x+w/2;
+      const icono=Math.max(14,Math.min(w,h)*.28);
+      contexto.save();
+      contexto.strokeStyle=hex;
+      contexto.fillStyle=hex;
+      contexto.lineWidth=Math.max(1.25,Math.min(w,h)*.025);
+      contexto.setLineDash([Math.max(4,w*.045),Math.max(3,w*.032)]);
+      contexto.shadowColor='rgba(12,18,49,.30)';
+      contexto.shadowBlur=Math.max(2,w*.025);
+      contexto.shadowOffsetY=1;
+      contexto.strokeRect(x,y,w,h);
+      contexto.setLineDash([]);
+      const iconoX=centroX-icono/2, iconoY=y+h*.19;
+      contexto.strokeRect(iconoX,iconoY,icono,icono*.72);
+      contexto.beginPath();
+      contexto.arc(iconoX+icono*.72,iconoY+icono*.20,icono*.07,0,Math.PI*2);
+      contexto.moveTo(iconoX+icono*.13,iconoY+icono*.59);
+      contexto.lineTo(iconoX+icono*.40,iconoY+icono*.34);
+      contexto.lineTo(iconoX+icono*.57,iconoY+icono*.49);
+      contexto.lineTo(iconoX+icono*.76,iconoY+icono*.30);
+      contexto.lineTo(iconoX+icono*.93,iconoY+icono*.59);
+      contexto.stroke();
+      contexto.font=`700 ${Math.max(9,Math.min(w*.13,h*.22))}px Arial, sans-serif`;
+      contexto.textAlign='center';
+      contexto.textBaseline='alphabetic';
+      contexto.fillText('TU LOGO AQUÍ',centroX,y+h*.84);
+      contexto.restore();
+    }
+
+    function mostrarAvisoAssets(archivos) {
+      const aviso=$('#preview-assets-warning');
+      $('#microphone').hidden=true;
+      aviso.hidden=false;
+      aviso.innerHTML=`<strong>Faltan capas PNG para mostrar esta vista previa.</strong><span>Agrega estos archivos en <code>/assets/mic/</code>:<br><code>${archivos.map(escapeHtml).join('</code><br><code>')}</code></span>`;
+    }
+
+    // Orden: cuerpo, cabeza, placa, zona de logo y, al final, brillos opcionales.
+    async function dibujarMicrofono() {
+      const ciclo=++vistaPrevia.ciclo;
+      const configuracion=capasActivas();
+      const resultados=await Promise.allSettled(configuracion.capas.map((capa)=>cargarImagen(capa.archivo)));
+      if (ciclo!==vistaPrevia.ciclo) return;
+      const faltantes=resultados.filter((resultado)=>resultado.status==='rejected').map((resultado)=>resultado.reason.message);
+      if (faltantes.length) { mostrarAvisoAssets(faltantes); return; }
+      const imagenes=resultados.map((resultado)=>resultado.value);
+      const primera=imagenes[0];
+      const incompatibles=imagenes.filter((imagen)=>imagen.naturalWidth!==primera.naturalWidth || imagen.naturalHeight!==primera.naturalHeight);
+      if (incompatibles.length) { mostrarAvisoAssets(['Los PNG deben tener exactamente el mismo tamaño de lienzo.']); return; }
+      const brillos=await Promise.all(configuracion.capas.map((capa)=>cargarImagen(archivoBrillo(capa.archivo),true)));
+      if (ciclo!==vistaPrevia.ciclo) return;
+      const lienzo=$('#microphone');
+      lienzo.hidden=false;
+      $('#preview-assets-warning').hidden=true;
+      const contexto=prepararLienzo(primera.naturalWidth,primera.naturalHeight);
+      configuracion.capas.forEach((capa,indice)=>contexto.drawImage(crearCapaRecolorada(capa,imagenes[indice]),0,0));
+      dibujarZonaLogo(contexto,configuracion.zonaLogo,primera.naturalWidth,primera.naturalHeight,hexVista(state.colores.logo));
+      brillos.forEach((brillo)=>{ if (brillo) contexto.drawImage(brillo,0,0); });
+    }
+
     function render() {
       $('#model').innerHTML=CONFIG.modelos.map((m)=>`<option value="${escapeHtml(m.nombre)}" ${m.nombre===state.modelo?'selected':''}>${escapeHtml(m.nombre)}${m.tamano==='pequeno'?' · Pequeño':' · Grande'}</option>`).join('');
       $('#shape-field').hidden=tamanoActual()==='grande';
@@ -196,12 +360,20 @@
 
     // Descarga local de la vista previa, sin subir información a ningún servidor.
     $('#download').addEventListener('click',()=>{
-      const svg=new XMLSerializer().serializeToString($('#microphone'));
-      const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}));
-      const image=new Image();
-      image.onload=()=>{ const canvas=document.createElement('canvas'); canvas.width=840; canvas.height=1040; const ctx=canvas.getContext('2d'); ctx.fillStyle='#e8e1ff'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.drawImage(image,0,0,canvas.width,canvas.height); URL.revokeObjectURL(url); const link=document.createElement('a'); link.download='microfono-kora.png'; link.href=canvas.toDataURL('image/png'); link.click(); };
-      image.onerror=()=>{ URL.revokeObjectURL(url); $('#status').textContent='No fue posible descargar la imagen. Inténtalo de nuevo.'; };
-      image.src=url;
+      const lienzo=$('#microphone');
+      if (lienzo.hidden || !lienzo.width || !lienzo.height) {
+        $('#status').textContent='La vista previa se podrá descargar cuando estén cargadas todas las capas PNG.';
+        return;
+      }
+      lienzo.toBlob((archivo)=>{
+        if (!archivo) { $('#status').textContent='No fue posible descargar la imagen. Inténtalo de nuevo.'; return; }
+        const enlace=document.createElement('a');
+        const url=URL.createObjectURL(archivo);
+        enlace.download='microfono-kora.png';
+        enlace.href=url;
+        enlace.click();
+        setTimeout(()=>URL.revokeObjectURL(url),0);
+      },'image/png');
     });
 
     // Hook para conectar un formulario o backend; recibe tanto objeto como JSON.
