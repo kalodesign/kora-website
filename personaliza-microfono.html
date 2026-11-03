@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Personaliza tu micrófono | Kora</title>
+  <style>
+    :root { --azul:#171d67; --tinta:#111b45; --lila:#e8e1ff; --rosa:#ffe5ee; --verde:#d7f3c0; --borde:#d4d3df; --radio:6px; --fondo:#fff; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--tinta); background:var(--fondo); font:16px/1.45 Arial, sans-serif; }
+    button, select { font:inherit; }
+    button { cursor:pointer; }
+    :focus-visible { outline:3px solid #fe7e01; outline-offset:3px; }
+    .topbar { min-height:64px; display:flex; align-items:center; justify-content:space-between; gap:20px; padding:12px max(20px, calc((100% - 1200px)/2)); border-bottom:1px solid #e9e8ed; }
+    .brand { color:var(--azul); font-size:23px; font-weight:900; text-decoration:none; }
+    .help { width:42px; height:42px; border:1px solid var(--azul); border-radius:var(--radio); background:white; color:var(--azul); font-size:22px; font-weight:bold; }
+    main { max-width:1200px; margin:auto; padding:25px 20px 60px; }
+    .intro { margin-bottom:20px; }
+    h1,h2,h3,p { margin-top:0; }
+    h1 { margin-bottom:7px; font-size:30px; line-height:1.1; color:var(--azul); }
+    .intro p { margin:0; color:#4b5065; }
+    .workspace { display:grid; gap:26px; }
+    .preview { min-width:0; }
+    .preview-stage { background:var(--lila); border-radius:var(--radio); display:grid; place-items:center; min-height:360px; overflow:hidden; }
+    #microphone { display:block; width:min(100%, 420px); max-height:510px; }
+    .preview-note { margin:12px 0; font-size:14px; }
+    .notice { color:#50536a; font-size:13px; }
+    .controls h2 { font-size:22px; color:var(--azul); margin:0 0 18px; }
+    fieldset { border:0; padding:0; margin:0 0 24px; min-width:0; }
+    legend, .field-label { display:block; margin-bottom:8px; font-weight:700; color:var(--azul); }
+    select { width:100%; height:44px; padding:0 12px; border:1px solid #a8a8b7; border-radius:var(--radio); background:white; color:var(--tinta); }
+    .segments { display:flex; flex-wrap:wrap; gap:8px; }
+    .segments label { position:relative; }
+    .segments input { position:absolute; opacity:0; }
+    .segments span { display:block; min-width:95px; text-align:center; padding:10px 14px; border:1px solid #a8a8b7; border-radius:var(--radio); background:white; cursor:pointer; }
+    .segments input:checked + span { color:white; border-color:var(--azul); background:var(--azul); }
+    .segments input:focus-visible + span { outline:3px solid #fe7e01; outline-offset:3px; }
+    .palette { display:flex; flex-wrap:wrap; gap:9px; }
+    .swatch { display:grid; place-items:center; width:34px; height:34px; padding:0; border:2px solid white; border-radius:50%; background:var(--swatch); box-shadow:0 0 0 1px #8e8e9c; color:var(--check); font-size:20px; font-weight:900; }
+    .swatch[aria-pressed="true"] { box-shadow:0 0 0 3px var(--azul); }
+    .swatch:disabled { cursor:not-allowed; opacity:.38; background-image:linear-gradient(135deg,transparent 46%,#5b5b5b 47%,#5b5b5b 53%,transparent 54%); }
+    .selection { min-height:22px; margin:8px 0 0; font-size:13px; color:#4a4d60; }
+    .neon { font-size:12px; margin:8px 0 0; color:#575b6b; }
+    .warning { background:#5b4600; color:#fff293; padding:10px 12px; border-radius:var(--radio); font-size:14px; }
+    .summary { border-top:1px solid var(--borde); padding-top:20px; }
+    .summary h2 { margin-bottom:12px; }
+    .summary dl { display:grid; grid-template-columns:minmax(90px,1fr) 2fr; gap:8px 12px; margin:0 0 18px; font-size:14px; }
+    dt { font-weight:bold; } dd { margin:0; overflow-wrap:anywhere; }
+    .actions { display:grid; gap:10px; }
+    .button { min-height:42px; padding:10px 16px; border-radius:var(--radio); font-weight:700; }
+    .primary { color:white; background:var(--azul); border:1px solid var(--azul); }
+    .secondary { color:var(--azul); background:white; border:1px solid var(--azul); }
+    .modal { position:fixed; inset:0; z-index:10; display:grid; place-items:center; padding:16px; background:rgba(12,18,49,.68); }
+    .modal[hidden], [hidden] { display:none !important; }
+    .dialog { width:min(100%,520px); max-height:calc(100dvh - 32px); overflow:auto; background:white; border-radius:var(--radio); padding:24px; box-shadow:0 20px 55px #1115; }
+    .dialog-top { display:flex; justify-content:space-between; align-items:start; gap:20px; }
+    .dialog h2 { color:var(--azul); font-size:24px; line-height:1.15; }
+    .close { border:0; background:transparent; color:var(--azul); font-size:28px; line-height:1; }
+    .steps { list-style:none; display:grid; gap:12px; padding:0; margin:4px 0 24px; }
+    .steps li { display:flex; align-items:center; gap:12px; }
+    .step-icon { width:38px; height:38px; flex:none; display:grid; place-items:center; border-radius:50%; background:var(--rosa); color:var(--azul); font-weight:bold; }
+    .dialog .button { width:100%; }
+    @media (min-width:900px) { .workspace { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:60px; align-items:start; } .preview { position:sticky; top:20px; } .preview-stage { min-height:570px; } h1 { font-size:38px; } }
+  </style>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="index.html" aria-label="Kora, inicio">KORA</a><button class="help" id="help" type="button" aria-label="Ver instrucciones">?</button></header>
+  <main>
+    <div class="intro"><h1>Personaliza tu micrófono</h1><p>Elige los detalles de una pieza tan única como tu voz.</p></div>
+    <div class="workspace">
+      <section class="preview" aria-label="Vista previa del micrófono">
+        <div class="preview-stage"><svg id="microphone" viewBox="0 0 420 520" role="img" aria-label="Vista previa de tu micrófono personalizado" xmlns="http://www.w3.org/2000/svg"></svg></div>
+        <p class="preview-note">Tu logo se colocará aquí. Nos lo envías después de solicitar tu diseño.</p>
+        <p class="notice">Vista previa referencial. El color y relieve final pueden variar ligeramente en la impresión 3D.</p>
+      </section>
+      <section class="controls" aria-labelledby="controls-title">
+        <h2 id="controls-title">Diseña el tuyo</h2>
+        <fieldset><label class="field-label" for="model">Micrófono inalámbrico</label><select id="model"></select></fieldset>
+        <fieldset id="shape-field"><legend>Forma de la placa</legend><div class="segments" id="shapes"></div></fieldset>
+        <fieldset><legend>Tipo de cabeza</legend><div class="segments" id="heads"></div></fieldset>
+        <div id="palettes"></div>
+        <p class="warning" id="contrast-warning" role="status" hidden>El color del logo y el de la placa tienen poco contraste. Prueba otra combinación para que tu logo se vea mejor.</p>
+        <section class="summary" aria-labelledby="summary-title"><h2 id="summary-title">Tu diseño</h2><dl id="summary"></dl></section>
+        <div class="actions"><button class="button secondary" id="download" type="button">Descargar vista previa</button><button class="button primary" id="request" type="button">Solicitar este diseño</button></div>
+        <p class="notice" id="status" role="status" aria-live="polite"></p>
+      </section>
+    </div>
+  </main>
+  <div class="modal" id="instructions" hidden>
+    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="instructions-title">
+      <div class="dialog-top"><h2 id="instructions-title">Crea tu micrófono en 4 pasos</h2><button type="button" class="close" id="close-instructions" aria-label="Cerrar instrucciones">×</button></div>
+      <ol class="steps"><li><span class="step-icon" aria-hidden="true">1</span>Elige tu micrófono inalámbrico.</li><li><span class="step-icon" aria-hidden="true">2</span>Elige forma, cabeza y colores.</li><li><span class="step-icon" aria-hidden="true">3</span>Revisa dónde irá tu logo.</li><li><span class="step-icon" aria-hidden="true">4</span>Solicita tu diseño y envíanos tu logo por WhatsApp.</li></ol>
+      <button type="button" class="button primary" id="start">Empezar</button>
+    </section>
+  </div>
+  <script>
+    // CONFIGURACIÓN: edita aquí los modelos, colores, WhatsApp y contraste.
+    const CONFIG = {
+      whatsapp: '573137151054',
+      contrasteMinimo: 3,
+      modelos: [
+        { nombre:'DJI Mic', tamano:'pequeno' }, { nombre:'DJI Mic 2', tamano:'pequeno' },
+        { nombre:'Hollyland Lark 2', tamano:'pequeno' }, { nombre:'Hollyland Lark M2', tamano:'pequeno' },
+        { nombre:'Otro modelo', tamano:'grande' }
+      ],
+      colores: [
+        { nombre:'Rojo', hex:'#D62828', disponible:true }, { nombre:'Negro', hex:'#1A1A1A', disponible:true },
+        { nombre:'Blanco', hex:'#F8F8F5', disponible:true }, { nombre:'Amarillo', hex:'#FFC800', disponible:true },
+        { nombre:'Amarillo claro', hex:'#FFE97A', disponible:true }, { nombre:'Fucsia', hex:'#E6007E', disponible:true, neon:true },
+        { nombre:'Rosado', hex:'#F7A8C8', disponible:true }, { nombre:'Lila', hex:'#C9A7EB', disponible:true },
+        { nombre:'Morado', hex:'#6B3FA0', disponible:true }, { nombre:'Gris', hex:'#8D8D8D', disponible:true },
+        { nombre:'Café', hex:'#6B4226', disponible:true }, { nombre:'Azul claro', hex:'#8FD3F4', disponible:true },
+        { nombre:'Azul oscuro', hex:'#1B3A6B', disponible:true }, { nombre:'Vinotinto', hex:'#6D1A2B', disponible:true },
+        { nombre:'Verde claro', hex:'#9BE08A', disponible:true }, { nombre:'Verde oscuro', hex:'#1F5E3B', disponible:true },
+        { nombre:'Verde fluorescente', hex:'#39FF14', disponible:true, neon:true }, { nombre:'Beige', hex:'#E8D5B5', disponible:true },
+        { nombre:'Naranja', hex:'#FF7A1A', disponible:true }
+      ]
+    };
+
+    // Estado único del configurador. Los colores se guardan como nombres de la paleta.
+    const state = { modelo:CONFIG.modelos[0].nombre, forma:'cuadrada', cabeza:'espuma', colores:{ cabeza:'Negro', cuerpo:'Negro', placa:'Lila', logo:'Azul oscuro' } };
+    const primerColorDisponible = CONFIG.colores.find((item) => item.disponible);
+    if (!primerColorDisponible) throw new Error('La paleta necesita al menos un color disponible.');
+    Object.keys(state.colores).forEach((parte) => {
+      if (!CONFIG.colores.some((item) => item.nombre === state.colores[parte] && item.disponible)) state.colores[parte] = primerColorDisponible.nombre;
+    });
+    const formas = { cuadrada:'Cuadrada', estrella:'Estrella', corazon:'Corazón', rectangular:'Rectangular grande' };
+    const partes = { cabeza:'Cabeza', cuerpo:'Cuerpo', placa:'Placa', logo:'Color del logo' };
+    const $ = (selector) => document.querySelector(selector);
+    const color = (nombre) => CONFIG.colores.find((item) => item.nombre === nombre);
+    const modeloActual = () => CONFIG.modelos.find((item) => item.nombre === state.modelo);
+    const tamanoActual = () => modeloActual().tamano;
+    const formaActual = () => tamanoActual() === 'grande' ? 'rectangular' : state.forma;
+    const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    // Luminancia relativa WCAG para advertir combinaciones con poco contraste.
+    function luminancia(hex) {
+      const rgb = hex.match(/[\da-f]{2}/gi).map((part) => parseInt(part,16)/255).map((n) => n <= .04045 ? n/12.92 : ((n+.055)/1.055)**2.4);
+      return rgb[0]*.2126 + rgb[1]*.7152 + rgb[2]*.0722;
+    }
+    function contraste(a,b) { const l1=luminancia(a), l2=luminancia(b); return (Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05); }
+    function opciones(grupo, values, seleccionado) {
+      return values.map(([valor,nombre]) => `<label><input type="radio" name="${grupo}" value="${valor}" ${valor===seleccionado?'checked':''}><span>${nombre}</span></label>`).join('');
+    }
+
+    // SVG por capas: mango detrás de placa, cabeza y detalles encima.
+    function dibujarMicrofono() {
+      const grande = tamanoActual()==='grande';
+      const forma = formaActual();
+      const c = Object.fromEntries(Object.entries(state.colores).map(([k,v]) => [k, color(v).hex]));
+      const placa = {
+        cuadrada:'M140 202 Q140 193 149 193 H271 Q280 193 280 202 V324 Q280 333 271 333 H149 Q140 333 140 324 Z',
+        rectangular:'M105 195 Q105 185 115 185 H305 Q315 185 315 195 V328 Q315 338 305 338 H115 Q105 338 105 328 Z',
+        estrella:'M210 175 L231 227 L288 230 L244 265 L259 322 L210 292 L161 322 L176 265 L132 230 L189 227 Z',
+        corazon:'M210 331 C197 319 132 280 132 237 C132 198 181 187 210 220 C239 187 288 198 288 237 C288 280 223 319 210 331 Z'
+      }[forma];
+      const area = forma==='estrella' ? {x:184,y:239,w:52,h:38,fs:6} : forma==='corazon' ? {x:178,y:238,w:64,h:43,fs:7} : forma==='rectangular' ? {x:153,y:228,w:114,h:68,fs:10} : {x:166,y:230,w:88,h:62,fs:8};
+      const {x,y,w,h,fs}=area;
+      const iconY=y+h*.2, labelY=y+h*.78;
+      const svg = `<defs>
+        <pattern id="foam" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.15" fill="#fff" opacity=".2"/><circle cx="6" cy="6" r="1" fill="#000" opacity=".22"/></pattern>
+        <pattern id="mesh" width="7" height="7" patternUnits="userSpaceOnUse"><path d="M0 0L7 7M7 0L0 7" stroke="#fff" opacity=".38" stroke-width=".8"/></pattern>
+        <linearGradient id="shade" x1="0" x2="1" y1="0" y2="0"><stop stop-color="#000" stop-opacity=".27"/><stop offset=".28" stop-color="#fff" stop-opacity=".18"/><stop offset=".7" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".24"/></linearGradient>
+        <filter id="shadow" x="-35%" y="-35%" width="170%" height="180%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity=".2"/></filter>
+        <filter id="relief" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="1" stdDeviation=".5" flood-color="#000" flood-opacity=".35"/></filter>
+      </defs>
+      <ellipse cx="210" cy="490" rx="82" ry="11" fill="#171d67" opacity=".10"/>
+      <g filter="url(#shadow)"><rect x="${grande?181:188}" y="135" width="${grande?58:44}" height="342" rx="${grande?25:20}" fill="${c.cuerpo}"/><rect x="${grande?181:188}" y="135" width="${grande?58:44}" height="342" rx="20" fill="url(#shade)"/></g>
+      <g filter="url(#shadow)"><path d="${placa}" transform="translate(3 7)" fill="${c.placa}" stroke="#000" stroke-opacity=".27" stroke-width="4"/><path d="${placa}" fill="${c.placa}" stroke="#000" stroke-opacity=".25" stroke-width="3" stroke-linejoin="round"/><path d="${placa}" fill="url(#shade)" opacity=".45"/></g>
+      <g fill="none" stroke="${c.logo}" stroke-width="1.5" filter="url(#relief)"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" stroke-dasharray="4 3"/><rect x="${210-w*.095}" y="${iconY}" width="${w*.19}" height="${h*.22}" rx="1"/><circle cx="${210-w*.04}" cy="${iconY+h*.06}" r="1" fill="${c.logo}" stroke="none"/><path d="M${210-w*.09} ${iconY+h*.18} l${w*.06} -${h*.06} l${w*.04} ${h*.035} l${w*.04} -${h*.06} l${w*.04} ${h*.085}"/></g>
+      <text x="210" y="${labelY}" fill="${c.logo}" text-anchor="middle" font-family="Arial,sans-serif" font-size="${fs}" font-weight="bold" filter="url(#relief)">TU LOGO AQUÍ</text>
+      <g filter="url(#shadow)"><rect x="${grande?163:174}" y="49" width="${grande?94:72}" height="144" rx="${grande?47:36}" fill="${c.cabeza}"/><rect x="${grande?163:174}" y="49" width="${grande?94:72}" height="144" rx="${grande?47:36}" fill="url(#${state.cabeza==='espuma'?'foam':'mesh'})"/><rect x="${grande?163:174}" y="49" width="${grande?94:72}" height="144" rx="${grande?47:36}" fill="url(#shade)"/>${state.cabeza==='malla'?`<rect x="${grande?165:176}" y="160" width="${grande?90:68}" height="14" rx="6" fill="#b7b9bd" stroke="#64676a" stroke-width="2"/>`:''}</g>`;
+      $('#microphone').innerHTML=svg;
+    }
+
+    function render() {
+      $('#model').innerHTML=CONFIG.modelos.map((m)=>`<option value="${escapeHtml(m.nombre)}" ${m.nombre===state.modelo?'selected':''}>${escapeHtml(m.nombre)}${m.tamano==='pequeno'?' · Pequeño':' · Grande'}</option>`).join('');
+      $('#shape-field').hidden=tamanoActual()==='grande';
+      $('#shapes').innerHTML=opciones('forma',Object.entries(formas).filter(([key])=>key!=='rectangular'),state.forma);
+      $('#heads').innerHTML=opciones('cabeza',[['espuma','Espuma'],['malla','Malla']],state.cabeza);
+      $('#palettes').innerHTML=Object.entries(partes).map(([key,label]) => {
+        const selected=color(state.colores[key]);
+        return `<fieldset><legend>${label}</legend><div class="palette" role="group" aria-label="Colores de ${label.toLowerCase()}">${CONFIG.colores.map((c)=>`<button type="button" class="swatch" data-parte="${key}" data-color="${escapeHtml(c.nombre)}" style="--swatch:${c.hex};--check:${luminancia(c.hex)>.4?'#111':'#fff'}" aria-pressed="${c.nombre===selected.nombre}" aria-label="${escapeHtml(c.nombre)}${c.disponible?'':', agotado'}${c.neon?', color neón':''}" title="${escapeHtml(c.nombre)}${c.disponible?'':' · Agotado'}${c.neon?' · Los colores neón se ven distintos en pantalla.':''}" ${c.disponible?'':'disabled'}>${c.nombre===selected.nombre?'✓':''}</button>`).join('')}</div><p class="selection">Seleccionado: <strong>${escapeHtml(selected.nombre)}</strong> · ${selected.hex}</p><p class="neon">Fucsia y verde fluorescente: los colores neón se ven distintos en pantalla.</p></fieldset>`;
+      }).join('');
+      $('#contrast-warning').hidden=contraste(color(state.colores.logo).hex,color(state.colores.placa).hex)>=CONFIG.contrasteMinimo;
+      const entries=[['Modelo',state.modelo],['Tamaño',tamanoActual()==='pequeno'?'Pequeño':'Grande'],['Forma',formas[formaActual()]],['Cabeza',state.cabeza==='espuma'?'Espuma':'Malla'],...Object.entries(partes).map(([k,label])=>[label,`${color(state.colores[k]).nombre} (${color(state.colores[k]).hex})`])];
+      $('#summary').innerHTML=entries.map(([k,v])=>`<dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd>`).join('');
+      dibujarMicrofono();
+    }
+
+    // Eventos del formulario y restauración del foco tras actualizar los controles.
+    $('#model').addEventListener('change',(event)=>{ state.modelo=event.target.value; render(); $('#model').focus(); });
+    $('#shapes').addEventListener('change',(event)=>{ state.forma=event.target.value; render(); $(`#shapes input[value="${state.forma}"]`).focus(); });
+    $('#heads').addEventListener('change',(event)=>{ state.cabeza=event.target.value; render(); $(`#heads input[value="${state.cabeza}"]`).focus(); });
+    $('#palettes').addEventListener('click',(event)=>{ const button=event.target.closest('[data-parte]'); if (!button) return; state.colores[button.dataset.parte]=button.dataset.color; render(); [...document.querySelectorAll('[data-parte]')].find((item)=>item.dataset.parte===button.dataset.parte && item.dataset.color===button.dataset.color)?.focus(); });
+
+    // Descarga local de la vista previa, sin subir información a ningún servidor.
+    $('#download').addEventListener('click',()=>{
+      const svg=new XMLSerializer().serializeToString($('#microphone'));
+      const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}));
+      const image=new Image();
+      image.onload=()=>{ const canvas=document.createElement('canvas'); canvas.width=840; canvas.height=1040; const ctx=canvas.getContext('2d'); ctx.fillStyle='#e8e1ff'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.drawImage(image,0,0,canvas.width,canvas.height); URL.revokeObjectURL(url); const link=document.createElement('a'); link.download='microfono-kora.png'; link.href=canvas.toDataURL('image/png'); link.click(); };
+      image.onerror=()=>{ URL.revokeObjectURL(url); $('#status').textContent='No fue posible descargar la imagen. Inténtalo de nuevo.'; };
+      image.src=url;
+    });
+
+    // Hook para conectar un formulario o backend; recibe tanto objeto como JSON.
+    function alSolicitarDiseno(configuracion, json) {
+      window.dispatchEvent(new CustomEvent('kora:solicitud-microfono',{detail:{configuracion,json}}));
+    }
+    $('#request').addEventListener('click',()=>{
+      const configuracion={modelo:state.modelo,tamano:tamanoActual()==='pequeno'?'Pequeño':'Grande',forma:formas[formaActual()],cabeza:state.cabeza==='espuma'?'Espuma':'Malla',colores:Object.fromEntries(Object.entries(state.colores).map(([k,v])=>[k,{nombre:v,hex:color(v).hex}]))};
+      const json=JSON.stringify(configuracion,null,2);
+      alSolicitarDiseno(configuracion,json);
+      const lineas=['Hola, quiero solicitar este diseño de micrófono:',`Modelo: ${configuracion.modelo}`,`Tamaño: ${configuracion.tamano}`,`Forma: ${configuracion.forma}`,`Cabeza: ${configuracion.cabeza}`,...Object.entries(partes).map(([k,label])=>`${label}: ${configuracion.colores[k].nombre} (${configuracion.colores[k].hex})`),'','Te envío mi logo en este chat (SVG o PNG transparente, 1-2 colores).'];
+      window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(lineas.join('\n'))}`,'_blank','noopener,noreferrer');
+      $('#status').textContent='Continúa tu solicitud en WhatsApp.';
+    });
+
+    // Instrucciones accesibles y reabribles.
+    const modal=$('#instructions');
+    function cerrarInstrucciones(){ modal.hidden=true; $('#help').focus(); }
+    function abrirInstrucciones(){ modal.hidden=false; $('#start').focus(); }
+    $('#start').addEventListener('click',cerrarInstrucciones);
+    $('#close-instructions').addEventListener('click',cerrarInstrucciones);
+    $('#help').addEventListener('click',abrirInstrucciones);
+    modal.addEventListener('keydown',(event)=>{ if(event.key==='Escape') cerrarInstrucciones(); if(event.key==='Tab'){ const controls=[...modal.querySelectorAll('button')]; const first=controls[0], last=controls[controls.length-1]; if(event.shiftKey && document.activeElement===first){event.preventDefault();last.focus();} else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();} } });
+    render(); abrirInstrucciones();
+  </script>
+</body>
+</html>
