@@ -23,6 +23,8 @@ PARTS = {
     'rectangular': ('cuerpo_grande', (0, 1, 0), (1, 0, 0), 2000),
     'corazon': ('placa_corazon', (1, -1, 0), (-1, -1, 0), 24000),
     'estrella': ('estrella', (1, 0, 0), (0, -1, 0), 18000),
+    'union-corazon': ('Parte posterior corazon ', (1, 0, 0), (0, 0, 1), 6000),
+    'union-estrella': ('Parte superior de estrella', (1, 0, 0), (0, 0, 1), 6000),
     'espuma-pequeno': ('cabeza_espuma_pequeno', (1, 0, 0), (0, 0, 1), 14000),
     'espuma-grande': ('cabeza_espuma_grande', (1, 0, 0), (0, 0, 1), 15000),
     'malla-pequeno': ('cabeza_malla_pequeno', (1, 0, 0), (0, 0, 1), 82000),

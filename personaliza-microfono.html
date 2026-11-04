@@ -48,6 +48,23 @@
     .segments span { min-height:42px; display:grid; place-items:center; padding:8px 16px; border:1px solid #a8a8b7; border-radius:var(--radio); background:white; cursor:pointer; }
     .segments input:checked + span { color:white; border-color:var(--azul); background:var(--azul); }
     .segments input:focus-visible + span { outline:3px solid #fe7e01; outline-offset:3px; }
+    .segments input:disabled + span { background:#f3f3f6; border-color:#d8d8e0; color:#656576; cursor:not-allowed; }
+    .field-note { margin-top:7px; font-size:13px; color:#50536a; }
+    .parts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+    .part { display:flex; align-items:center; justify-content:center; gap:6px; height:42px; padding:0 4px; background:white; color:var(--azul); border:1px solid #a8a8b7; border-radius:var(--radio); font-weight:600; }
+    .part[aria-pressed="true"] { background:#f2efff; border:2px solid var(--azul); }
+    .part::before, .tone-mark { border-radius:50%; background:var(--tono); }
+    .part::before { content:""; flex:none; width:12px; height:12px; border:1px solid #737384; }
+    .tone-label { margin:14px 0 0; font-size:14px; }
+    .tones { display:flex; flex-wrap:wrap; gap:2px; margin-top:4px; }
+    .tone { position:relative; display:grid; place-items:center; width:42px; height:42px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .tone input { position:absolute; opacity:0; width:1px; height:1px; }
+    .tone-mark { display:grid; place-items:center; width:29px; height:29px; box-shadow:0 0 0 1px #92929f; font-weight:900; color:var(--marca); }
+    .tone input:checked + .tone-mark { box-shadow:0 0 0 2px white,0 0 0 4px var(--azul); }
+    .tone input:checked + .tone-mark::after { content:"✓"; }
+    .tone input:focus-visible + .tone-mark { outline:3px solid #fe7e01; outline-offset:5px; }
+    .tone input:disabled + .tone-mark { opacity:.45; cursor:not-allowed; }
+    .tone input:disabled + .tone-mark::after { content:"×"; }
     .summary { border-top:1px solid var(--borde); padding-top:16px; }
     .summary h2 { margin-bottom:10px; }
     dl { display:grid; grid-template-columns:minmax(92px,1fr) 2fr; gap:7px 12px; margin:0 0 18px; }
@@ -79,7 +96,8 @@
     <div class="workspace">
       <section class="preview" aria-label="Vista previa del micrófono">
         <div class="preview-stage">
-          <img id="poster" src="assets/mic/v1/cuadrada-espuma.png" alt="Micrófono ensamblado con carcasa cuadrada y cabeza de espuma" width="800" height="800">
+          <canvas id="poster" role="img" aria-label="Vista frontal del ensamble" width="800" height="800" hidden></canvas>
+          <noscript><img src="assets/mic/v1/cuadrada-espuma.png" alt="Carcasa cuadrada con cabeza de espuma" width="800" height="800" style="width:100%;height:auto"></noscript>
           <canvas id="microphone" role="img" aria-label="Ensamble en 3D" aria-describedby="view-hint" tabindex="0" hidden></canvas>
           <span class="view-badge" id="view-badge" role="status">Vista del ensamble</span>
         </div>
@@ -96,7 +114,17 @@
         <h2 id="controls-title">Diseña el tuyo</h2>
         <fieldset><label class="field-label" for="model">Micrófono inalámbrico</label><select id="model"></select></fieldset>
         <fieldset id="shape-field"><legend>Forma de la carcasa</legend><div class="segments" id="shapes"></div></fieldset>
-        <fieldset><legend>Tipo de cabeza</legend><div class="segments" id="heads"></div></fieldset>
+        <fieldset aria-describedby="head-rule"><legend>Tipo de cabeza</legend><div class="segments" id="heads"></div>
+          <p class="field-note" id="head-rule" hidden>Esta carcasa se arma únicamente con cabeza de malla.</p>
+        </fieldset>
+        <fieldset>
+          <legend>Colores por pieza</legend>
+          <div class="parts" id="color-parts" role="group" aria-label="Pieza que quieres pintar"></div>
+          <p class="tone-label" id="color-selection" aria-live="polite"></p>
+          <div class="tones" id="tones" role="radiogroup" aria-label="Paleta de la pieza seleccionada"></div>
+          <p class="field-note" id="union-note" hidden>La bola y su unión con la carcasa comparten este color.</p>
+          <p class="field-note">Los colores neón se ven distintos en pantalla. Aplica para fucsia y verde fluorescente.</p>
+        </fieldset>
         <section class="summary" aria-labelledby="summary-title"><h2 id="summary-title">Tu diseño</h2><dl id="summary"></dl></section>
         <div class="actions">
           <button class="button secondary" id="download" type="button" disabled>Descargar vista previa</button>
@@ -111,7 +139,7 @@
       <div class="dialog-top"><h2 id="instructions-title">Arma tu micrófono en 3 pasos</h2><button type="button" class="close" id="close-instructions" aria-label="Cerrar instrucciones">×</button></div>
       <ol class="steps">
         <li><span class="step-icon" aria-hidden="true">1</span>Elige tu micrófono inalámbrico.</li>
-        <li><span class="step-icon" aria-hidden="true">2</span>Elige la carcasa y el tipo de cabeza.</li>
+        <li><span class="step-icon" aria-hidden="true">2</span>Elige la carcasa, el tipo de cabeza y el color de cada pieza.</li>
         <li><span class="step-icon" aria-hidden="true">3</span>Revisa el ensamble y solicita tu diseño por WhatsApp.</li>
       </ol>
       <button type="button" class="button primary" id="start">Empezar</button>
@@ -128,20 +156,43 @@
         { nombre:'Otro modelo', tamano:'grande' }
       ],
       formas: {
-        cuadrada: { nombre:'Cuadrada', entradaMango:.002, entradaCabeza:.0006 },
-        estrella: { nombre:'Estrella', entradaMango:.009, entradaCabeza:.0008 },
-        corazon: { nombre:'Corazón', entradaMango:.0058, entradaCabeza:.0062 },
-        rectangular: { nombre:'Rectangular grande', entradaMango:.0015, entradaCabeza:.0006 }
+        cuadrada: { nombre:'Cuadrada', tono:'Naranja', entradaMango:.002, entradaCabeza:.0006 },
+        estrella: { nombre:'Estrella', tono:'Rosado', entradaMango:.009, cabezaFija:'malla',
+          union:{ archivo:'union-estrella', asiento:.017208, espiga:.01501 } },
+        corazon: { nombre:'Corazón', tono:'Verde fluorescente', entradaMango:.0058, cabezaFija:'malla',
+          union:{ archivo:'union-corazon', asiento:.008248, espiga:.01501 } },
+        rectangular: { nombre:'Rectangular grande', tono:'Naranja', entradaMango:.0015, entradaCabeza:.0006 }
       },
-      cabezas: { espuma:'Espuma', malla:'Malla' }
+      cabezas: { espuma:'Espuma', malla:'Malla' },
+      // Inventario fijo. Un tono con disponible:false se muestra agotado.
+      colores: [
+        { nombre:'Rojo', hex:'#D62828', disponible:true }, { nombre:'Negro', hex:'#1A1A1A', disponible:true },
+        { nombre:'Blanco', hex:'#F8F8F5', disponible:true }, { nombre:'Amarillo', hex:'#FFC800', disponible:true },
+        { nombre:'Amarillo claro', hex:'#FFE97A', disponible:true }, { nombre:'Fucsia', hex:'#E6007E', disponible:true },
+        { nombre:'Rosado', hex:'#F7A8C8', disponible:true }, { nombre:'Lila', hex:'#C9A7EB', disponible:true },
+        { nombre:'Morado', hex:'#6B3FA0', disponible:true }, { nombre:'Gris', hex:'#8D8D8D', disponible:true },
+        { nombre:'Café', hex:'#6B4226', disponible:true }, { nombre:'Azul claro', hex:'#8FD3F4', disponible:true },
+        { nombre:'Azul oscuro', hex:'#1B3A6B', disponible:true }, { nombre:'Vinotinto', hex:'#6D1A2B', disponible:true },
+        { nombre:'Verde claro', hex:'#9BE08A', disponible:true }, { nombre:'Verde oscuro', hex:'#1F5E3B', disponible:true },
+        { nombre:'Verde fluorescente', hex:'#39FF14', disponible:true }, { nombre:'Beige', hex:'#E8D5B5', disponible:true },
+        { nombre:'Naranja', hex:'#FF7A1A', disponible:true }
+      ]
     };
-    const state = { modelo:CONFIG.modelos[0].nombre, forma:'cuadrada', cabeza:'espuma' };
+    const PARTES = {
+      cabeza:{ nombre:'Cabeza', etiqueta:'Color de la cabeza' },
+      placa:{ nombre:'Carcasa', etiqueta:'Color de la carcasa' },
+      cuerpo:{ nombre:'Mango', etiqueta:'Color del mango' }
+    };
+    // La preferencia libre se recuerda al volver a una carcasa compatible.
+    // Un color elegido expresamente acompaña al cliente aunque cambie de forma.
+    const state = { modelo:CONFIG.modelos[0].nombre, forma:'cuadrada', cabezaPreferida:'espuma',
+      parte:'cabeza', colores:{ cabeza:null, placa:null, cuerpo:null } };
     const $ = (selector) => document.querySelector(selector);
     const lienzo = $('#microphone');
     const poster = $('#poster');
     const etapa = $('.preview-stage');
 
-    // Visor WebGL nativo. Las tres superficies del producto proceden siempre de los STL.
+    // Visor WebGL nativo. Cada superficie del ensamble procede de su STL.
     const VERTEX = `
       attribute vec3 aPosition;
       attribute vec3 aNormal;
@@ -229,6 +280,7 @@
       const cache = new Map();
       const camara = { giro:.195, altura:.112, zoom:1 };
       let escena = null;
+      let tintes = null;
       let altoTotal = 0;
 
       function buffer(tipo, datos) {
@@ -305,7 +357,7 @@
           const m = parte.malla;
           gl.uniform1f(uniform.Offset,parte.base);
           gl.uniform1f(uniform.Kind,parte.material);
-          gl.uniform3fv(uniform.Tint,parte.tinte);
+          gl.uniform3fv(uniform.Tint,tintes[parte.grupo]);
           conectar(attr.Position,m.posicion,3);
           conectar(attr.Normal,m.normal,3);
           conectar(attr.Light,m.luz,4);
@@ -313,19 +365,30 @@
           gl.drawElements(gl.TRIANGLES,m.cantidad,m.indices.tipo,m.indices.offset);
         }
       }
-      function montar([mango,carcasa,cabeza], forma, modo) {
+      function pintar(nuevosTintes) {
+        tintes = nuevosTintes;
+        dibujar();
+      }
+      function montar([mango,carcasa,cabeza,union], forma, modo, tonos) {
         const encaje = CONFIG.formas[forma];
         const baseCarcasa = mango.alto - encaje.entradaMango;
-        const baseCabeza = baseCarcasa + carcasa.alto - encaje.entradaCabeza;
-        const rosa = forma==='corazon' || forma==='estrella';
+        const cima = baseCarcasa + carcasa.alto;
         escena = [
-          { malla:mango, base:0, material:2, tinte:[.17,.176,.193] },
-          { malla:carcasa, base:baseCarcasa, material:3, tinte:rosa ? [.95,.34,.63] : [1,.46,.075] },
-          { malla:cabeza, base:baseCabeza, material:modo==='malla' ? 1 : 0,
-            tinte:modo==='espuma' ? [.175,.177,.195] : (rosa ? [.22,.22,.24] : [.74,.76,.80]) }
+          { malla:mango, base:0, material:2, grupo:'cuerpo' },
+          { malla:carcasa, base:baseCarcasa, material:3, grupo:'placa' }
         ];
+        let baseCabeza;
+        if (union) {
+          // El extremo ancho se apoya en el fondo del alojamiento, el estrecho entra en la bola.
+          const baseUnion = cima - encaje.union.asiento;
+          escena.push({ malla:union, base:baseUnion, material:2, grupo:'cabeza' });
+          baseCabeza = baseUnion + union.alto - encaje.union.espiga;
+        } else {
+          baseCabeza = cima - encaje.entradaCabeza;
+        }
+        escena.push({ malla:cabeza, base:baseCabeza, material:modo==='malla' ? 1 : 0, grupo:'cabeza' });
         altoTotal = baseCabeza+cabeza.alto;
-        dibujar();
+        pintar(tonos);
       }
       function mover(dx,dy,factor=1) {
         camara.giro += dx;
@@ -334,7 +397,7 @@
         dibujar();
       }
       function centrar() { Object.assign(camara,{ giro:.195, altura:.112, zoom:1 }); dibujar(); }
-      return { pieza, montar, dibujar, mover, centrar };
+      return { pieza, montar, pintar, dibujar, mover, centrar };
     }
 
     function init3D() {
@@ -344,15 +407,36 @@
     let visor = init3D();
     let version = 0, claveActual = '';
     let listo3D = false, posterListo = false, cargando3D = false, cargandoPoster = false;
+    let frente = null, temporizadorFrente;
+
+    function colorDisponible(nombre) {
+      return CONFIG.colores.find((c) => c.disponible && c.nombre===nombre)
+        || CONFIG.colores.find((c) => c.disponible)
+        || { nombre:'Agotado', hex:'#8D8D8D', disponible:false };
+    }
+    function rgb(hex) {
+      return [1,3,5].map((i) => parseInt(hex.slice(i,i+2),16)/255);
+    }
+    function tintesDe(sel) {
+      return Object.fromEntries(Object.entries(sel.colores).map(([k,c]) => [k,rgb(c.hexVista || c.hex)]));
+    }
 
     function seleccion() {
       const modelo = CONFIG.modelos.find((item) => item.nombre===state.modelo);
       const forma = modelo.tamano==='grande' ? 'rectangular' : state.forma;
-      return { modelo:modelo.nombre, tamano:modelo.tamano, forma, cabeza:state.cabeza };
+      const carcasa = CONFIG.formas[forma];
+      const cabeza = carcasa.cabezaFija || state.cabezaPreferida;
+      const cabezaInicial = cabeza==='malla' && !carcasa.union ? 'Gris' : 'Negro';
+      return { modelo:modelo.nombre, tamano:modelo.tamano, forma, cabeza, colores:{
+        cabeza:colorDisponible(state.colores.cabeza || cabezaInicial),
+        placa:colorDisponible(state.colores.placa || carcasa.tono),
+        cuerpo:colorDisponible(state.colores.cuerpo || 'Negro')
+      } };
     }
     function resumen(sel) {
       return { modelo:sel.modelo, tamano:sel.tamano==='pequeno' ? 'Pequeño' : 'Grande',
-        forma:CONFIG.formas[sel.forma].nombre, cabeza:CONFIG.cabezas[sel.cabeza] };
+        forma:CONFIG.formas[sel.forma].nombre, cabeza:CONFIG.cabezas[sel.cabeza],
+        colores:Object.fromEntries(Object.entries(sel.colores).map(([k,c]) => [k,{ nombre:c.nombre, hex:c.hex }])) };
     }
     function mostrarVista() {
       lienzo.hidden = !listo3D;
@@ -372,38 +456,88 @@
       $('#view-badge').textContent = letrero;
       $('#view-hint').textContent = ayuda;
     }
+    // Cada mapa frontal contiene el fondo con reflejos y los pesos de luz de las tres piezas.
+    // Así la imagen de respaldo y su PNG respetan también la pintura del pedido.
+    const ESCALA_LUZ_FRONTAL = 1.35;
+    async function leerFrente(clave) {
+      const imagen = new Image();
+      imagen.src = CONFIG.carpeta+'frentes/'+clave+'.png';
+      await imagen.decode();
+      const alto=imagen.naturalHeight, ancho=imagen.naturalWidth/2;
+      if (ancho!==alto) throw Error('Mapa frontal inválido');
+      const auxiliar=document.createElement('canvas');
+      auxiliar.width=ancho; auxiliar.height=alto;
+      const ctx=auxiliar.getContext('2d',{willReadFrequently:true});
+      ctx.drawImage(imagen,0,0);
+      const base=ctx.getImageData(0,0,ancho,alto);
+      ctx.drawImage(imagen,-ancho,0);
+      const pesos=ctx.getImageData(0,0,ancho,alto).data;
+      const salida=new ImageData(new Uint8ClampedArray(base.data),ancho,alto);
+      return { base:base.data, pesos, salida };
+    }
+    function pintarFrente(tonos) {
+      const {base,pesos,salida}=frente, pixels=salida.data;
+      for (let i=0; i<pixels.length; i+=4) {
+        if (!(pesos[i] || pesos[i+1] || pesos[i+2])) continue;
+        for (let canal=0; canal<3; canal++) {
+          const luz=pesos[i]*tonos.cabeza[canal]+pesos[i+1]*tonos.placa[canal]+pesos[i+2]*tonos.cuerpo[canal];
+          pixels[i+canal]=base[i+canal]+luz*ESCALA_LUZ_FRONTAL;
+        }
+      }
+      poster.getContext('2d').putImageData(salida,0,0);
+    }
     function cargarEnsamble(sel, forzar=false) {
-      const clave = sel.forma+'-'+sel.cabeza;
-      if (clave===claveActual && !forzar) return;
-      claveActual = clave;
-      const turno = ++version;
-      listo3D = posterListo = false;
-      cargando3D = !!visor;
-      cargandoPoster = true;
+      const clave=sel.forma+'-'+sel.cabeza;
+      const descripcion='Carcasa '+CONFIG.formas[sel.forma].nombre.toLowerCase()+' ('+sel.colores.placa.nombre+
+        '), cabeza de '+sel.cabeza+' ('+sel.colores.cabeza.nombre+') y mango '+sel.colores.cuerpo.nombre+'.';
+      lienzo.setAttribute('aria-label',descripcion+' Vista 3D interactiva.');
+      poster.setAttribute('aria-label',descripcion+' Vista frontal.');
+      if (clave===claveActual && !forzar) {
+        if (listo3D) visor.pintar(tintesDe(sel));
+        else if (posterListo) pintarFrente(tintesDe(sel));
+        return;
+      }
+
+      claveActual=clave;
+      const turno=++version, actual=visor;
+      clearTimeout(temporizadorFrente);
+      frente=null; listo3D=posterListo=false;
+      cargando3D=!!actual; cargandoPoster=true;
       mostrarVista();
-      const descripcion = 'Micrófono con carcasa '+CONFIG.formas[sel.forma].nombre.toLowerCase()
-        +' y cabeza de '+sel.cabeza;
-      lienzo.setAttribute('aria-label', descripcion+'. Vista 3D interactiva.');
-      poster.alt = descripcion;
-      poster.src = CONFIG.carpeta+clave+'.png';
-      // La imagen frontal procede del mismo ensamble. También permite descargar sin WebGL.
-      poster.decode().then(() => {
-        if (turno===version) posterListo = true;
-      }).catch(() => {}).finally(() => {
-        if (turno===version) { cargandoPoster=false; mostrarVista(); }
+      let iniciado=false;
+      async function iniciarFrente() {
+        if (iniciado || turno!==version || listo3D) return;
+        iniciado=true;
+        try {
+          const mapa=await leerFrente(clave);
+          if (turno!==version || listo3D) return;
+          frente=mapa;
+          poster.width=mapa.salida.width; poster.height=mapa.salida.height;
+          pintarFrente(tintesDe(seleccion()));
+          posterListo=true;
+        } catch (error) {
+          if (turno===version && !listo3D) console.warn('Vista frontal de Kora:',error.message);
+        } finally {
+          if (turno===version) { cargandoPoster=false; mostrarVista(); }
+        }
+      }
+      if (!actual) { iniciarFrente(); return; }
+      temporizadorFrente=setTimeout(iniciarFrente,450);
+      const nombres=['mango',sel.forma,sel.cabeza+'-'+sel.tamano];
+      const union=CONFIG.formas[sel.forma].union;
+      if (union) nombres.push(union.archivo);
+      Promise.all(nombres.map(actual.pieza)).then((piezas) => {
+        if (turno!==version) return;
+        // Mientras cargaban los modelos el cliente pudo haber elegido un color nuevo.
+        actual.montar(piezas,sel.forma,sel.cabeza,tintesDe(seleccion()));
+        listo3D=true;
+        clearTimeout(temporizadorFrente);
+        frente=null; posterListo=cargandoPoster=false;
+      }).catch((error) => {
+        if (turno===version) { console.warn('Vista 3D de Kora:',error.message); iniciarFrente(); }
+      }).finally(() => {
+        if (turno===version) { cargando3D=false; mostrarVista(); }
       });
-      if (!visor) return;
-      const actual = visor;
-      Promise.all(['mango',sel.forma,sel.cabeza+'-'+sel.tamano].map(actual.pieza))
-        .then((piezas) => {
-          if (turno!==version) return;
-          actual.montar(piezas,sel.forma,sel.cabeza);
-          listo3D=true;
-        }).catch((error) => {
-          if (turno===version) console.warn('Vista frontal de Kora:',error.message);
-        }).finally(() => {
-          if (turno===version) { cargando3D=false; mostrarVista(); }
-        });
     }
 
     function crearRadios(grupo, opciones) {
@@ -426,11 +560,67 @@
       .map(([k,forma]) => [k,forma.nombre]));
     crearRadios('cabeza', Object.entries(CONFIG.cabezas));
 
+    function crearEditorDeColor() {
+      for (const [key,parte] of Object.entries(PARTES)) {
+        const boton=document.createElement('button');
+        boton.type='button'; boton.className='part'; boton.dataset.parte=key;
+        boton.textContent=parte.nombre;
+        $('#color-parts').append(boton);
+      }
+      for (const color of CONFIG.colores) {
+        const etiqueta=document.createElement('label');
+        const input=document.createElement('input'), muestra=document.createElement('span');
+        const hex=color.hexVista || color.hex;
+        const [r,g,b]=rgb(hex).map((v) => v<=.04045 ? v/12.92 : ((v+.055)/1.055)**2.4);
+        etiqueta.className='tone'; etiqueta.style.setProperty('--tono',hex);
+        etiqueta.style.setProperty('--marca',.2126*r+.7152*g+.0722*b>.19 ? '#111' : '#fff');
+        input.type='radio'; input.name='tono'; input.value=color.nombre; input.disabled=!color.disponible;
+        etiqueta.title=color.nombre+(color.disponible ? '' : ' · Agotado');
+        input.setAttribute('aria-label',etiqueta.title);
+        muestra.className='tone-mark'; muestra.setAttribute('aria-hidden','true');
+        etiqueta.append(input,muestra); $('#tones').append(etiqueta);
+      }
+    }
+    function mostrarColores(sel) {
+      for (const boton of $('#color-parts').children) {
+        const key=boton.dataset.parte, c=sel.colores[key];
+        boton.style.setProperty('--tono',c.hexVista || c.hex);
+        boton.setAttribute('aria-pressed',String(key===state.parte));
+        boton.setAttribute('aria-label',PARTES[key].etiqueta+' · '+c.nombre);
+      }
+      const c=sel.colores[state.parte], parte=PARTES[state.parte];
+      for (const input of $('#tones').querySelectorAll('input')) input.checked=input.value===c.nombre;
+      $('#tones').setAttribute('aria-label',parte.etiqueta);
+      $('#color-selection').textContent=parte.etiqueta+' · '+c.nombre+' ('+c.hex+')';
+      $('#union-note').hidden=!(state.parte==='cabeza' && CONFIG.formas[sel.forma].union);
+      $('#request').disabled=!c.disponible;
+    }
+    crearEditorDeColor();
+    $('#color-parts').addEventListener('click',(e) => {
+      const boton=e.target.closest('button[data-parte]');
+      if (boton) { state.parte=boton.dataset.parte; mostrarColores(seleccion()); }
+    });
+    function escogerTono(e) {
+      const input=e.target;
+      if (!input.matches('input[name="tono"]:enabled') || state.colores[state.parte]===input.value) return;
+      state.colores[state.parte]=input.value;
+      render();
+    }
+    $('#tones').addEventListener('change',escogerTono);
+    $('#tones').addEventListener('click',escogerTono);
+
     function render() {
       const sel = seleccion(), info = resumen(sel);
+      const fija = CONFIG.formas[sel.forma].cabezaFija;
       $('#shape-field').hidden = sel.tamano==='grande';
-      for (const input of document.querySelectorAll('.segments input')) input.checked=input.value===state[input.name];
-      const filas=[['Modelo',info.modelo],['Tamaño',info.tamano],['Forma',info.forma],['Cabeza',info.cabeza]];
+      $('#head-rule').hidden = !fija;
+      for (const input of document.querySelectorAll('.segments input')) {
+        input.checked=input.value===sel[input.name];
+        input.disabled=input.name==='cabeza' && !!fija && input.value!==fija;
+      }
+      mostrarColores(sel);
+      const filas=[['Modelo',info.modelo],['Tamaño',info.tamano],['Forma',info.forma],['Cabeza',info.cabeza],
+        ...Object.entries(info.colores).map(([k,c]) => [PARTES[k].etiqueta,c.nombre+' ('+c.hex+')'])];
       const nodos=filas.flatMap(([etiqueta,valor]) => {
         const nombre=document.createElement('dt'), dato=document.createElement('dd');
         nombre.textContent=etiqueta; dato.textContent=valor;
@@ -441,8 +631,9 @@
       cargarEnsamble(sel);
     }
     $('#model').addEventListener('change',(e) => { state.modelo=e.target.value; render(); });
-    for (const id of ['#shapes','#heads']) $(id).addEventListener('change',(e) => {
-      state[e.target.name]=e.target.value;
+    $('#shapes').addEventListener('change',(e) => { state.forma=e.target.value; render(); });
+    $('#heads').addEventListener('change',(e) => {
+      if (!CONFIG.formas[seleccion().forma].cabezaFija) state.cabezaPreferida=e.target.value;
       render();
     });
 
@@ -485,10 +676,10 @@
     $('#download').addEventListener('click',() => {
       const link=document.createElement('a');
       link.download='microfono-kora-'+claveActual+'.png';
-      if (!listo3D && posterListo) { link.href=poster.src; link.click(); return; }
-      if (!listo3D) return;
-      visor.dibujar();
-      lienzo.toBlob((blob) => {
+      if (!listo3D && !posterListo) return;
+      if (listo3D) visor.dibujar();
+      const imagen=listo3D ? lienzo : poster;
+      imagen.toBlob((blob) => {
         if (!blob) { $('#status').textContent='No se pudo descargar la imagen. Inténtalo de nuevo.'; return; }
         link.href=URL.createObjectURL(blob);
         link.click();
@@ -503,7 +694,8 @@
       const info=resumen(seleccion());
       alSolicitarDiseno(info,JSON.stringify(info,null,2));
       const mensaje=['Hola, quiero solicitar este diseño de micrófono:',
-        'Modelo: '+info.modelo, 'Tamaño: '+info.tamano, 'Forma: '+info.forma, 'Cabeza: '+info.cabeza].join('\n');
+        'Modelo: '+info.modelo, 'Tamaño: '+info.tamano, 'Forma: '+info.forma, 'Cabeza: '+info.cabeza,
+        ...Object.entries(info.colores).map(([k,c]) => PARTES[k].etiqueta+': '+c.nombre+' ('+c.hex+')')].join('\n');
       window.open('https://wa.me/'+CONFIG.whatsapp+'?text='+encodeURIComponent(mensaje),'_blank','noopener,noreferrer');
       $('#status').textContent='Continúa tu solicitud en WhatsApp.';
     });
