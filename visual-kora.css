@@ -384,6 +384,7 @@ body.home-reference .best-sellers {
   background: #fff;
 }
 body.home-reference .best-sellers .section-inner {
+  width: 100%;
   max-width: none;
   margin: 0;
   padding: 0 60px;
