@@ -343,3 +343,36 @@ body.home-reference .hero .hero-media img { opacity: 1; }
  body.home-reference .main-nav { min-height: 66px; grid-template-columns: 36px minmax(0, 1fr) auto; padding-inline: 16px; }
  body.home-reference .reference-announcement { font-size: 10px; }
 }
+
+/* Navbar: fondo blanco descendente al entrar al contenedor. */
+body.home-reference .main-nav {
+  isolation: isolate;
+}
+body.home-reference .main-nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #fff;
+  transform: scaleY(0);
+  transform-origin: top center;
+  transition: transform 420ms cubic-bezier(.22, 1, .36, 1);
+  pointer-events: none;
+}
+body.home-reference .main-nav:hover::before,
+body.home-reference .main-nav:focus-within::before {
+  transform: scaleY(1);
+}
+@media (max-width: 1100px) {
+  body.home-reference .main-nav:has(.nav-menu.open)::before {
+    transform: scaleY(1);
+  }
+  body.home-reference .nav-menu {
+    background: #fff;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.home-reference .main-nav::before {
+    transition: none;
+  }
+}
