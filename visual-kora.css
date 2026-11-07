@@ -648,3 +648,50 @@ body.home-reference .home-category img {
 @media (max-width: 700px) {
   body.home-reference .home-category-grid { grid-template-columns: 1fr; }
 }
+
+/* Cinco publicaciones de Instagram cuando el feed autorizado esté disponible. */
+.home-social-grid.is-instagram-feed {
+  max-width: none;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+.home-social .instagram-post {
+  position: relative;
+  display: block;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: #f0eef4;
+}
+.home-social .instagram-post img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: inherit;
+  transition: transform 250ms ease;
+}
+.home-social .instagram-post:hover img { transform: scale(1.045); }
+.instagram-post-video {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #0009;
+  color: #fff;
+  font-size: 12px;
+}
+@media (max-width: 900px) {
+  .home-social-grid.is-instagram-feed { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .home-social-grid.is-instagram-feed { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-social .instagram-post img { transition: none; }
+}
