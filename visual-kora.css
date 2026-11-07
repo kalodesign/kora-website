@@ -320,3 +320,26 @@ input, select, textarea { border-radius: var(--visual-radius); }
     min-height: calc(100svh - 27px);
   }
 }
+
+/* Corrección de cabecera según referencia del cliente. */
+body.home-reference { --hero-nav-color: #000; }
+body.home-reference .site-header { position: absolute; inset: 0 0 auto; height: auto; background: transparent; box-shadow: none; border: 0; }
+body.home-reference .reference-announcement { height: 28px; min-height: 28px; box-sizing: border-box; background: #ffcfdb; color: #000; }
+body.home-reference .main-nav { position: relative; top: auto; min-height: 82px; background: transparent; box-shadow: none; border: 0; grid-template-columns: auto minmax(0, 1fr) auto; gap: 40px; padding-inline: 60px; }
+body.home-reference .nav-menu { justify-content: flex-end; color: #000; gap: 30px; }
+body.home-reference .nav-menu a { color: #000; font: 600 12px/1 Archivo, Arial, sans-serif; letter-spacing: .06em; white-space: nowrap; }
+body.home-reference .brand img,
+body.home-reference .nav-actions img { filter: brightness(0); }
+body.home-reference .nav-toggle span { background: #000; }
+body.home-reference main { padding-top: 28px; }
+body.home-reference .hero { min-height: calc(100svh - 28px); }
+body.home-reference .hero::after { display: none; }
+body.home-reference .hero .hero-media img { opacity: 1; }
+@media (max-width: 1100px) {
+ body.home-reference .main-nav { grid-template-columns: 42px minmax(0, 1fr) auto; gap: 14px; padding-inline: 24px; }
+ body.home-reference .nav-menu { top: 100%; justify-content: stretch; background: #ffcfdb; }
+}
+@media (max-width: 760px) {
+ body.home-reference .main-nav { min-height: 66px; grid-template-columns: 36px minmax(0, 1fr) auto; padding-inline: 16px; }
+ body.home-reference .reference-announcement { font-size: 10px; }
+}
