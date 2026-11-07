@@ -1,10 +1,11 @@
 /* Dirección visual editorial para las páginas públicas de Kora. */
 :root {
-  --visual-ink: #111111;
+  --visual-ink: #171d67;
   --visual-white: #ffffff;
-  --visual-accent: #c5f273;
-  --visual-soft: #f7f7f3;
-  --visual-muted: #626262;
+  --visual-accent: #c4bbfe;
+  --visual-highlight: #fbee64;
+  --visual-soft: #f8f6ff;
+  --visual-muted: #555b72;
   --visual-gutter: clamp(18px, 3.2vw, 64px);
   --visual-section: clamp(64px, 8vw, 120px);
   --visual-radius: 6px;
@@ -14,12 +15,12 @@
 
 body { background: var(--visual-white); color: var(--visual-ink); }
 .site-header { background: var(--visual-white); }
-.reference-announcement { min-height: 26px; display: flex; align-items: center; justify-content: center; padding: 4px 16px; background: var(--visual-accent); color: var(--visual-ink); font-size: 11px; font-weight: 600; text-align: center; }
+.reference-announcement { min-height: 28px; display: flex; align-items: center; justify-content: center; padding: 4px 16px; background: var(--visual-highlight); color: var(--visual-ink); font-size: 11px; font-weight: 700; text-align: center; }
 .main-nav { max-width: none; min-height: 62px; padding: 10px var(--visual-gutter); border-color: transparent; background: var(--visual-white); }
 .nav-menu { gap: clamp(12px, 1.7vw, 32px); color: var(--visual-ink); font-size: 12px; font-weight: 700; letter-spacing: .045em; }
 .nav-menu .active, .nav-menu a:hover { color: var(--visual-ink); text-decoration: underline; text-underline-offset: 6px; }
-.brand img { filter: grayscale(1) brightness(.2); }
-.nav-actions img { filter: grayscale(1) brightness(.2); }
+.brand img { filter: none; }
+.nav-actions img { filter: none; }
 .cart-count { background: var(--visual-ink); }
 .button.button-primary, .product-add-button, .product-card-cta { background: var(--visual-ink); border-color: var(--visual-ink); color: var(--visual-white); }
 .button, .product-add-button, .product-card-cta { border-radius: var(--visual-radius); }
@@ -27,16 +28,16 @@ body { background: var(--visual-white); color: var(--visual-ink); }
 .footer a, .footer h2, .footer-brand { color: var(--visual-ink); }
 .footer h2 { font-size: 15px; }
 .footer a:hover { color: var(--visual-ink); text-decoration: underline; }
-.footer-brand img { filter: grayscale(1) brightness(.2); }
+.footer-brand img { filter: none; }
 
 /* Inicio: imagen protagonista, compra visual y capítulos editoriales. */
-body:has(.home-category-grid) .hero { min-height: calc(100svh - 88px); }
-body:has(.home-category-grid) .hero .hero-copy { align-items: center; justify-content: center; text-align: center; }
-body:has(.home-category-grid) .hero h1 { max-width: 13ch; color: var(--visual-white); font-size: clamp(52px, 7.4vw, 118px); letter-spacing: -.055em; }
-body:has(.home-category-grid) .hero .hero-copy p { color: var(--visual-white); }
-body:has(.home-category-grid) .hero .hero-media img { opacity: .87; }
+body:has(.home-category-grid) .hero { display: block; min-height: calc(100svh - 88px); }
+body:has(.home-category-grid) .hero .hero-copy { min-height: calc(100svh - 88px); align-items: center; justify-content: center; text-align: center; }
+body:has(.home-category-grid) .hero h1 { max-width: min(90vw, 14ch); color: var(--visual-white); font-size: clamp(42px, 6.4vw, 106px); letter-spacing: -.055em; text-wrap: balance; text-shadow: 0 3px 25px rgba(0, 18, 51, .28); }
+body:has(.home-category-grid) .hero h1 span { white-space: normal; }
+body:has(.home-category-grid) .hero .hero-copy p { color: var(--visual-white); white-space: normal; }
+body:has(.home-category-grid) .hero .hero-media img { opacity: .95; }
 body:has(.home-category-grid) .benefits,
-body:has(.home-category-grid) .story-split.reverse,
 body:has(.home-category-grid) .about-band { display: none; }
 body:has(.home-category-grid) .product-section { padding-block: var(--visual-section); }
 body:has(.home-category-grid) .product-section h2 { font-size: clamp(26px, 3vw, 42px); font-weight: 700; text-transform: uppercase; }
@@ -56,6 +57,8 @@ body:has(.home-category-grid) .story-split { background: var(--visual-white); }
 body:has(.home-category-grid) .story-split .story-copy { background: var(--visual-white); color: var(--visual-ink); }
 body:has(.home-category-grid) .story-split .story-copy h2 { max-width: 13ch; margin: 12px 0; font-size: clamp(36px, 4.5vw, 76px); line-height: 1.02; text-transform: uppercase; }
 body:has(.home-category-grid) .story-split .story-copy p { max-width: 38ch; color: var(--visual-ink); }
+body:has(.home-category-grid) .story-split .story-copy { padding-inline: clamp(32px, 7vw, 120px); }
+body:has(.home-category-grid) .story-split.reverse .story-copy { background: var(--visual-soft); }
 body:has(.home-category-grid) .story-split .story-image { min-height: 560px; }
 body:has(.home-category-grid) .home-categories,
 body:has(.home-category-grid) .home-social { padding-block: var(--visual-section); }
@@ -64,6 +67,12 @@ body:has(.home-category-grid) .home-social h2 { font-size: clamp(25px, 3vw, 42px
 .home-category span { font-size: clamp(17px, 2vw, 30px); }
 .home-social-grid { max-width: 1200px; margin-inline: auto; }
 .home-social a { color: var(--visual-ink); }
+.home-categories { background: var(--visual-soft); }
+.home-category { box-shadow: var(--visual-shadow); }
+.home-category img { transition: transform var(--visual-motion); }
+.home-category:hover img { transform: scale(1.06); }
+.home-social-grid img { transition: transform var(--visual-motion); }
+.home-social-grid img:hover { transform: translateY(-6px); }
 
 /* Tienda y detalle: fotografías amplias, información ligera. */
 .product-grid.shop-grid { gap: clamp(14px, 2vw, 28px); }
@@ -77,6 +86,7 @@ input, select, textarea { border-radius: var(--visual-radius); }
 }
 @media (max-width: 767px) {
   body:has(.home-category-grid) .hero { min-height: 78svh; }
+  body:has(.home-category-grid) .hero .hero-copy { min-height: 78svh; }
   body:has(.home-category-grid) .hero h1 { font-size: clamp(42px, 13vw, 70px); }
   body:has(.home-category-grid) .story-split .story-image { min-height: 360px; }
   body:has(.home-category-grid) .home-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
