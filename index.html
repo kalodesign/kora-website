@@ -8,16 +8,21 @@
       name="description"
       content="Kora Studio transforma recuerdos, mascotas e ideas en llaveros y dijes personalizados."
     />
+    <link
+      rel="preload"
+      as="image"
+      href="assets/home-navidad-2026-mobile.jpg"
+      imagesrcset="assets/home-navidad-2026-mobile.jpg 940w, assets/home-navidad-2026-desktop.jpg 1672w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="home-editorial.css" />
     <link rel="stylesheet" href="visual-kora.css" />
   </head>
-  <body>
+  <body class="home-reference">
     <header class="site-header">
       <div class="reference-announcement">Piezas únicas, hechas en Cali y enviadas a toda Colombia</div>
-      <div class="promo-bar">
-        <a href="hazlotumismo.html">Personaliza tu recuerdo favorito hoy <span aria-hidden="true">→</span></a>
-      </div>
 
       <nav class="main-nav" aria-label="Navegación principal">
         <a class="brand" href="index.html" aria-label="Kora Studio inicio">
@@ -31,18 +36,14 @@
         </button>
 
         <div class="nav-menu" id="nav-menu">
-          <a class="active" href="#">Inicio</a>
-          <a href="mascotas.html">Mascotas</a>
-          <a href="llaveros.html">Llaveros</a>
-          <a href="hazlotumismo.html">Hazlo tú mismo</a>
+          <a href="#crear">Nuevo</a>
+          <a href="llaveros.html">Comprar</a>
+          <a href="#crear">Los más vendidos</a>
+          <a href="hazlotumismo.html">Personaliza</a>
           <a href="nosotros.html">Nosotros</a>
-          <a href="contacto.html">Contacto</a>
         </div>
 
         <div class="nav-actions" aria-label="Acciones de tienda">
-          <button type="button" aria-label="Favoritos" title="Favoritos">
-            <img src="assets/icon-03.svg" alt="" />
-          </button>
           <button class="cart-button" type="button" aria-label="Carrito" title="Carrito">
             <img src="assets/icon-01.svg" alt="" />
             <strong class="cart-count">0</strong>
@@ -52,24 +53,14 @@
     </header>
 
     <main>
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="hero-copy">
-          <p class="home-eyebrow">Diseños hechos para acompañarte</p>
-          <h1 id="hero-title">
-            <span>Llévalo contigo</span>
-            <span>siempre.</span>
-          </h1>
-          <p>
-            Transformamos tus recuerdos favoritos en algo único para ti.
-          </p>
-          <a class="button button-primary" href="hazlotumismo.html">Crea el tuyo</a>
-        </div>
-        <div class="hero-media" aria-label="Espacio para fotografía principal">
+      <h1 class="sr-only">Llaveros y accesorios personalizados de Kora Studio</h1>
+      <section class="hero" aria-label="Colección de Kora Studio">
+        <a class="hero-media" href="hazlotumismo.html" aria-label="Ir a Hazlo tú mismo">
           <div class="wavy-border" aria-hidden="true"></div>
           <picture>
             <source
               srcset="assets/home-navidad-2026-mobile.jpg 940w, assets/home-navidad-2026-desktop.jpg 1672w"
-              sizes="(max-width: 760px) 100vw, 50vw"
+              sizes="100vw"
               type="image/jpeg"
             />
             <img
@@ -82,7 +73,7 @@
               decoding="async"
             />
           </picture>
-        </div>
+        </a>
       </section>
 
       <section class="benefits dark-section" aria-labelledby="benefits-title">
