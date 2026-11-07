@@ -18,7 +18,7 @@
     />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="home-editorial.css" />
-    <link rel="stylesheet" href="visual-kora.css?v=20261107-nav-hover-1" />
+    <link rel="stylesheet" href="visual-kora.css?v=20261107-bestsellers-1" />
   </head>
   <body class="home-reference">
     <header class="site-header">
@@ -129,53 +129,16 @@
         </div>
       </section>
 
-      <section class="product-section" id="crear" aria-labelledby="create-title">
+      <section class="product-section best-sellers" id="productos-destacados" aria-labelledby="best-sellers-title">
         <div class="section-inner">
-          <p class="home-eyebrow">Nuestros favoritos</p>
-          <h2 class="section-title" id="create-title">
-            <span>Hazlo</span>
-            <span>tú mismo</span>
-          </h2>
-          <p class="section-lead">
-            Elige, combina y crea algo totalmente tuyo. Encuentra tus dijes favoritos,
-            mezcla colores, formas y estilos, y arma un llavero que hable de ti.
-          </p>
-
-          <div class="product-grid home-product-grid" id="productos-destacados">
-            <a class="product-card" href="producto.html?id=dije-corazon-rojo">
-              <div class="product-media"><img src="assets/image-12.png" alt="Dije corazón rojo" /></div>
-              <div class="product-info">
-                <div class="product-heading-row"><h3>Dije corazón rojo</h3><span>30x34 mm</span></div>
-                <div class="product-price"><strong>$18.000</strong><span>$24.000</span></div>
-                <span class="product-card-cta"><img src="assets/llaveros-cart.svg" alt="" />Ver en tienda</span>
-              </div>
-            </a>
-            <a class="product-card" href="producto.html?id=dije-concha-dorada">
-              <div class="product-media"><img src="assets/image-10.png" alt="Dije concha dorada" /></div>
-              <div class="product-info">
-                <div class="product-heading-row"><h3>Dije concha dorada</h3><span>18x24 mm</span></div>
-                <div class="product-price"><strong>$16.000</strong><span>$20.000</span></div>
-                <span class="product-card-cta"><img src="assets/llaveros-cart.svg" alt="" />Ver en tienda</span>
-              </div>
-            </a>
-            <a class="product-card" href="producto.html?id=dije-hongo-rojo">
-              <div class="product-media"><img src="assets/image-08.png" alt="Dije hongo rojo" /></div>
-              <div class="product-info">
-                <div class="product-heading-row"><h3>Dije hongo rojo</h3><span>24x28 mm</span></div>
-                <div class="product-price"><strong>$15.000</strong><span>$19.000</span></div>
-                <span class="product-card-cta"><img src="assets/llaveros-cart.svg" alt="" />Ver en tienda</span>
-              </div>
-            </a>
-            <a class="product-card" href="producto.html?id=dije-redondo-gratitud">
-              <div class="product-media"><img src="assets/image-09.png" alt="Dije redondo colorido" /></div>
-              <div class="product-info">
-                <div class="product-heading-row"><h3>Dije redondo gratitud</h3><span>32 mm</span></div>
-                <div class="product-price"><strong>$17.000</strong><span>$22.000</span></div>
-                <span class="product-card-cta"><img src="assets/llaveros-cart.svg" alt="" />Ver en tienda</span>
-              </div>
-            </a>
+          <div class="best-sellers-header">
+            <h2 id="best-sellers-title">LOS MÁS VENDIDOS</h2>
+            <div class="best-sellers-arrows" aria-label="Controles del carrusel">
+              <button class="best-sellers-arrow" type="button" data-carousel-prev aria-label="Ver productos anteriores">←</button>
+              <button class="best-sellers-arrow" type="button" data-carousel-next aria-label="Ver más productos">→</button>
+            </div>
           </div>
-          <a class="button shop-button" href="hazlotumismo.html">Ir a la tienda</a>
+          <div class="best-sellers-track" id="best-sellers-track" role="region" aria-roledescription="carrusel" aria-label="Los más vendidos" tabindex="0"></div>
         </div>
       </section>
 
@@ -259,5 +222,6 @@
     <script src="config.js"></script>
     <script src="products.js"></script>
     <script src="script.js"></script>
+    <script src="home-bestsellers.js?v=20261107-1"></script>
   </body>
 </html>
