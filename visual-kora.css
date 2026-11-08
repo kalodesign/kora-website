@@ -741,3 +741,60 @@ body.product-detail-page .product-related { padding:28px 0 80px; }
 .product-component-card { border-radius:8px; }
 body.product-detail-page .footer { margin-top:0; }
 @media(max-width:800px) { body.product-detail-page .product-detail-layout { grid-template-columns:1fr; gap:24px; padding:12px 18px 50px; } body.product-detail-page .product-breadcrumb { padding:16px 18px; } body.product-detail-page .product-detail-copy h1 { font-size:24px; } .product-gallery-thumb { width:64px;height:64px; } }
+
+
+/* Token único de botones para el sitio público. */
+:root {
+  --button-primary-bg: #f2a6c2;
+  --button-primary-fg: #171d67;
+  --button-primary-radius: 999px;
+}
+.button,
+a.button,
+button.button,
+.button-primary,
+.button-secondary,
+.button-tertiary,
+.product-add-button,
+.product-card-cta,
+.product-detail-actions button,
+input[type="submit"] {
+  border-radius: var(--button-primary-radius) !important;
+}
+.button-primary,
+.button-secondary,
+.button-tertiary,
+.product-add-button,
+.product-card-cta,
+.product-detail-actions button,
+input[type="submit"] {
+  background: var(--button-primary-bg) !important;
+  border-color: var(--button-primary-bg) !important;
+  color: var(--button-primary-fg) !important;
+}
+.product-detail-actions button {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 12px 18px;
+  line-height: 1.25;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.product-quantity-select select {
+  box-sizing: border-box;
+  padding: 4px 12px;
+}
+.product-related-grid {
+  display: grid !important;
+  visibility: visible;
+  opacity: 1;
+}
+.nav-menu > a[href="mascotas.html"] {
+  display: none !important;
+}
