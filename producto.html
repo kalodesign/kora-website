@@ -6,7 +6,7 @@
     <title>Kora Studio | Detalle de producto</title>
     <meta name="description" content="Conoce todos los detalles de tu producto Kora." />
     <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="visual-kora.css" />
+    <link rel="stylesheet" href="visual-kora.css?v=product-detail-v2" />
   </head>
   <body class="product-detail-page">
     <header class="site-header">
@@ -29,7 +29,7 @@
           <a href="index.html">Inicio</a>
           <a href="mascotas.html">Mascotas</a>
           <a href="llaveros.html">Llaveros</a>
-          <a class="active" href="hazlotumismo.html">Hazlo tú mismo</a>
+          <a class="active" href="hazlotumismo.html">Tienda</a>
           <a href="nosotros.html">Nosotros</a>
           <a href="contacto.html">Contacto</a>
         </div>
@@ -48,90 +48,56 @@
 
     <main id="product-detail-root">
       <nav class="section-inner product-breadcrumb" aria-label="Ruta del producto">
-        <a id="product-breadcrumb-category" href="hazlotumismo.html">Tienda</a>
-        <span aria-hidden="true">›</span>
-        <strong id="product-breadcrumb-title">Producto</strong>
+        <a class="active" href="hazlotumismo.html">Tienda</a>
+        <span aria-hidden="true">›</span><strong id="product-breadcrumb-title">Producto</strong>
       </nav>
-
-      <section class="section-inner product-detail-layout" aria-labelledby="product-detail-title">
+      <section class="product-detail-layout" aria-labelledby="product-detail-title">
         <div class="product-detail-gallery">
-          <div class="product-detail-media">
-            <img id="product-detail-image" src="" alt="" />
-          </div>
-          <div class="product-gallery-dots" aria-hidden="true">
-            <span class="active"></span>
-            <span></span>
-          </div>
+          <div class="product-detail-media"><img id="product-detail-image" src="" alt="" /></div>
+          <div class="product-gallery-thumbnails" id="product-gallery-thumbnails" aria-label="Fotos del producto"></div>
         </div>
-
         <div class="product-detail-copy">
           <p class="product-detail-category" id="product-detail-category"></p>
           <h1 id="product-detail-title">Cargando producto</h1>
-          <div class="product-detail-price">
-            <strong id="product-detail-price"></strong>
-            <span id="product-detail-compare"></span>
-          </div>
-
-          <div class="product-quantity" aria-label="Cantidad">
-            <button type="button" id="product-quantity-minus" aria-label="Restar una unidad">−</button>
-            <output id="product-quantity-value" aria-live="polite">1</output>
-            <button type="button" id="product-quantity-plus" aria-label="Sumar una unidad">+</button>
-          </div>
-
+          <div class="product-detail-price"><strong id="product-detail-price"></strong><span id="product-detail-compare"></span></div>
+          <p class="product-stock-status" id="product-stock-status" aria-live="polite"></p>
+          <label class="product-quantity-select"><span>Cantidad</span>
+            <select id="product-quantity-value" aria-label="Seleccionar cantidad">
+              <option value="1">1</option><option value="12">12</option><option value="100">100</option>
+            </select>
+          </label>
           <div class="product-detail-actions">
-            <button class="product-detail-add" type="button" id="product-detail-add">
-              <img src="assets/llaveros-cart.svg" alt="" />
-              <span>Agregar al carrito</span>
-            </button>
-            <button class="product-favorite" type="button" id="product-favorite" aria-label="Agregar a favoritos" aria-pressed="false">
-              <span aria-hidden="true">♡</span>
-            </button>
+            <button class="product-detail-add" type="button" id="product-detail-add">Añadir al carrito</button>
+            <button class="product-detail-buy" type="button" id="product-detail-buy">Comprar ahora</button>
           </div>
-
-          <p class="product-delivery">Entregas nacionales de 6 a 8 días hábiles.</p>
-
-          <ul class="product-benefits" aria-label="Beneficios del producto">
-            <li>Envío gratuito por compras superiores a $50.000</li>
-            <li>Diseño creado con atención al detalle</li>
-            <li>Material resistente al sol y al agua</li>
-            <li>Piezas listas para llevar todos los días</li>
-          </ul>
-
-          <div class="product-description-block">
-            <h2>Descripción</h2>
-            <p id="product-detail-description"></p>
+          <div class="product-accordions">
+            <details open><summary>Descripción</summary><p id="product-detail-description"></p></details>
+            <details><summary>Envíos y garantías</summary><p>Preparamos tu pedido con cuidado. Consulta los tiempos y cobertura al finalizar la compra.</p></details>
+            <details><summary>Materiales y cuidados</summary><p id="product-detail-materials">Materiales seleccionados y acabados cuidados para cada pieza.</p></details>
           </div>
-
           <dl class="product-specs" id="product-detail-specs"></dl>
-
           <section class="product-components" id="product-components" aria-labelledby="product-components-title" hidden>
-            <h2 id="product-components-title">Piezas incluidas</h2>
-            <div class="product-components-grid" id="product-components-grid"></div>
+            <h2 id="product-components-title">Piezas incluidas</h2><div class="product-components-grid" id="product-components-grid"></div>
           </section>
         </div>
       </section>
-
       <section class="product-related" aria-labelledby="product-related-title">
         <div class="section-inner">
-          <div class="product-related-head">
-            <div>
-              <h2 id="product-related-title"><span>Hazlo</span><span>tú mismo</span></h2>
-              <p>Descubre productos relacionados y encuentra nuevas piezas para complementar tu selección.</p>
-            </div>
-            <strong id="product-related-count"></strong>
+          <div class="product-related-tabs" role="tablist">
+            <button type="button" role="tab" aria-selected="true" data-related-mode="suggestions">Te puede gustar</button>
+            <button type="button" role="tab" aria-selected="false" data-related-mode="recent">Recientemente vistos</button>
           </div>
           <div class="product-grid product-related-grid" id="product-related-grid"></div>
-          <a class="button button-primary product-store-link" href="hazlotumismo.html">Ir a tienda</a>
+          <a class="button button-primary product-store-link" href="hazlotumismo.html">Ir a Tienda</a>
         </div>
       </section>
     </main>
-
     <footer class="footer" id="contacto">
       <div class="section-inner footer-grid">
         <div>
           <h2>Compañía</h2>
           <a href="nosotros.html">Sobre nosotros</a>
-          <a href="hazlotumismo.html">Hazlo tú mismo</a>
+          <a class="active" href="hazlotumismo.html">Tienda</a>
           <a href="personaliza-microfono.html">Personaliza tu micrófono</a>
           <a href="mascotas.html">Mascotas</a>
           <a href="llaveros.html">Llaveros</a>
@@ -159,6 +125,6 @@
     <script src="config.js"></script>
     <script src="products.js"></script>
     <script src="script.js"></script>
-    <script src="product-detail.js"></script>
+    <script src="product-detail.js?v=product-detail-v2"></script>
   </body>
 </html>
