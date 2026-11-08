@@ -165,7 +165,7 @@ const getProduct = (id) =>
   store.products.find((product) => product.id === id) ||
   store.cart.find((item) => item.id === id)?.product;
 
-const addToCart = (productId, qty = 1, fallbackProduct = null) => {
+const addToCart = (productId, qty = 1, fallbackProduct = null, customNames = []) => {
   const product = getProduct(productId) || fallbackProduct;
   if (!product) return;
   const nextQty = Math.max(1, Number(qty) || 1);
@@ -176,7 +176,7 @@ const addToCart = (productId, qty = 1, fallbackProduct = null) => {
     store.cart.push({
       id: productId,
       qty: nextQty,
-      customNames: Array.isArray(product.customNames) ? product.customNames : [],
+      customNames: Array.isArray(customNames) ? customNames : [],
       product: {
         id: product.id,
         title: product.title,
