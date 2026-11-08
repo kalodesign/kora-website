@@ -45,10 +45,10 @@
     const qty=Number(el.quantity.value||1), tiers=product.priceTiers||[];
     const tier=[...tiers].sort((a,b)=>b.quantity-a.quantity).find(t=>qty>=Number(t.quantity))||null;
     el.price.textContent=money.format(tier?.price??product.price??0);
-    const stock=Number(product.stock||0), label=stock<=0?"Agotado":stock<=5?`¡Últimas ${stock} unidades!`:stock<=15?`Solo ${stock} disponibles`:"Disponible";
+    const stock=Number(product.stock||0), maxQty=Number(product.maxQuantity||stock||99), label=stock<=0?"Agotado":stock<=5?`¡Últimas ${stock} unidades!`:stock<=15?`Solo ${stock} disponibles`:"Disponible";
     el.stock.textContent=label; el.stock.className="product-stock-status "+(stock<=0?"is-out":stock<=5?"is-low":"is-ready");
-    [...el.quantity.options].forEach(o=>{o.disabled=Number(o.value)>stock;});
-    if(Number(el.quantity.value)>stock) el.quantity.value="1";
+    [...el.quantity.options].forEach(o=>{o.disabled=Number(o.value)>Math.min(stock,maxQty);});
+    if(Number(el.quantity.value)>Math.min(stock,maxQty)) el.quantity.value="1";
     el.add.disabled=stock<=0; el.buy.disabled=stock<=0;
   };
   const addToCart=(goToCheckout,names=[])=>{
