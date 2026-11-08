@@ -1,0 +1,141 @@
+/* Navbar interna: replica la jerarquía, proporciones y navegación del home. */
+body:not(.home-reference) .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .06);
+}
+body:not(.home-reference) .reference-announcement {
+  box-sizing: border-box;
+  min-height: 28px;
+  padding: 5px 16px;
+  background: #ffcfdb;
+  color: #0b0b0b;
+  font: 400 11.4px/17px Arial, sans-serif;
+  text-align: center;
+}
+body:not(.home-reference) .main-nav {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  min-height: 82px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 40px;
+  padding: 0 clamp(24px, 4.7vw, 60px);
+  border: 0;
+  background: #fff;
+}
+body:not(.home-reference) .brand img {
+  width: 180px;
+  height: auto;
+}
+body:not(.home-reference) .nav-menu {
+  position: static;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 30px;
+  min-height: 82px;
+  padding: 0;
+  background: transparent;
+  color: #0b0b0b;
+  font: 600 12px/1 Archivo, Arial, sans-serif;
+  letter-spacing: .06em;
+}
+body:not(.home-reference) .nav-menu a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 82px;
+  padding: 0;
+  color: #0b0b0b;
+  font: inherit;
+  letter-spacing: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+}
+body:not(.home-reference) .nav-menu a::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 24px;
+  left: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 320ms cubic-bezier(.22, 1, .36, 1);
+}
+body:not(.home-reference) .nav-menu a:hover::after,
+body:not(.home-reference) .nav-menu a:focus-visible::after,
+body:not(.home-reference) .nav-menu a.active::after {
+  transform: scaleX(1);
+}
+body:not(.home-reference) .nav-menu .active,
+body:not(.home-reference) .nav-menu a:hover {
+  color: #0b0b0b;
+  text-decoration: none;
+}
+body:not(.home-reference) .nav-actions { gap: 14px; }
+body:not(.home-reference) .nav-actions img { filter: brightness(0); }
+body:not(.home-reference) .cart-count {
+  background: #ffcfdb;
+  color: #0b0b0b;
+}
+body:not(.home-reference) .nav-toggle span { background: #0b0b0b; }
+
+@media (max-width: 1100px) {
+  body:not(.home-reference) .main-nav {
+    min-height: 74px;
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+    grid-template-areas: "toggle brand actions";
+    gap: 14px;
+    padding-inline: 24px;
+  }
+  body:not(.home-reference) .brand {
+    grid-area: brand;
+    justify-self: center;
+  }
+  body:not(.home-reference) .brand img { width: 150px; }
+  body:not(.home-reference) .nav-toggle { grid-area: toggle; }
+  body:not(.home-reference) .nav-actions { grid-area: actions; }
+  body:not(.home-reference) .nav-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    z-index: 4;
+    display: none;
+    min-height: 0;
+    padding: 24px;
+    background: #fff;
+    box-shadow: 0 16px 30px rgba(0, 18, 51, .12);
+  }
+  body:not(.home-reference) .nav-menu.open {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+  body:not(.home-reference) .nav-menu a { min-height: 46px; }
+  body:not(.home-reference) .nav-menu a::after { bottom: 6px; }
+}
+@media (max-width: 760px) {
+  body:not(.home-reference) .main-nav {
+    min-height: 66px;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    padding-inline: 16px;
+  }
+  body:not(.home-reference) .reference-announcement {
+    padding-inline: 10px;
+    font-size: 10px;
+  }
+  body:not(.home-reference) .brand img { width: 116px; }
+  body:not(.home-reference) .nav-actions { gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body:not(.home-reference) .nav-menu a::after { transition: none; }
+}
