@@ -256,7 +256,7 @@ window.KORA_PRODUCTS = [
     "image": "assets/galleta-clickleable-1.png",
     "images": [
       "assets/galleta-clickleable-1.png",
-      "assets/galleta-clickleable-2.png",
+      "assets/galleta-clickleable-2.jpg",
       "assets/galleta-clickleable-3.png"
     ],
     "description": "Una galleta antiestrés inspirada en el chocolate, diseñada para distraerte, liberar tensión y pasar un rato entretenido. Presiona sus piezas clickleables y disfruta una sensación satisfactoria en cualquier momento. Es compacta, divertida y perfecta para llevar en tu escritorio, bolso o llavero.",
