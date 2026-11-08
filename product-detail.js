@@ -57,7 +57,7 @@
     const tiers=product.priceTiers||[];
     const tier=[...tiers].sort((a,b)=>Number(b.quantity)-Number(a.quantity)).find(t=>qty>=Number(t.quantity));
     const cartProduct={...product,price:Number(tier?.price??product.price??0)};
-    window.KoraCart?.add(product.id,qty,{...cartProduct,customNames:names});
+    window.KoraCart?.add(product.id,qty,cartProduct,names);
     if(goToCheckout){location.href="carrito.html";return;}
     const original=el.add.textContent; el.add.textContent="Añadido al carrito";
     setTimeout(()=>el.add.textContent=original,1200);
