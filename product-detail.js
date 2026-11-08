@@ -25,7 +25,7 @@
     try { const r=await fetch("data/demo-products.json",{cache:"no-store"}); if(r.ok) return mergeConfiguredProduct(await r.json()); } catch {}
     return window.KORA_PRODUCTS||[];
   };
-  const productCard=(item)=>`<article class="product-card"><a class="product-media" href="producto.html?id=${encodeURIComponent(item.id)}"><img src="${esc(item.image)}" alt="${esc(item.title)}" loading="lazy"></a><div class="product-info"><h3>${esc(item.title)}</h3><div class="product-price"><strong>${money.format(item.price||0)}</strong></div><a class="product-card-cta" href="producto.html?id=${encodeURIComponent(item.id)}">Ver producto</a></div></article>`;
+  const productCard=(item)=>{const hoverImage=(item.images||[]).find(src=>src&&src!==item.image)||"";return `<article class="product-card"><a class="product-media" href="producto.html?id=${encodeURIComponent(item.id)}"><img class="product-image-main" src="${esc(item.image)}" alt="${esc(item.title)}" loading="lazy">${hoverImage?`<img class="product-image-hover" src="${esc(hoverImage)}" alt="" aria-hidden="true" loading="lazy">`:""}</a><div class="product-info"><h3>${esc(item.title)}</h3><div class="product-price"><strong>${money.format(item.price||0)}</strong></div><a class="product-card-cta" href="producto.html?id=${encodeURIComponent(item.id)}">Ver producto</a></div></article>`;};
   const recentIds=()=>{try{return JSON.parse(localStorage.getItem("kora_recent_products")||"[]")}catch{return[]}};
   const remember=()=>{const list=[product.id,...recentIds().filter(id=>id!==product.id)].slice(0,8);localStorage.setItem("kora_recent_products",JSON.stringify(list));};
   const renderRelated=()=>{
