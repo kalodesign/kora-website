@@ -816,3 +816,26 @@ html body input[type="submit"] {
   color: var(--button-primary-fg) !important;
   border-radius: var(--button-primary-radius) !important;
 }
+
+
+/* Ficha de producto: botones de compra apilados y a ancho completo. */
+html body.product-detail-page .product-detail-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 460px;
+  gap: 10px;
+}
+html body.product-detail-page .product-detail-actions button {
+  flex: 0 0 44px;
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+  padding: 0 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
