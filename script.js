@@ -622,3 +622,11 @@ loadProducts();
   syncNavbar();
   window.addEventListener("scroll", syncNavbar, { passive: true });
 })();
+
+
+document.addEventListener("error", (event) => {
+  const image = event.target;
+  if (image instanceof HTMLImageElement && image.matches(".product-image-hover, .best-card-secondary")) {
+    image.remove();
+  }
+}, true);
