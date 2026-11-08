@@ -83,5 +83,41 @@
         "price": 13000
       }
     ]
+  },
+  {
+    "id": "galleta-clickleable",
+    "title": "Galleta clickleable de chocolate",
+    "category": "Antiestrés",
+    "image": "assets/galleta-clickleable-1.png",
+    "images": [
+      "assets/galleta-clickleable-1.png",
+      "assets/galleta-clickleable-2.png",
+      "assets/galleta-clickleable-3.png"
+    ],
+    "description": "Una galleta antiestrés inspirada en el chocolate, diseñada para distraerte, liberar tensión y pasar un rato entretenido. Presiona sus piezas clickleables y disfruta una sensación satisfactoria en cualquier momento. Es compacta, divertida y perfecta para llevar en tu escritorio, bolso o llavero.",
+    "size": "Aprox. 45 × 40 mm",
+    "material": "PLA de alta definición y mecanismo clickleable",
+    "price": 15000,
+    "compareAt": 18000,
+    "stock": 1000,
+    "priceTiers": [
+      {
+        "quantity": 1,
+        "price": 15000
+      },
+      {
+        "quantity": 12,
+        "price": 13500
+      },
+      {
+        "quantity": 100,
+        "price": 10700
+      }
+    ],
+    "relatedProductIds": [
+      "dije-hongo-rojo",
+      "dije-redondo-gratitud",
+      "set-inicial"
+    ]
   }
 ]
