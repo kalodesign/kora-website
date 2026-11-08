@@ -385,8 +385,21 @@ const loadProducts = async () => {
     const response = await fetch(productSource, { cache: "no-store" });
     if (!response.ok) throw new Error("No products JSON");
     store.products = await response.json();
+    if (!Array.isArray(store.products) || store.products.length === 0) {
+      try {
+        const demoResponse = await fetch("data/demo-products.json", { cache: "no-store" });
+        if (demoResponse.ok) store.products = await demoResponse.json();
+      } catch {
+        store.products = window[productFallbackKey] || window.KORA_PRODUCTS || [];
+      }
+    }
   } catch {
-    store.products = window[productFallbackKey] || window.KORA_PRODUCTS || [];
+    try {
+      const demoResponse = await fetch("data/demo-products.json", { cache: "no-store" });
+      store.products = demoResponse.ok ? await demoResponse.json() : (window[productFallbackKey] || window.KORA_PRODUCTS || []);
+    } catch {
+      store.products = window[productFallbackKey] || window.KORA_PRODUCTS || [];
+    }
   }
   if (selectors.productGrid && initialCategory && store.products.some((product) => product.category === initialCategory)) {
     store.activeCategory = initialCategory;
