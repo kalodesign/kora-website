@@ -28,7 +28,7 @@
     const related=recent
       ?recentIds().filter(id=>id!==product.id).map(id=>products.find(p=>p.id===id)).filter(Boolean).slice(0,4)
       :products.filter(p=>p.id!==product.id).sort((a,b)=>Number((b.category===product.category))-Number((a.category===product.category))).slice(0,4);
-    el.relatedGrid.innerHTML=related.map(productCard).join("")||'<p class="product-related-empty">Pronto encontrarás más productos aquí.</p>';
+    el.relatedGrid.hidden=false; el.relatedGrid.innerHTML=related.map(productCard).join("")||'<p class="product-related-empty">Pronto encontrarás más productos aquí.</p>';
   };
   const setGallery=(images)=>{
     const gallery=(Array.isArray(images)&&images.length?images:[product.image]).filter(Boolean).slice(0,3);
@@ -68,7 +68,7 @@
     el.compare.textContent=product.compareAt?money.format(product.compareAt):""; el.compare.hidden=!product.compareAt;
     el.description.textContent=product.description||"Una pieza creada para acompañarte.";
     el.materials.textContent=product.material||"Materiales seleccionados y acabados cuidados para cada pieza.";
-    el.breadcrumb.textContent="Tienda"; el.breadcrumb.href="hazlotumismo.html"; el.breadcrumbTitle.textContent=product.title;
+    if(el.breadcrumb){el.breadcrumb.textContent="Tienda"; el.breadcrumb.href="hazlotumismo.html";} el.breadcrumbTitle.textContent=product.title;
     el.specs.innerHTML=`<div><dt>Medida</dt><dd>${esc(product.size||"No aplica")}</dd></div><div><dt>Disponibilidad</dt><dd>${Number(product.stock||0)} unidades</dd></div><div><dt>Tipo</dt><dd>${esc(product.category||"Producto")}</dd></div>`;
     setGallery(product.images); updatePriceAndStock(); renderComponents(); remember(); renderRelated();
   };
