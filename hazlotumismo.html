@@ -8,8 +8,8 @@
       name="description"
       content="Compra dijes, bases y piezas para armar accesorios personalizados Kora."
     />
-    <link rel="stylesheet" href="styles.css?v=buttons-pink-v2" />
-    <link rel="stylesheet" href="visual-kora.css?v=navbar-underline-v1" />
+    <link rel="stylesheet" href="styles.css?v=store-grid-v1" />
+    <link rel="stylesheet" href="visual-kora.css?v=store-grid-v1" />
   </head>
   <body class="shop-page">
     <header class="site-header">
@@ -51,42 +51,22 @@
 
     <main>
       <section class="product-section shop-store" id="crear" aria-labelledby="create-title">
-        <div class="section-inner">
-          <div class="shop-head">
-            <div>
-              <h1 class="section-title" id="create-title">
-                <span>Hazlo</span>
-                <span>tú mismo</span>
-              </h1>
-              <p class="section-lead">
-                Elige tus piezas favoritas y agrégalas al carrito. Compra dijes, bases, kits y llaveros personalizados. Puedes pedir piezas individuales o explorar las combinaciones armadas.
-              </p>
-            </div>
-            <div class="shop-summary" aria-live="polite">
-              <strong id="shop-visible-count">0</strong>
-              <span>productos visibles</span>
-            </div>
-          </div>
-
-          <div class="shop-toolbar" aria-label="Filtros de productos">
-            <label class="shop-search">
-              <span class="sr-only">Buscar productos</span>
-              <input id="shop-search" type="search" placeholder="Buscar producto" />
-            </label>
-            <div class="shop-filters" id="shop-filters"></div>
-            <label class="shop-sort">
-              <span>Ordenar</span>
-              <select id="shop-sort">
+        <div class="section-inner shop-inner">
+          <div class="shop-toolbar shop-toolbar-minimal" aria-label="Ordenar productos">
+            <label class="shop-sort shop-sort-minimal">
+              <span>Ordenar por</span>
+              <select id="shop-sort" aria-label="Ordenar productos">
                 <option value="featured">Destacados</option>
                 <option value="price-asc">Precio menor</option>
                 <option value="price-desc">Precio mayor</option>
                 <option value="name">Nombre</option>
               </select>
             </label>
+            <p class="shop-results" aria-live="polite"><strong id="shop-visible-count">0</strong> productos</p>
           </div>
 
           <div class="product-grid shop-grid" id="productos" aria-live="polite"></div>
-          <p class="shop-empty" id="shop-empty" hidden>No encontramos productos con esos filtros.</p>
+          <p class="shop-empty" id="shop-empty" hidden>No encontramos productos.</p>
         </div>
       </section>
     </main>
