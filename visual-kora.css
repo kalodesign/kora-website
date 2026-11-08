@@ -1083,3 +1083,71 @@ body.shop-page .product-badge-discount {
     font-size: 11px;
   }
 }
+
+
+/* Barrido suave con desenfoque leve para imágenes secundarias de las cards. */
+.product-media img.product-image-main {
+  position: relative;
+  z-index: 0;
+}
+.product-media img.product-image-hover {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  object-fit: cover;
+  clip-path: inset(0 100% 0 0);
+  opacity: 1;
+  filter: blur(4px);
+  transform: none;
+  will-change: clip-path, filter;
+  transition:
+    clip-path 620ms cubic-bezier(.22, 1, .36, 1),
+    filter 620ms cubic-bezier(.22, 1, .36, 1);
+}
+.product-card:hover .product-media .product-image-hover,
+.product-card:focus-within .product-media .product-image-hover {
+  clip-path: inset(0);
+  filter: blur(0);
+  transform: none;
+}
+.product-card:hover .product-media .product-image-main,
+.product-card:focus-within .product-media .product-image-main {
+  transform: none;
+}
+
+/* Mantiene el mismo barrido en el carrusel de más vendidos. */
+.best-card-media .best-card-primary {
+  opacity: 1;
+  transition: none;
+}
+.best-card-media .best-card-secondary {
+  z-index: 1;
+  clip-path: inset(0 100% 0 0);
+  opacity: 1;
+  filter: var(--variant-filter) blur(4px);
+  transform: none;
+  will-change: clip-path, filter;
+  transition:
+    clip-path 620ms cubic-bezier(.22, 1, .36, 1),
+    filter 620ms cubic-bezier(.22, 1, .36, 1);
+}
+.best-card:hover .best-card-primary,
+.best-card:focus-within .best-card-primary {
+  opacity: 1;
+}
+.best-card:hover .best-card-secondary,
+.best-card:focus-within .best-card-secondary {
+  clip-path: inset(0);
+  opacity: 1;
+  filter: var(--variant-filter) blur(0);
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .product-media img.product-image-hover,
+  .best-card-media .best-card-secondary {
+    transition: none;
+  }
+}
