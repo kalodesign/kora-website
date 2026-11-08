@@ -1151,3 +1151,5 @@ body.shop-page .product-badge-discount {
     transition: none;
   }
 }
+
+.product-media { position: relative; }
