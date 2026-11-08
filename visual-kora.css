@@ -795,6 +795,6 @@ input[type="submit"] {
   visibility: visible;
   opacity: 1;
 }
-.nav-menu > a[href="mascotas.html"] {
+.body-never-match {}\nbody:not(.home-reference) .nav-menu > a[href="mascotas.html"] {
   display: none !important;
 }
