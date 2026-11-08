@@ -1153,3 +1153,69 @@ body.shop-page .product-badge-discount {
 }
 
 .product-media { position: relative; }
+
+
+/* Navbar consistente en páginas internas: mismas opciones y barra rosa del home. */
+.site-header .reference-announcement {
+  background: var(--reference-pink, #ffcfdb);
+  color: #0b0b0b;
+}
+
+/* Tarjetas de llaveros con la misma jerarquía visual que el catálogo. */
+.llaveros-page .llaveros-product-grid {
+  gap: clamp(16px, 2vw, 28px);
+}
+.llaveros-page .llaveros-product-card {
+  border-radius: 8px;
+  color: var(--visual-ink);
+  text-decoration: none;
+}
+.llaveros-page .llaveros-product-media {
+  aspect-ratio: .91 / 1;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.llaveros-page .llaveros-product-media > img {
+  transition: transform 320ms ease;
+}
+.llaveros-page .llaveros-product-card:hover .llaveros-product-media > img {
+  transform: scale(1.035);
+}
+.llaveros-page .llaveros-card-info {
+  min-height: 0;
+  gap: 8px;
+  padding-top: 12px;
+}
+.llaveros-page .llaveros-card-info .product-heading-row {
+  align-items: baseline;
+  gap: 8px;
+}
+.llaveros-page .llaveros-card-info .product-heading-row h3 {
+  color: #171d67;
+  font: 700 16px/1.25 Archivo, Arial, sans-serif;
+  text-transform: uppercase;
+}
+.llaveros-page .llaveros-card-info .product-heading-row > span {
+  color: #555b72;
+  font: 600 10px/1.2 Archivo, Arial, sans-serif;
+  text-transform: uppercase;
+}
+.llaveros-page .llaveros-card-info .product-price {
+  gap: 8px;
+  align-items: baseline;
+}
+.llaveros-page .llaveros-card-info .product-price strong {
+  color: #171d67;
+  font: 500 14px/1 Archivo, Arial, sans-serif;
+}
+.llaveros-page .llaveros-card-info .product-price span {
+  color: #646464;
+  font: 400 12px/1 Archivo, Arial, sans-serif;
+}
+.llaveros-page .llaveros-card-info .product-card-cta {
+  display: none !important;
+}
+@media (max-width: 760px) {
+  .llaveros-page .llaveros-card-info .product-heading-row h3 { font-size: 14px; }
+  .llaveros-page .llaveros-card-info .product-price strong { font-size: 13px; }
+}
