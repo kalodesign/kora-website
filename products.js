@@ -284,5 +284,42 @@ window.KORA_PRODUCTS = [
       "dije-redondo-gratitud",
       "set-inicial"
     ]
+  },
+  {
+    "id": "bola-nombre-personalizado",
+    "title": "Bola navideña con nombre personalizado",
+    "category": "Personalizados",
+    "image": "assets/bola-nombre-personalizado-1.webp",
+    "images": [
+      "assets/bola-nombre-personalizado-1.webp",
+      "assets/bola-nombre-personalizado-2.webp"
+    ],
+    "description": "Decora tu árbol con una bola navideña personalizada con el nombre que elijas. Un detalle especial, colorido y hecho en impresión 3D para regalar, decorar tu hogar o celebrar la Navidad con toda la familia.",
+    "size": "Aprox. 9 cm de diámetro",
+    "material": "PLA de alta definición",
+    "price": 8500,
+    "compareAt": 10000,
+    "stock": 12,
+    "maxQuantity": 12,
+    "customization": {
+      "type": "names",
+      "label": "Nombres personalizados",
+      "maxQuantity": 12
+    },
+    "priceTiers": [
+      {
+        "quantity": 1,
+        "price": 8500
+      },
+      {
+        "quantity": 12,
+        "price": 8500
+      }
+    ],
+    "relatedProductIds": [
+      "set-inicial",
+      "dije-redondo-gratitud",
+      "dije-corazon-rojo"
+    ]
   }
 ];
