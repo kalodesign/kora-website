@@ -171,11 +171,12 @@ const addToCart = (productId, qty = 1, fallbackProduct = null) => {
   const nextQty = Math.max(1, Number(qty) || 1);
   const existing = store.cart.find((item) => item.id === productId);
   if (existing) {
-    existing.qty += nextQty;
+    existing.qty = Math.min(Number(existing.maxQuantity || existing.qty + nextQty), existing.qty + nextQty);
   } else {
     store.cart.push({
       id: productId,
       qty: nextQty,
+      customNames: Array.isArray(product.customNames) ? product.customNames : [],
       product: {
         id: product.id,
         title: product.title,
@@ -184,7 +185,9 @@ const addToCart = (productId, qty = 1, fallbackProduct = null) => {
         description: product.description,
         size: product.size,
         price: product.price,
-        compareAt: product.compareAt
+        compareAt: product.compareAt,
+        maxQuantity: product.maxQuantity || null,
+        customization: product.customization || null
       }
     });
   }
@@ -366,7 +369,7 @@ const renderCart = () => {
           <img src="${product.image}" alt="${product.title}" />
           <div>
             <h3>${product.title}</h3>
-            <p>${formatMoney(product.price)} · ${product.size || product.category}</p>
+            <p>${formatMoney(product.price)} · ${product.size || product.category}</p>${item.customNames?.length ? `<p class="cart-item-customization">Nombres: ${item.customNames.join(", ")}</p>` : ""}
             <div class="cart-item-controls">
               <button type="button" data-cart-dec="${item.id}" aria-label="Restar">-</button>
               <strong>${item.qty}</strong>
@@ -388,15 +391,22 @@ const renderCart = () => {
   selectors.cartEmpty.classList.toggle("is-visible", store.cart.length === 0);
 };
 
+const mergeConfiguredProducts = (items) => {
+  const configured = Array.isArray(window.KORA_PRODUCTS) ? window.KORA_PRODUCTS : [];
+  const merged = Array.isArray(items) ? [...items] : [];
+  configured.forEach((product) => { if (!merged.some((item) => item.id === product.id)) merged.push(product); });
+  return merged;
+};
+
 const loadProducts = async () => {
   try {
     const response = await fetch(productSource, { cache: "no-store" });
     if (!response.ok) throw new Error("No products JSON");
-    store.products = await response.json();
+    store.products = mergeConfiguredProducts(await response.json());
     if (!Array.isArray(store.products) || store.products.length === 0) {
       try {
         const demoResponse = await fetch("data/demo-products.json", { cache: "no-store" });
-        if (demoResponse.ok) store.products = await demoResponse.json();
+        if (demoResponse.ok) store.products = mergeConfiguredProducts(await demoResponse.json());
       } catch {
         store.products = window[productFallbackKey] || window.KORA_PRODUCTS || [];
       }
@@ -404,7 +414,7 @@ const loadProducts = async () => {
   } catch {
     try {
       const demoResponse = await fetch("data/demo-products.json", { cache: "no-store" });
-      store.products = demoResponse.ok ? await demoResponse.json() : (window[productFallbackKey] || window.KORA_PRODUCTS || []);
+      store.products = demoResponse.ok ? mergeConfiguredProducts(await demoResponse.json()) : (window[productFallbackKey] || window.KORA_PRODUCTS || []);
     } catch {
       store.products = window[productFallbackKey] || window.KORA_PRODUCTS || [];
     }
@@ -470,7 +480,7 @@ selectors.checkoutForm?.addEventListener("submit", async (event) => {
   const submitButton = selectors.checkoutForm.querySelector("button[type='submit']");
   const formData = new FormData(selectors.checkoutForm);
   const payload = {
-    items: store.cart.map((item) => ({ id: item.id, qty: item.qty })),
+    items: store.cart.map((item) => ({ id: item.id, qty: item.qty, customNames: item.customNames || [] })),
     customer: Object.fromEntries(formData.entries())
   };
 
