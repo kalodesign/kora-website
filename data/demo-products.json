@@ -13,7 +13,7 @@
     "material": "Resina y herraje metálico",
     "price": 15000,
     "compareAt": 19000,
-    "stock": 18,
+    "stock": 180,
     "priceTiers": [
       {
         "quantity": 1,
