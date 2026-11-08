@@ -13,6 +13,7 @@
     components:$("#product-components"), componentsGrid:$("#product-components-grid"), relatedGrid:$("#product-related-grid")
   };
   let products=[], product=null, currentMode="suggestions";
+  let pendingNames = [];
   const idFromUrl=()=>new URLSearchParams(location.search).get("id");
   const readProducts=async()=>{
     const requestedId=idFromUrl();
@@ -50,13 +51,13 @@
     if(Number(el.quantity.value)>stock) el.quantity.value="1";
     el.add.disabled=stock<=0; el.buy.disabled=stock<=0;
   };
-  const addToCart=(goToCheckout)=>{
+  const addToCart=(goToCheckout,names=[])=>{
     const qty=Number(el.quantity.value||1);
     if(!product||qty>Number(product.stock||0)) return;
     const tiers=product.priceTiers||[];
     const tier=[...tiers].sort((a,b)=>Number(b.quantity)-Number(a.quantity)).find(t=>qty>=Number(t.quantity));
     const cartProduct={...product,price:Number(tier?.price??product.price??0)};
-    window.KoraCart?.add(product.id,qty,cartProduct);
+    window.KoraCart?.add(product.id,qty,{...cartProduct,customNames:names});
     if(goToCheckout){location.href="carrito.html";return;}
     const original=el.add.textContent; el.add.textContent="Añadido al carrito";
     setTimeout(()=>el.add.textContent=original,1200);
@@ -77,8 +78,18 @@
     el.specs.innerHTML=`<div><dt>Medida</dt><dd>${esc(product.size||"No aplica")}</dd></div><div><dt>Disponibilidad</dt><dd>${Number(product.stock||0)} unidades</dd></div><div><dt>Tipo</dt><dd>${esc(product.category||"Producto")}</dd></div>`;
     setGallery(product.images); updatePriceAndStock(); renderComponents(); remember(); renderRelated();
   };
+  const ensureNameModal=()=>{
+    if(document.querySelector("#name-customization-modal")) return;
+    const overlay=document.createElement("div"); overlay.id="name-customization-modal"; overlay.className="checkout-modal-overlay"; overlay.setAttribute("aria-hidden","true");
+    overlay.innerHTML=`<article class="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="name-customization-title"><button class="modal-close" type="button" data-close-names aria-label="Cerrar">×</button><form id="name-customization-form" class="checkout-form"><header><p>Personalización</p><h2 id="name-customization-title">Agrega los nombres</h2><span>Escribe un nombre por unidad. Puedes usar hasta 12 nombres.</span></header><div id="name-fields" class="checkout-form-grid"></div><button class="button button-primary" type="submit">Agregar al carrito</button><p class="checkout-status" id="name-customization-status" aria-live="polite"></p></form></article>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener("click",e=>{if(e.target===overlay||e.target.closest("[data-close-names]")){overlay.classList.remove("is-open");overlay.setAttribute("aria-hidden","true");}});
+    overlay.querySelector("form").addEventListener("submit",e=>{e.preventDefault(); const names=[...overlay.querySelectorAll("input[name='custom-name']")].map(i=>i.value.trim()); if(names.some(n=>!n)){overlay.querySelector("#name-customization-status").textContent="Completa todos los nombres.";return;} pendingNames=names; overlay.classList.remove("is-open"); overlay.setAttribute("aria-hidden","true"); addToCart(false,pendingNames);});
+  };
+  const openNameModal=(qty,goToCheckout)=>{ensureNameModal(); const modal=document.querySelector("#name-customization-modal"),fields=document.querySelector("#name-fields"); fields.innerHTML=Array.from({length:qty},(_,i)=>`<label><span>Nombre ${i+1}</span><input name="custom-name" type="text" maxlength="24" required placeholder="Ej. Sol"></label>`).join(""); modal.classList.add("is-open"); modal.setAttribute("aria-hidden","false"); modal.dataset.goCheckout=String(goToCheckout); fields.querySelector("input")?.focus();};
   el.quantity.addEventListener("change",updatePriceAndStock);
-  el.add.addEventListener("click",()=>addToCart(false)); el.buy.addEventListener("click",()=>addToCart(true));
+  el.add.addEventListener("click",()=>{const qty=Number(el.quantity.value||1); if(product?.customization?.type==="names"){openNameModal(qty,false);}else addToCart(false);});
+  el.buy.addEventListener("click",()=>{const qty=Number(el.quantity.value||1); if(product?.customization?.type==="names"){openNameModal(qty,true);}else addToCart(true);});
   el.thumbs.addEventListener("click",event=>{const button=event.target.closest("[data-gallery-index]");if(!button)return;const index=Number(button.dataset.galleryIndex);el.image.src=(product.images||[product.image])[index];el.thumbs.querySelectorAll(".product-gallery-thumb").forEach((b,i)=>b.classList.toggle("is-active",i===index));});
   document.querySelectorAll("[data-related-mode]").forEach(button=>button.addEventListener("click",()=>{currentMode=button.dataset.relatedMode;document.querySelectorAll("[data-related-mode]").forEach(b=>b.setAttribute("aria-selected",String(b===button)));renderRelated();}));
   readProducts().then(items=>{products=items;product=products.find(p=>p.id===idFromUrl())||products[0];if(!product){root.innerHTML='<section class="section-inner product-not-found"><h1>Pronto llegan nuevos productos</h1><a class="button button-primary" href="hazlotumismo.html">Ir a Tienda</a></section>';return;}render();});
