@@ -248,10 +248,13 @@ const renderProducts = () => {
       const discountPercent = Number(product.compareAt) > Number(product.price)
         ? Math.round((1 - Number(product.price) / Number(product.compareAt)) * 100) : 0;
       const soldOut = Number(product.stock) <= 0;
+      const gallery = [...new Set((Array.isArray(product.images) ? product.images : []).filter(Boolean))];
+      const hoverImage = gallery.find((image) => image !== product.image) || "";
       return `
         <article class="product-card${soldOut ? " is-sold-out" : ""}">
           <a class="product-media" href="producto.html?id=${encodeURIComponent(product.id)}" aria-label="Ver producto ${product.title}">
-            <img src="${product.image}" alt="${product.title}" />
+            <img class="product-image-main" src="${product.image}" alt="${product.title}" />
+            ${hoverImage ? `<img class="product-image-hover" src="${hoverImage}" alt="" aria-hidden="true" loading="lazy" />` : ""}
             ${soldOut ? '<span class="product-badge product-badge-sold-out">Agotado</span>' : ""}
             ${discountPercent ? `<span class="product-badge product-badge-discount">Ahorre ${discountPercent}%</span>` : ""}
           </a>
