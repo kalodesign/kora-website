@@ -798,3 +798,21 @@ input[type="submit"] {
 body:not(.home-reference) .nav-menu > a[href="mascotas.html"] {
   display: none !important;
 }
+
+
+/* Prioridad del token por encima de estilos antiguos de color. */
+html body .button,
+html body .button.button-primary,
+html body .button.button-secondary,
+html body .button.button-tertiary,
+html body .button-primary,
+html body .button-secondary,
+html body .button-tertiary,
+html body .product-add-button,
+html body .product-card-cta,
+html body input[type="submit"] {
+  background-color: var(--button-primary-bg) !important;
+  border-color: var(--button-primary-bg) !important;
+  color: var(--button-primary-fg) !important;
+  border-radius: var(--button-primary-radius) !important;
+}
