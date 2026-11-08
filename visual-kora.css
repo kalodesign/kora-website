@@ -839,3 +839,37 @@ html body.product-detail-page .product-detail-actions button {
   overflow: hidden;
   text-overflow: clip;
 }
+
+
+/* Navbar fija en el hero; al desplazarse toma fondo blanco. */
+body.home-reference .site-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  background: transparent;
+  transition: background-color 220ms ease, box-shadow 220ms ease;
+}
+body.home-reference .site-header.is-scrolled .main-nav {
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(20, 20, 20, .08);
+}
+body.home-reference .site-header.is-scrolled .main-nav,
+body.home-reference .site-header.is-scrolled .nav-menu {
+  color: #111;
+}
+body.home-reference .site-header.is-scrolled .main-nav a {
+  color: #111;
+}
+body.home-reference .site-header.is-scrolled .brand img,
+body.home-reference .site-header.is-scrolled .nav-actions img {
+  filter: brightness(0);
+}
+body.home-reference .site-header.is-scrolled .nav-toggle span {
+  background: #111;
+}
+@media (prefers-reduced-motion: reduce) {
+  body.home-reference .site-header,
+  body.home-reference .main-nav {
+    transition: none;
+  }
+}
