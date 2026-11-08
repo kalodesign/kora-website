@@ -38,12 +38,15 @@
   track.innerHTML = productIds.map(id => {
     const product = products.find(item => item.id === id);
     if (!product) return "";
-    const [front, back] = views[id];
+    const galleryImages = [...new Set((Array.isArray(product.images) ? product.images : []).filter(Boolean))];
+    const [fallbackFront, fallbackBack] = views[id] || [];
+    const front = product.image || galleryImages[0] || fallbackFront;
+    const back = galleryImages.find(image => image !== front) || (fallbackBack !== front ? fallbackBack : "");
     return `<article class="best-card" data-product-id="${escape(id)}" style="--variant-filter:none">
       <div class="best-card-media">
         <a class="best-card-link" href="producto.html?id=${encodeURIComponent(id)}" aria-label="Ver ${escape(product.title)}">
           <img class="best-card-primary" src="${front}" alt="${escape(product.title)}" loading="lazy" width="329" height="362">
-          <img class="best-card-secondary" src="${back}" alt="" loading="lazy" width="329" height="362" aria-hidden="true">
+          ${back ? `<img class="best-card-secondary" src="${escape(back)}" alt="" loading="lazy" width="329" height="362" aria-hidden="true">` : ""}
         </a>
         <button class="best-card-quick" type="button" data-quick-buy="${escape(id)}" aria-label="Compra rápida: ${escape(product.title)}">COMPRA RÁPIDA</button>
       </div>
