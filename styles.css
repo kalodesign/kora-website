@@ -4364,3 +4364,34 @@ body.modal-open {
     text-align: left;
   }
 }
+
+
+/* Token único de botones de acción del sitio. */
+:root {
+  --button-primary-bg: #f2a6c2;
+  --button-primary-fg: #171d67;
+  --button-primary-radius: 999px;
+}
+.button,
+.button-primary,
+.button-secondary,
+.button-tertiary,
+.product-add-button,
+.product-card-cta,
+.product-detail-actions button,
+input[type="submit"] {
+  box-sizing: border-box;
+  border-radius: var(--button-primary-radius) !important;
+}
+.button,
+.button-primary,
+.button-secondary,
+.button-tertiary,
+.product-add-button,
+.product-card-cta,
+.product-detail-actions button,
+input[type="submit"] {
+  background-color: var(--button-primary-bg) !important;
+  border-color: var(--button-primary-bg) !important;
+  color: var(--button-primary-fg) !important;
+}
