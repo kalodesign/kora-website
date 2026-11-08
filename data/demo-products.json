@@ -1,0 +1,87 @@
+[
+  {
+    "id": "dije-hongo-rojo",
+    "title": "Dije hongo rojo",
+    "category": "Dijes",
+    "image": "assets/image-08.png",
+    "images": [
+      "assets/image-08.png",
+      "assets/image-09.png"
+    ],
+    "description": "Dije tipo hongo con puntos blancos, ideal para accesorios divertidos y coloridos.",
+    "size": "24 × 28 mm",
+    "material": "Resina y herraje metálico",
+    "price": 15000,
+    "compareAt": 19000,
+    "stock": 18,
+    "priceTiers": [
+      {
+        "quantity": 1,
+        "price": 15000
+      },
+      {
+        "quantity": 12,
+        "price": 13500
+      },
+      {
+        "quantity": 100,
+        "price": 11500
+      }
+    ]
+  },
+  {
+    "id": "dije-corazon-rojo",
+    "title": "Dije corazón rojo",
+    "category": "Dijes",
+    "image": "assets/image-12.png",
+    "images": [
+      "assets/image-12.png",
+      "assets/image-13.png"
+    ],
+    "description": "Un dije colorido para personalizar llaveros y accesorios.",
+    "size": "30 × 34 mm",
+    "material": "PLA de alta definición",
+    "price": 18000,
+    "compareAt": 24000,
+    "stock": 5,
+    "priceTiers": [
+      {
+        "quantity": 1,
+        "price": 18000
+      },
+      {
+        "quantity": 12,
+        "price": 16000
+      }
+    ]
+  },
+  {
+    "id": "dije-redondo-gratitud",
+    "title": "Dije redondo gratitud",
+    "category": "Dijes",
+    "image": "assets/image-09.png",
+    "images": [
+      "assets/image-09.png"
+    ],
+    "description": "Pieza circular para dar un detalle especial a tu combinación.",
+    "size": "32 mm",
+    "material": "PLA",
+    "price": 17000,
+    "compareAt": 22000,
+    "stock": 26,
+    "priceTiers": [
+      {
+        "quantity": 1,
+        "price": 17000
+      },
+      {
+        "quantity": 12,
+        "price": 15000
+      },
+      {
+        "quantity": 100,
+        "price": 13000
+      }
+    ]
+  }
+]
