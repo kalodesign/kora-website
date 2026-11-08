@@ -15,9 +15,14 @@
   let products=[], product=null, currentMode="suggestions";
   const idFromUrl=()=>new URLSearchParams(location.search).get("id");
   const readProducts=async()=>{
-    try { const r=await fetch("data/products.json",{cache:"no-store"}); if(!r.ok) throw 0; const data=await r.json(); if(Array.isArray(data)&&data.length) return data; }
+    const requestedId=idFromUrl();
+    const configuredProduct=(window.KORA_PRODUCTS||[]).find(item=>item.id===requestedId);
+    const mergeConfiguredProduct=(data)=>Array.isArray(data)&&data.length
+      ?data.map(item=>item.id===requestedId&&configuredProduct?configuredProduct:item)
+      :data;
+    try { const r=await fetch("data/products.json",{cache:"no-store"}); if(!r.ok) throw 0; const data=await r.json(); if(Array.isArray(data)&&data.length) return mergeConfiguredProduct(data); }
     catch {}
-    try { const r=await fetch("data/demo-products.json",{cache:"no-store"}); if(r.ok) return await r.json(); } catch {}
+    try { const r=await fetch("data/demo-products.json",{cache:"no-store"}); if(r.ok) return mergeConfiguredProduct(await r.json()); } catch {}
     return window.KORA_PRODUCTS||[];
   };
   const productCard=(item)=>`<article class="product-card"><a class="product-media" href="producto.html?id=${encodeURIComponent(item.id)}"><img src="${esc(item.image)}" alt="${esc(item.title)}" loading="lazy"></a><div class="product-info"><h3>${esc(item.title)}</h3><div class="product-price"><strong>${money.format(item.price||0)}</strong></div><a class="product-card-cta" href="producto.html?id=${encodeURIComponent(item.id)}">Ver producto</a></div></article>`;
