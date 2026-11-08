@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Personaliza tu micrófono | Kora</title>
+  <title>Personaliza tu micrófono | Kora</title>\n  <link rel="stylesheet" href="styles.css?v=navbar-shared-llaveros-v1" />\n  <link rel="stylesheet" href="visual-kora.css?v=navbar-shared-llaveros-v1" />
   <style>
     :root { --azul:#171d67; --tinta:#111b45; --lila:#e8e1ff; --rosa:#ffe5ee; --borde:#d4d3df; --radio:6px; }
     * { box-sizing:border-box; }
@@ -12,7 +12,7 @@
     button, select { font:inherit; }
     button { cursor:pointer; }
     :focus-visible { outline:3px solid #fe7e01; outline-offset:3px; }
-    .topbar { min-height:64px; display:flex; align-items:center; justify-content:space-between; padding:10px max(20px, calc((100% - 1160px)/2)); border-bottom:1px solid #e9e8ed; }
+    .topbar.site-header { display:block; min-height:0; padding:0; border:0; }\n    .personalizer-help { margin:12px 0 0; }
     .brand img { display:block; width:106px; height:auto; }
     .help, .tool { height:42px; border:1px solid var(--borde); border-radius:var(--radio); color:var(--azul); background:white; }
     .help { width:42px; font-size:20px; font-weight:bold; }
@@ -87,12 +87,21 @@
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="index.html" aria-label="Kora, inicio"><img src="assets/llaveros-logo.svg" width="114" height="26" alt="Kora"></a>
-    <button class="help" id="help" type="button" aria-label="Ver instrucciones">?</button>
+<header class="site-header topbar">
+    <div class="reference-announcement">ENVÍO GRATIS DESPUÉS DE $100.000 EN COMPRAS</div>
+    <nav class="main-nav" aria-label="Navegación principal">
+      <a class="brand" href="index.html" aria-label="Kora Studio inicio"><img src="assets/icon-06.svg" alt="Kora" /></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu"><span></span><span></span><span></span></button>
+      <div class="nav-menu" id="nav-menu">
+        <a href="index.html">Inicio</a><a href="llaveros.html">Llaveros</a><a href="hazlotumismo.html">Tienda</a><a href="contacto.html">Contacto</a><a href="nosotros.html">Nosotros</a>
+      </div>
+      <div class="nav-actions" aria-label="Acciones de tienda">
+        <button class="cart-button" type="button" aria-label="Carrito" title="Carrito"><img src="assets/icon-01.svg" alt="" /><strong class="cart-count">0</strong></button>
+      </div>
+    </nav>
   </header>
   <main>
-    <div class="intro"><h1>Personaliza tu micrófono</h1><p>Arma la carcasa para tu micrófono inalámbrico y revisa cómo encajan las piezas.</p></div>
+    <div class="intro"><h1>Personaliza tu micrófono</h1><p>Arma la carcasa para tu micrófono inalámbrico y revisa cómo encajan las piezas.</p><button class="help personalizer-help" id="help" type="button" aria-label="Ver instrucciones">?</button></div>
     <div class="workspace">
       <section class="preview" aria-label="Vista previa del micrófono">
         <div class="preview-stage">
@@ -704,7 +713,7 @@
     function instrucciones(abiertas) {
       modal.hidden=!abiertas;
       $('main').inert=abiertas;
-      $('.topbar').inert=abiertas;
+      $('.site-header').inert=abiertas;
       (abiertas ? $('#start') : $('#help')).focus();
     }
     $('#start').addEventListener('click',() => instrucciones(false));
@@ -720,5 +729,5 @@
     render();
     instrucciones(true);
   </script>
-</body>
+  <script src="config.js"></script>\n  <script src="products.js"></script>\n  <script src="script.js?v=navbar-shared-llaveros-v1"></script>\n</body>
 </html>
