@@ -98,11 +98,26 @@ window.KORA_PRODUCTS = [
     "compareAt": 80000,
     "stock": 8,
     "components": [
-      { "productId": "dije-corazon-rojo", "quantity": 1 },
-      { "productId": "dije-redondo-gratitud", "quantity": 1 },
-      { "productId": "dije-palmera", "quantity": 1 },
-      { "productId": "argolla-dorada", "quantity": 1 },
-      { "productId": "cadena-dorada", "quantity": 1 }
+      {
+        "productId": "dije-corazon-rojo",
+        "quantity": 1
+      },
+      {
+        "productId": "dije-redondo-gratitud",
+        "quantity": 1
+      },
+      {
+        "productId": "dije-palmera",
+        "quantity": 1
+      },
+      {
+        "productId": "argolla-dorada",
+        "quantity": 1
+      },
+      {
+        "productId": "cadena-dorada",
+        "quantity": 1
+      }
     ]
   },
   {
@@ -116,9 +131,18 @@ window.KORA_PRODUCTS = [
     "compareAt": 60000,
     "stock": 10,
     "components": [
-      { "productId": "dije-corazon-rojo", "quantity": 1 },
-      { "productId": "dije-redondo-gratitud", "quantity": 1 },
-      { "productId": "argolla-dorada", "quantity": 1 }
+      {
+        "productId": "dije-corazon-rojo",
+        "quantity": 1
+      },
+      {
+        "productId": "dije-redondo-gratitud",
+        "quantity": 1
+      },
+      {
+        "productId": "argolla-dorada",
+        "quantity": 1
+      }
     ]
   },
   {
@@ -132,9 +156,18 @@ window.KORA_PRODUCTS = [
     "compareAt": 60000,
     "stock": 12,
     "components": [
-      { "productId": "dije-palmera", "quantity": 1 },
-      { "productId": "dije-concha-dorada", "quantity": 1 },
-      { "productId": "argolla-dorada", "quantity": 1 }
+      {
+        "productId": "dije-palmera",
+        "quantity": 1
+      },
+      {
+        "productId": "dije-concha-dorada",
+        "quantity": 1
+      },
+      {
+        "productId": "argolla-dorada",
+        "quantity": 1
+      }
     ]
   },
   {
@@ -148,9 +181,18 @@ window.KORA_PRODUCTS = [
     "compareAt": 75000,
     "stock": 9,
     "components": [
-      { "productId": "dije-corazon-rojo", "quantity": 1 },
-      { "productId": "cadena-dorada", "quantity": 1 },
-      { "productId": "argolla-dorada", "quantity": 1 }
+      {
+        "productId": "dije-corazon-rojo",
+        "quantity": 1
+      },
+      {
+        "productId": "cadena-dorada",
+        "quantity": 1
+      },
+      {
+        "productId": "argolla-dorada",
+        "quantity": 1
+      }
     ]
   },
   {
@@ -164,9 +206,18 @@ window.KORA_PRODUCTS = [
     "compareAt": 70000,
     "stock": 11,
     "components": [
-      { "productId": "dije-corazon-rojo", "quantity": 1 },
-      { "productId": "cadena-dorada", "quantity": 1 },
-      { "productId": "argolla-dorada", "quantity": 1 }
+      {
+        "productId": "dije-corazon-rojo",
+        "quantity": 1
+      },
+      {
+        "productId": "cadena-dorada",
+        "quantity": 1
+      },
+      {
+        "productId": "argolla-dorada",
+        "quantity": 1
+      }
     ]
   },
   {
@@ -180,10 +231,58 @@ window.KORA_PRODUCTS = [
     "compareAt": 68000,
     "stock": 7,
     "components": [
-      { "productId": "dije-hongo-rojo", "quantity": 1 },
-      { "productId": "dije-redondo-gratitud", "quantity": 1 },
-      { "productId": "dije-palmera", "quantity": 1 },
-      { "productId": "argolla-dorada", "quantity": 1 }
+      {
+        "productId": "dije-hongo-rojo",
+        "quantity": 1
+      },
+      {
+        "productId": "dije-redondo-gratitud",
+        "quantity": 1
+      },
+      {
+        "productId": "dije-palmera",
+        "quantity": 1
+      },
+      {
+        "productId": "argolla-dorada",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "galleta-clickleable",
+    "title": "Galleta clickleable de chocolate",
+    "category": "Antiestrés",
+    "image": "assets/galleta-clickleable-1.png",
+    "images": [
+      "assets/galleta-clickleable-1.png",
+      "assets/galleta-clickleable-2.png",
+      "assets/galleta-clickleable-3.png"
+    ],
+    "description": "Una galleta antiestrés inspirada en el chocolate, diseñada para distraerte, liberar tensión y pasar un rato entretenido. Presiona sus piezas clickleables y disfruta una sensación satisfactoria en cualquier momento. Es compacta, divertida y perfecta para llevar en tu escritorio, bolso o llavero.",
+    "size": "Aprox. 45 × 40 mm",
+    "material": "PLA de alta definición y mecanismo clickleable",
+    "price": 15000,
+    "compareAt": 18000,
+    "stock": 1000,
+    "priceTiers": [
+      {
+        "quantity": 1,
+        "price": 15000
+      },
+      {
+        "quantity": 12,
+        "price": 13500
+      },
+      {
+        "quantity": 100,
+        "price": 10700
+      }
+    ],
+    "relatedProductIds": [
+      "dije-hongo-rojo",
+      "dije-redondo-gratitud",
+      "set-inicial"
     ]
   }
 ];
