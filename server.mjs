@@ -333,7 +333,8 @@ createServer(async (req, res) => {
             title: product.title,
             qty,
             unitPrice: Number(product.price || 0),
-            total: Number(product.price || 0) * qty
+            total: Number(product.price || 0) * qty,
+            customNames: Array.isArray(cartItem.customNames) ? cartItem.customNames.slice(0, 12).map(name => String(name).trim().slice(0, 24)).filter(Boolean) : []
           } : null;
         })
         .filter(Boolean);
