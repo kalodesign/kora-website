@@ -604,3 +604,13 @@ document.addEventListener("keydown", (event) => {
 });
 
 loadProducts();
+
+
+/* Mantiene la navbar del home visible y cambia su fondo después del hero. */
+(() => {
+  const header = document.querySelector("body.home-reference .site-header");
+  if (!header) return;
+  const syncNavbar = () => header.classList.toggle("is-scrolled", window.scrollY > 24);
+  syncNavbar();
+  window.addEventListener("scroll", syncNavbar, { passive: true });
+})();
