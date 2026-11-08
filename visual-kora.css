@@ -873,3 +873,20 @@ body.home-reference .site-header.is-scrolled .nav-toggle span {
     transition: none;
   }
 }
+
+
+/* Transición suave del fondo de la navbar al cambiar el estado de scroll. */
+body.home-reference .main-nav {
+  transition:
+    background-color 420ms cubic-bezier(.22, 1, .36, 1),
+    box-shadow 420ms cubic-bezier(.22, 1, .36, 1),
+    backdrop-filter 420ms cubic-bezier(.22, 1, .36, 1);
+}
+body.home-reference .site-header.is-scrolled .main-nav {
+  backdrop-filter: blur(6px);
+}
+@media (prefers-reduced-motion: reduce) {
+  body.home-reference .main-nav {
+    transition: none;
+  }
+}
