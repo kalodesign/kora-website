@@ -1,4 +1,12 @@
 .env
+.env.*
+*.env
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
 importador-local.env
 data/whatsapp-orders-local.json
 data/analisis-whatsapp-state.json

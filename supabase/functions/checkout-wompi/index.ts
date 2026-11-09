@@ -1,5 +1,7 @@
 import {
   getSupabaseAdmin,
+  enforceBodyLimit,
+  enforceRateLimit,
   handleOptions,
   isAllowedBrowserOrigin,
   jsonResponse,
@@ -20,6 +22,10 @@ Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return handleOptions(request);
   if (request.method !== "POST") return jsonResponse(request, { error: "Metodo no permitido" }, 405);
   if (!isAllowedBrowserOrigin(request)) return jsonResponse(request, { error: "Origen no permitido" }, 403);
+  const limited = enforceRateLimit(request, "checkout-wompi", 6);
+  const oversized = enforceBodyLimit(request, 256 * 1024);
+  if (limited) return limited;
+  if (oversized) return oversized;
 
   try {
     const publicKey = Deno.env.get("WOMPI_PUBLIC_KEY");

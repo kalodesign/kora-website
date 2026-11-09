@@ -1,6 +1,8 @@
 import {
   getNestedValue,
   getSupabaseAdmin,
+  enforceBodyLimit,
+  enforceRateLimit,
   handleOptions,
   jsonResponse,
   sha256
@@ -10,6 +12,10 @@ import { emailLayout, escapeHtml, formatCop, sendKoraEmail } from "../_shared/em
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return handleOptions(request);
   if (request.method !== "POST") return jsonResponse(request, { error: "Metodo no permitido" }, 405);
+  const limited = enforceRateLimit(request, "wompi-webhook", 30);
+  const oversized = enforceBodyLimit(request, 512 * 1024);
+  if (limited) return limited;
+  if (oversized) return oversized;
 
   try {
     const eventSecret = Deno.env.get("WOMPI_EVENTS_SECRET");

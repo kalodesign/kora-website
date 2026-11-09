@@ -1,5 +1,7 @@
 import {
   getSupabaseAdmin,
+  enforceBodyLimit,
+  enforceRateLimit,
   handleOptions,
   isAllowedBrowserOrigin,
   jsonResponse,
@@ -14,6 +16,10 @@ Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return handleOptions(request);
   if (request.method !== "POST") return jsonResponse(request, { error: "Metodo no permitido" }, 405);
   if (!isAllowedBrowserOrigin(request)) return jsonResponse(request, { error: "Origen no permitido" }, 403);
+  const limited = enforceRateLimit(request, "contact", 5);
+  const oversized = enforceBodyLimit(request, 20 * 1024 * 1024);
+  if (limited) return limited;
+  if (oversized) return oversized;
 
   try {
     const formData = await request.formData();

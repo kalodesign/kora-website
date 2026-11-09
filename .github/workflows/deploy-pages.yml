@@ -43,6 +43,10 @@ jobs:
             --exclude 'Solicitud clientes/' \
             --exclude 'scripts/' \
             --exclude '*.env' \
+            --exclude '*.env.*' \
+            --exclude 'data/orders.json' \
+            --exclude 'data/contact-requests.json' \
+            --exclude 'data/pet-requests.json' \
             --exclude '*.md' \
             --exclude '*.sql' \
             --exclude 'server.mjs' \
