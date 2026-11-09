@@ -262,14 +262,16 @@ const renderProducts = () => {
             ${discountPercent ? `<span class="product-badge product-badge-discount">Ahorre ${discountPercent}%</span>` : ""}
           </a>
           <div class="product-info">
-            <div class="product-heading-row">
-              <h3>${product.title}</h3>
-              <span>${variant}</span>
-            </div>
-            <div class="product-price">
-              <strong>${formatMoney(product.price)}</strong>
-              ${compare}
-            </div>
+            <a class="product-info-link" href="producto.html?id=${encodeURIComponent(product.id)}" aria-label="Ver detalle de ${product.title}">
+              <div class="product-heading-row">
+                <h3>${product.title}</h3>
+                <span>${variant}</span>
+              </div>
+              <div class="product-price">
+                <strong>${formatMoney(product.price)}</strong>
+                ${compare}
+              </div>
+            </a>
             <button class="product-add-button" type="button" data-add="${product.id}">
               <img src="assets/llaveros-cart.svg" alt="" />
               <span>Agregar al carrito</span>
@@ -442,7 +444,16 @@ selectors.sort?.addEventListener("change", renderProducts);
 
 selectors.productGrid?.addEventListener("click", (event) => {
   const addButton = event.target.closest("[data-add]");
-  if (addButton) addToCart(addButton.dataset.add);
+  if (addButton) {
+    addToCart(addButton.dataset.add);
+    return;
+  }
+
+  // En móvil también permite abrir el detalle tocando el espacio libre de la tarjeta.
+  if (event.target.closest("a, button, input, select, textarea")) return;
+  const card = event.target.closest(".product-card");
+  const productLink = card?.querySelector(".product-media[href]");
+  if (productLink) window.location.assign(productLink.href);
 });
 
 selectors.productModalAdd?.addEventListener("click", () => {
