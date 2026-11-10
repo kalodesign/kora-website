@@ -1,0 +1,14 @@
+:root{
+  --primary:#26B79B;--primary-hover:#1FA187;--primary-soft:#E6F7F3;
+  --text:#0F172A;--text-muted:#6B7280;--text-subtle:#9CA3AF;
+  --border:#E5E7EB;--bg:#FFFFFF;--bg-sidebar:#F7F7F5;--bg-thead:#F7F7F8;
+  --success-bg:#DCF5E3;--success-text:#1E7A3C;--warning-bg:#FFE9D2;--warning-text:#B45309;
+  --info-bg:#DCEBFF;--info-text:#1D5FBF;--danger-bg:#FFE1E1;--danger-text:#B42323;
+  --neutral-bg:#F1F2F4;--neutral-text:#4B5563;
+  --hover-row:#FAFAFA;--active-nav:#EEEEEC;--backdrop:rgba(15,23,42,.36);
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--space-8:32px;
+  --radius-control:8px;--radius-card:12px;--radius-pill:999px;
+  --sidebar-width:256px;--row-height:56px;--thumb-size:40px;--avatar-size:32px;
+  --font-body:14px;--font-small:12px;--font-title:28px;--font-kpi:24px;
+  --motion:180ms ease;--dropdown-shadow:0 10px 32px rgba(15,23,42,.12);
+}
