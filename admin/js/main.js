@@ -50,10 +50,10 @@ app.innerHTML = `<div class="ds-app">
     <header class="ds-page-header"><div><h1 class="ds-h1">Lista de pedidos</h1><p>Gestiona los pedidos de impresión 3D de tu tienda.</p></div><div class="head-actions"><button type="button" class="ds-btn ds-btn--primary" data-preview="Nuevo pedido">${icon('plus')} Nuevo pedido</button><button type="button" class="ds-btn ds-btn--secondary" data-preview="Más acciones">Más acciones ${icon('more')}</button></div></header>
     <p class="ds-alert ds-alert--warning preview-note">Vista previa · datos de ejemplo · sin conexión a pedidos reales</p>
     <section class="ds-stats" aria-label="Indicadores de ejemplo">
-      <div class="ds-stat"><span class="ds-stat__label">Pedidos totales</span><div class="ds-stat__value">1.248 <span class="ds-trend">—</span></div><small class="ds-stat__help">Últimos 365 días</small></div>
-      <div class="ds-stat"><span class="ds-stat__label">Pedidos nuevos</span><div class="ds-stat__value">126 <span class="ds-trend">—</span></div><small class="ds-stat__help">Últimos 365 días</small></div>
-      <div class="ds-stat"><span class="ds-stat__label">Completados</span><div class="ds-stat__value">982 <span class="ds-trend">—</span></div><small class="ds-stat__help">Últimos 365 días</small></div>
-      <div class="ds-stat"><span class="ds-stat__label">Cancelados</span><div class="ds-stat__value">19 <span class="ds-trend">—</span></div><small class="ds-stat__help">Últimos 365 días</small></div>
+      <div class="ds-stat"><span class="ds-stat__label">Pedidos totales</span><div class="ds-stat__value">1.248 <span class="ds-trend" aria-hidden="true"></span></div><small class="ds-stat__help">Últimos 365 días</small></div>
+      <div class="ds-stat"><span class="ds-stat__label">Pedidos nuevos</span><div class="ds-stat__value">126 <span class="ds-trend" aria-hidden="true"></span></div><small class="ds-stat__help">Últimos 365 días</small></div>
+      <div class="ds-stat"><span class="ds-stat__label">Completados</span><div class="ds-stat__value">982 <span class="ds-trend" aria-hidden="true"></span></div><small class="ds-stat__help">Últimos 365 días</small></div>
+      <div class="ds-stat"><span class="ds-stat__label">Cancelados</span><div class="ds-stat__value">19 <span class="ds-trend" aria-hidden="true"></span></div><small class="ds-stat__help">Últimos 365 días</small></div>
     </section>
     <section class="ds-card ds-card--flush" aria-label="Pedidos de ejemplo">
       <div class="ds-tabs" role="tablist" aria-label="Estado del pedido">
