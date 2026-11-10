@@ -28,3 +28,4 @@
 #order-status{width:auto;min-width:190px}.ds-toolbar #order-from,.ds-toolbar #order-to{width:160px}
 .ds-main #orders-feedback{margin:0 var(--card-padding) var(--space-4);color:var(--color-text-muted)}.orders-table .ds-cell{max-width:100%}
 @media(max-width:767px){#order-status{width:100%}.ds-toolbar #order-from,.ds-toolbar #order-to{width:100%}.ds-main .ds-toolbar{align-items:stretch}.orders-table .ds-cell{min-width:0}}
+

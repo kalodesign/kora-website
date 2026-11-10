@@ -1,7 +1,8 @@
 import { renderTable } from './ui/table.js';
 import { attachTabs } from './ui/tabs.js';
 import { showToast } from './ui/toast.js';
-import { getOrdersPage, PAGE_SIZE } from './api/orders.js';
+import { getOrdersPage, getOrderMetrics, getOrderDetail, updateOrderStatus, PAGE_SIZE } from './api/orders.js';
+import { openOrderDrawer } from './ui/drawer.js';
 import { getSupabase } from './supabase.js';
 const CONFIG = Object.freeze({ locale: window.KORA_CONFIG?.locale || 'es-CO', currency: window.KORA_CONFIG?.currency || 'COP' });
 const iconPaths = {
@@ -22,9 +23,45 @@ const iconPaths = {
 };
 const icon = (name) => `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] || iconPaths.box}</svg>`;
 const app = document.getElementById('app');
-const authClient = getSupabase();
-const { data: { session } } = await authClient.auth.getSession();
-if (!session) {
+let authClient = null;
+let session = null;
+let startupError = null;
+try {
+  authClient = getSupabase();
+  const authResult = await authClient.auth.getSession();
+  session = authResult.data?.session || null;
+  if (authResult.error) throw authResult.error;
+} catch (error) {
+  startupError = error;
+}
+if (app) delete app.dataset.boot;
+function showStartupError(error) {
+  app.replaceChildren();
+  const main = document.createElement('main');
+  main.className = 'ds-container ds-auth';
+  const card = document.createElement('section');
+  card.className = 'ds-card ds-stack';
+  const title = document.createElement('h1');
+  title.className = 'ds-h2';
+  title.textContent = 'No se pudo iniciar el panel';
+  const detail = document.createElement('p');
+  detail.className = 'ds-text-muted';
+  detail.textContent = error?.message || 'No se pudo validar la sesión con Supabase.';
+  const hint = document.createElement('p');
+  hint.className = 'ds-text-muted';
+  hint.textContent = 'Verifica la conexión, las claves públicas y que la librería de Supabase esté disponible.';
+  const retry = document.createElement('button');
+  retry.className = 'ds-btn ds-btn--primary';
+  retry.type = 'button';
+  retry.textContent = 'Reintentar';
+  retry.addEventListener('click', () => location.reload());
+  card.append(title, detail, hint, retry);
+  main.append(card);
+  app.append(main);
+}
+if (startupError) {
+  showStartupError(startupError);
+} else if (!session) {
   app.innerHTML = `<main class="ds-container ds-auth"><form class="ds-card ds-stack" id="admin-login"><h1 class="ds-h2">Iniciar sesión</h1><p class="ds-text-muted">Acceso privado para el equipo Kora.</p><label class="ds-field"><span class="ds-label">Correo</span><input class="ds-input" type="email" name="email" autocomplete="username" required></label><label class="ds-field"><span class="ds-label">Contraseña</span><input class="ds-input" type="password" name="password" autocomplete="current-password" required></label><button class="ds-btn ds-btn--primary ds-btn--block" type="submit">Entrar</button><p id="login-message" class="ds-error" role="alert"></p></form></main>`;
   document.querySelector('#admin-login').addEventListener('submit', async event => { event.preventDefault(); const form=event.currentTarget, button=form.querySelector('button'), message=document.querySelector('#login-message'); button.disabled=true; message.textContent='Validando acceso…'; try { const {error}=await authClient.auth.signInWithPassword({email:form.email.value.trim(),password:form.password.value}); if(error)throw error; location.reload(); } catch(error) { message.textContent=error.message || 'No fue posible iniciar sesión.'; button.disabled=false; } });
 } else {
@@ -56,14 +93,13 @@ app.innerHTML = `<div class="ds-app">
     <div class="mobile-topbar"><strong>Kora Admin</strong><button type="button" class="ds-btn ds-btn--ghost ds-btn--icon" id="open-menu" aria-label="Abrir menú">${icon('menu')}</button></div>
     <div class="ds-breadcrumb"><ol><li>Inicio</li><li aria-current="page">Pedidos</li></ol></div>
     <header class="ds-page-header"><div><h1 class="ds-h1">Lista de pedidos</h1><p>Gestiona los pedidos de impresión 3D de tu tienda.</p></div><div class="head-actions"><button type="button" class="ds-btn ds-btn--primary" data-preview="Nuevo pedido">${icon('plus')} Nuevo pedido</button><button type="button" class="ds-btn ds-btn--secondary" data-preview="Más acciones">Más acciones ${icon('more')}</button></div></header>
-    <p class="ds-alert ds-alert--warning preview-note">Vista previa · datos de ejemplo · sin conexión a pedidos reales</p>
-    <section class="ds-stats" aria-label="Indicadores de ejemplo">
-      <div class="ds-stat"><span class="ds-stat__label">Pedidos totales</span><div class="ds-stat__value">1.248 <span class="ds-trend" aria-hidden="true"></span></div><small class="ds-stat__help">Últimos 365 días</small></div>
-      <div class="ds-stat"><span class="ds-stat__label">Pedidos nuevos</span><div class="ds-stat__value">126 <span class="ds-trend" aria-hidden="true"></span></div><small class="ds-stat__help">Últimos 365 días</small></div>
-      <div class="ds-stat"><span class="ds-stat__label">Completados</span><div class="ds-stat__value">982 <span class="ds-trend" aria-hidden="true"></span></div><small class="ds-stat__help">Últimos 365 días</small></div>
-      <div class="ds-stat"><span class="ds-stat__label">Cancelados</span><div class="ds-stat__value">19 <span class="ds-trend" aria-hidden="true"></span></div><small class="ds-stat__help">Últimos 365 días</small></div>
+    <section class="ds-stats" aria-label="Indicadores de pedidos" aria-busy="true">
+      <div class="ds-stat"><span class="ds-stat__label">Pedidos totales</span><div class="ds-stat__value" data-metric="total"><span class="ds-skeleton" aria-label="Cargando"></span></div><small class="ds-stat__help">Últimos 365 días</small></div>
+      <div class="ds-stat"><span class="ds-stat__label">Nuevos</span><div class="ds-stat__value" data-metric="new"><span class="ds-skeleton" aria-label="Cargando"></span></div><small class="ds-stat__help">Últimos 365 días</small></div>
+      <div class="ds-stat"><span class="ds-stat__label">Completados</span><div class="ds-stat__value" data-metric="delivered"><span class="ds-skeleton" aria-label="Cargando"></span></div><small class="ds-stat__help">Últimos 365 días</small></div>
+      <div class="ds-stat"><span class="ds-stat__label">Ventas</span><div class="ds-stat__value" data-metric="revenue"><span class="ds-skeleton" aria-label="Cargando"></span></div><small class="ds-stat__help">Últimos 365 días</small></div>
     </section>
-    <section class="ds-card ds-card--flush" aria-label="Pedidos de ejemplo">
+    <section class="ds-card ds-card--flush" aria-label="Pedidos">
       <div class="ds-tabs" role="tablist" aria-label="Estado del pedido">
         <button class="ds-tab" role="tab" aria-selected="true" tabindex="0" data-status="all">Todos <span class="ds-count" data-count="all">—</span></button>
         <button class="ds-tab" role="tab" aria-selected="false" tabindex="-1" data-status="new">Nuevos <span class="ds-count" data-count="new">—</span></button>
@@ -78,6 +114,7 @@ app.innerHTML = `<div class="ds-app">
     </section>
   </main>
   <div class="ds-toasts"><div id="toast" role="status" aria-live="polite" hidden></div></div>
+  <div id="order-drawer-root"></div>
 </div>`;
 const params=new URLSearchParams(location.search);
 const allowedTabs=['all','new','printing','delivered','cancelled'];const requestedTab=params.get('tab');const filters={page:Math.max(1,Number(params.get('page'))||1),tab:allowedTabs.includes(requestedTab)?requestedTab:'all',q:params.get('q')||'',status:params.get('status')||'',from:params.get('from')||'',to:params.get('to')||''};
@@ -86,7 +123,7 @@ searchInput.value=filters.q;statusInput.value=filters.status;fromInput.value=fil
 const feedback=document.getElementById('orders-feedback'),tbody=document.getElementById('order-rows');let lastPayload={orders:[],count:0,page:1,pageSize:PAGE_SIZE};
 function syncUrl(){const next=new URLSearchParams();for(const key of ['tab','q','status','from','to'])if(filters[key]&&!(key==='tab'&&filters[key]==='all'))next.set(key,filters[key]);if(filters.page>1)next.set('page',String(filters.page));history.replaceState(null,'',location.pathname+(next.size?'?'+next:''));}
 function pagination(payload){const pages=document.getElementById('orders-pages'),total=Math.max(1,Math.ceil(payload.count/PAGE_SIZE));pages.replaceChildren();const button=(number,label=String(number))=>{const el=document.createElement('button');el.type='button';el.className='ds-page';el.textContent=label;if(number===filters.page)el.setAttribute('aria-current','page');el.addEventListener('click',()=>{filters.page=number;loadOrders()});pages.append(el)};if(filters.page>1)button(Math.max(1,filters.page-1),'…');button(1);if(total>1&&filters.page!==1&&filters.page!==total)button(filters.page);if(total>1)button(total);document.getElementById('orders-prev').disabled=filters.page<=1;document.getElementById('orders-next').disabled=filters.page>=total;}
-async function loadOrders(){document.querySelectorAll('.ds-tab').forEach(tab=>{const selected=tab.dataset.status===filters.tab;tab.setAttribute('aria-selected',String(selected));tab.tabIndex=selected?0:-1});syncUrl();feedback.hidden=true;tbody.replaceChildren();const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=6;td.textContent='Cargando pedidos…';tr.append(td);tbody.append(tr);try{lastPayload=await getOrdersPage(filters);renderTable(lastPayload.orders,CONFIG,message=>showToast(message));pagination(lastPayload);for(const tab of ['all','new','printing','delivered','cancelled']){const el=document.querySelector('[data-count="'+tab+'"]');if(el)el.textContent=tab===filters.tab?String(lastPayload.count):'—';}if(!lastPayload.orders.length){feedback.hidden=false;feedback.textContent='Sin pedidos con estos filtros. Ajusta la búsqueda o limpia los filtros.';const clear=document.createElement('button');clear.type='button';clear.className='ds-btn ds-btn--secondary';clear.textContent='Limpiar filtros';clear.addEventListener('click',()=>{Object.assign(filters,{page:1,tab:'all',q:'',status:'',from:'',to:''});searchInput.value='';statusInput.value='';fromInput.value='';toInput.value='';loadOrders()});feedback.append(' ',clear);}}catch(error){feedback.hidden=false;feedback.replaceChildren();const message=document.createElement('p');message.textContent=error.message||'No se pudieron cargar los pedidos.';const retry=document.createElement('button');retry.type='button';retry.className='ds-btn ds-btn--secondary';retry.textContent='Reintentar';retry.addEventListener('click',loadOrders);feedback.append(message,retry);}}
+async function loadOrders(){document.querySelectorAll('.ds-tab').forEach(tab=>{const selected=tab.dataset.status===filters.tab;tab.setAttribute('aria-selected',String(selected));tab.tabIndex=selected?0:-1});syncUrl();feedback.hidden=true;tbody.replaceChildren();for(let i=0;i<4;i++){const tr=document.createElement('tr');for(let j=0;j<6;j++){const td=document.createElement('td');const skeleton=document.createElement('span');skeleton.className='ds-skeleton';skeleton.setAttribute('aria-hidden','true');td.append(skeleton);tr.append(td)}tbody.append(tr)}try{lastPayload=await getOrdersPage(filters);renderTable(lastPayload.orders,CONFIG,order=>openOrderDrawer(order,{getOrderDetail,updateOrderStatus,showToast,refresh:loadOrders}));pagination(lastPayload);for(const tab of ['all','new','printing','delivered','cancelled']){const el=document.querySelector('[data-count="'+tab+'"]');if(el)el.textContent=tab===filters.tab?String(lastPayload.count):'—';}if(!lastPayload.orders.length){feedback.hidden=false;feedback.textContent='Sin pedidos con estos filtros. Ajusta la búsqueda o limpia los filtros.';const clear=document.createElement('button');clear.type='button';clear.className='ds-btn ds-btn--secondary';clear.textContent='Limpiar filtros';clear.addEventListener('click',()=>{Object.assign(filters,{page:1,tab:'all',q:'',status:'',from:'',to:''});searchInput.value='';statusInput.value='';fromInput.value='';toInput.value='';loadOrders()});feedback.append(' ',clear);}}catch(error){feedback.hidden=false;feedback.replaceChildren();const message=document.createElement('p');message.textContent=error.message||'No se pudieron cargar los pedidos.';const retry=document.createElement('button');retry.type='button';retry.className='ds-btn ds-btn--secondary';retry.textContent='Reintentar';retry.addEventListener('click',loadOrders);feedback.append(message,retry);}}
 document.querySelectorAll('.ds-tab').forEach(tab=>{const selected=tab.dataset.status===filters.tab;tab.setAttribute('aria-selected',String(selected));tab.tabIndex=selected?0:-1});
 attachTabs(document.querySelector('.ds-tabs'),status=>{filters.tab=status;filters.page=1;loadOrders()});
 let searchTimer;searchInput.addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{filters.q=searchInput.value.trim();filters.page=1;loadOrders()},300)});
@@ -96,4 +133,6 @@ document.getElementById('global-search').addEventListener('click',()=>searchInpu
 const sidebar=document.getElementById('sidebar'),overlay=document.getElementById('overlay');function closeMenu(){sidebar.classList.remove('is-open');overlay.classList.remove('is-open')};document.getElementById('open-menu').addEventListener('click',()=>{sidebar.classList.add('is-open');overlay.classList.add('is-open')});overlay.addEventListener('click',closeMenu);
 document.getElementById('store-toggle').addEventListener('click',e=>{const open=e.currentTarget.getAttribute('aria-expanded')==='true';e.currentTarget.setAttribute('aria-expanded',String(!open));document.getElementById('store-nav').hidden=open});
 loadOrders();
+loadMetrics();
+async function loadMetrics(){try{const data=await getOrderMetrics();const money=new Intl.NumberFormat(CONFIG.locale,{style:'currency',currency:CONFIG.currency,maximumFractionDigits:0});for(const [key,value] of Object.entries({total:data.total||0,new:data.new||0,delivered:data.delivered||0,revenue:money.format(data.revenue||0)})){const target=document.querySelector('[data-metric="'+key+'"]');if(target)target.textContent=String(value)}document.querySelector('.ds-main .ds-stats')?.setAttribute('aria-busy','false')}catch(error){document.querySelectorAll('[data-metric]').forEach(el=>el.textContent='—');document.querySelector('.ds-main .ds-stats')?.setAttribute('aria-busy','false');showToast(error.message||'No se pudieron cargar las métricas.')}}
 }

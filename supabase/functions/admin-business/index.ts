@@ -7,7 +7,14 @@ const getAdmin = async (request: Request) => {
   const { data, error } = await supabase.auth.getUser(token);
   if (error || !data.user?.email) return null;
   const allowed = (Deno.env.get("KORA_ADMIN_EMAILS") || "").split(",").map((value) => value.trim().toLowerCase()).filter(Boolean);
-  return allowed.includes(data.user.email.toLowerCase()) ? data.user : null;
+  if (!allowed.includes(data.user.email.toLowerCase())) return null;
+  let profile = await supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle();
+  if (profile.error) return null;
+  if (!profile.data) {
+    await supabase.from("profiles").insert({ id: data.user.id, role: "admin" });
+    profile = await supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle();
+  }
+  return profile.data?.role === "admin" ? data.user : null;
 };
 
 const text = (value: unknown, limit = 500) => String(value ?? "").trim().slice(0, limit);
@@ -71,6 +78,23 @@ Deno.serve(async (request) => {
   try {
     if (request.method === "GET") {
       const url = new URL(request.url);
+      if (url.searchParams.get("view") === "metrics") {
+        const { data, error } = await supabase.rpc("admin_order_metrics");
+        if (error) throw error;
+        return jsonResponse(request, { metrics: data || {} });
+      }
+      if (url.searchParams.get("view") === "order-detail") {
+        const orderId = text(url.searchParams.get("orderId"), 120);
+        if (!orderId) return jsonResponse(request, { error: "Falta el identificador del pedido" }, 400);
+        const [orderResult, historyResult] = await Promise.all([
+          supabase.from("orders").select("id,reference,created_at,updated_at,status,fulfillment_status,currency,subtotal,shipping,total,items,customer,payment_provider,wompi_payment_method,wompi_transaction_id").eq("id", orderId).maybeSingle(),
+          supabase.from("order_status_history").select("previous_status,new_status,changed_by,note,created_at").eq("order_id", orderId).order("created_at", { ascending: true })
+        ]);
+        if (orderResult.error) throw orderResult.error;
+        if (!orderResult.data) return jsonResponse(request, { error: "No se encontró el pedido" }, 404);
+        if (historyResult.error) throw historyResult.error;
+        return jsonResponse(request, { order: orderResult.data, history: historyResult.data || [] });
+      }
       if (url.searchParams.get("view") === "orders") {
         const page = Math.max(1, Math.min(10000, Number(url.searchParams.get("page")) || 1));
         const pageSize = Math.max(1, Math.min(50, Number(url.searchParams.get("pageSize")) || 10));
@@ -79,7 +103,7 @@ Deno.serve(async (request) => {
         const status = text(url.searchParams.get("status"), 30);
         const from = text(url.searchParams.get("from"), 10);
         const to = text(url.searchParams.get("to"), 10);
-        let query = supabase.from("orders").select("id,reference,created_at,updated_at,status,fulfillment_status,currency,subtotal,shipping,total,items,customer,payment_provider,wompi_payment_method", { count: "exact" }).order("created_at", { ascending: false });
+        let query = supabase.from("orders").select("id,reference,created_at,updated_at,status,fulfillment_status,currency,subtotal,shipping,total,items,customer,payment_provider,wompi_payment_method,wompi_transaction_id", { count: "exact" }).order("created_at", { ascending: false });
         if (tab === "new") query = query.eq("fulfillment_status", "pending");
         if (tab === "printing") query = query.in("fulfillment_status", ["in_progress", "ready"]);
         if (tab === "delivered") query = query.eq("fulfillment_status", "delivered");
@@ -157,7 +181,9 @@ Deno.serve(async (request) => {
     } else if (action === "update-order-fulfillment") {
       const orderId = text(payload.id, 100); const fulfillmentStatus = text(payload.status, 30);
       if (!orderId || !["pending", "in_progress", "ready", "shipped", "delivered", "cancelled"].includes(fulfillmentStatus)) return jsonResponse(request, { error: "Estado de despacho no válido" }, 400);
-      const { error } = await supabase.from("orders").update({ fulfillment_status: fulfillmentStatus, updated_at: new Date().toISOString() }).eq("id", orderId); if (error) throw error;
+      const { error } = await supabase.rpc("admin_update_order_status", {
+        p_order_id: orderId, p_status: fulfillmentStatus, p_changed_by: user.id, p_note: text(payload.note, 500) || null
+      }); if (error) throw error;
     } else if (action === "upsert-home-category") {
       const value = (payload.category || {}) as Record<string, unknown>;
       const categoryId = text(value.id, 30);
