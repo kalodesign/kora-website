@@ -85,8 +85,8 @@ Deno.serve(async (request) => {
         if (tab === "delivered") query = query.eq("fulfillment_status", "delivered");
         if (tab === "cancelled") query = query.eq("fulfillment_status", "cancelled");
         if (status && ["pending", "in_progress", "ready", "shipped", "delivered", "cancelled"].includes(status)) query = query.eq("fulfillment_status", status);
-        if (/^\\d{4}-\\d{2}-\\d{2}$/.test(from)) query = query.gte("created_at", new Date(from + "T00:00:00-05:00").toISOString());
-        if (/^\\d{4}-\\d{2}-\\d{2}$/.test(to)) query = query.lte("created_at", new Date(new Date(to + "T00:00:00-05:00").getTime() + 86400000 - 1).toISOString());
+        if (/^\d{4}-\d{2}-\d{2}$/.test(from)) query = query.gte("created_at", new Date(from + "T00:00:00-05:00").toISOString());
+        if (/^\d{4}-\d{2}-\d{2}$/.test(to)) query = query.lte("created_at", new Date(new Date(to + "T00:00:00-05:00").getTime() + 86400000 - 1).toISOString());
         if (search) query = query.or("reference.ilike.*" + search + "*,search_document.ilike.*" + search + "*");
         const { data, error, count } = await query.range((page - 1) * pageSize, page * pageSize - 1);
         if (error) throw error;
