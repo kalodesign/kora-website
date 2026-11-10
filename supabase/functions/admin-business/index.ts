@@ -80,6 +80,44 @@ Deno.serve(async (request) => {
       const analyticsDays = Math.max(1, Math.min(365, Number(new URL(request.url).searchParams.get("analytics_days")) || 90));
       const analyticsSince = new Date(Date.now() - (analyticsDays - 1) * 86400000).toISOString().slice(0, 10);
       const url = new URL(request.url);
+      if (url.searchParams.get("view") === "dashboard") {
+        const since = new Date(Date.now() - 29 * 86400000).toISOString().slice(0, 10);
+        const [metrics, products, latest, sales, traffic] = await Promise.all([
+          supabase.rpc("admin_order_metrics"),
+          supabase.from("store_products").select("id,title,image,stock").eq("is_active", true).order("title").limit(1000),
+          supabase.from("orders").select("id,reference,created_at,total,status,fulfillment_status,customer").order("created_at", { ascending: false }).limit(5),
+          supabase.from("orders").select("items,status").in("status", ["paid", "approved"]).order("created_at", { ascending: false }).limit(1000),
+          supabase.from("site_analytics_daily").select("source,views").gte("day", since).limit(2000)
+        ]);
+        for (const result of [metrics, products, latest, sales, traffic]) if (result.error) throw result.error;
+        const catalog = products.data || [];
+        const counts = new Map<string, number>();
+        for (const order of sales.data || []) {
+          for (const item of Array.isArray(order.items) ? order.items : []) {
+            const productId = String(item.productId || item.id || item.product_id || "");
+            if (!productId) continue;
+            const quantity = Math.max(0, Math.floor(Number(item.qty || item.quantity || 1)));
+            counts.set(productId, (counts.get(productId) || 0) + quantity);
+          }
+        }
+        const bestSellers = catalog.map((product) => ({
+          id: product.id, title: product.title, image: product.image, units: counts.get(product.id) || 0
+        })).filter((item) => item.units > 0).sort((a, b) => b.units - a.units).slice(0, 5);
+        const sources: Record<string, number> = {};
+        for (const visit of traffic.data || []) sources[visit.source] = (sources[visit.source] || 0) + Number(visit.views || 0);
+        return jsonResponse(request, {
+          summary: {
+            metrics: metrics.data || {},
+            products: catalog.length,
+            lowStock: catalog.filter((product) => Number(product.stock) <= 5).slice(0, 6),
+            bestSellers,
+            latestOrders: latest.data || [],
+            visits: Object.values(sources).reduce((sum, value) => sum + value, 0),
+            sources,
+            salesWindow: 1000
+          }
+        });
+      }
       if (url.searchParams.get("view") === "metrics") {
         const { data, error } = await supabase.rpc("admin_order_metrics");
         if (error) throw error;
