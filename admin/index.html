@@ -15,5 +15,19 @@
   <script defer src="../config.js"></script>
   <script type="module" src="./js/main.js"></script>
 </head>
-<body class="ds-root"><div id="app"></div></body>
+<body class="ds-root">
+  <div id="app" data-boot="true">
+    <main class="ds-container ds-auth" role="status">
+      <section class="ds-card ds-stack"><h1 class="ds-h2">Abriendo el panel de Kora</h1><p class="ds-text-muted">Conectando con el servicio seguro…</p></section>
+    </main>
+  </div>
+  <script>
+    window.setTimeout(() => {
+      const app = document.getElementById("app");
+      if (app?.dataset.boot === "true") {
+        app.textContent = "El panel no pudo cargar sus archivos. Recarga la página; si continúa, revisa la consola o despliegue de GitHub Pages.";
+      }
+    }, 12000);
+  </script>
+</body>
 </html>
