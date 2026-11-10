@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sistema de diseño · Kora</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+  <link rel="stylesheet" href="./css/styleguide.css">
+  <script type="module" src="./js/styleguide.js"></script>
+</head>
+<body class="ds-root">
+  <main class="ds-container guide">
+    <header class="guide-header">
+      <div><span class="ds-caption">KORA / DESIGN SYSTEM / FASE 0</span><h1 class="ds-h1">Componentes</h1><p class="ds-text-muted">Primitivos → semánticos → componentes. Estados y densidades en una sola página.</p></div>
+      <div class="ds-row"><label class="ds-label" for="density">Densidad</label><select class="ds-select" id="density"><option value="compact">Admin · 36 px</option><option value="comfortable">Tienda · 44 px</option></select></div>
+    </header>
+    <div id="guide-content"></div>
+  </main>
+  <div class="ds-overlay" id="guide-overlay"></div>
+  <aside class="ds-drawer" id="guide-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title"><div class="ds-dialog__header"><strong id="drawer-title">Detalle de pedido</strong><button class="ds-btn ds-btn--ghost ds-btn--icon" data-close aria-label="Cerrar drawer">×</button></div><div class="ds-dialog__body">Vista de ejemplo · <a href="#">Archivos</a>, pago e historial.</div><div class="ds-dialog__footer"><button class="ds-btn ds-btn--secondary" data-close>Cerrar</button></div></aside>
+  <section class="ds-modal" id="guide-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="ds-dialog__header"><strong id="modal-title">Confirmar acción</strong><button class="ds-btn ds-btn--ghost ds-btn--icon" data-close aria-label="Cerrar modal">×</button></div><div class="ds-dialog__body">Ejemplo de modal con foco atrapado y cierre con Esc.</div><div class="ds-dialog__footer"><button class="ds-btn ds-btn--secondary" data-close>Cancelar</button><button class="ds-btn ds-btn--primary" data-close>Guardar cambios</button></div></section>
+  <div class="ds-toasts" id="guide-toasts" aria-live="polite"></div>
+</body>
+</html>
