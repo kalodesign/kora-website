@@ -33,6 +33,7 @@ jobs:
         run: test -n "$ACCESS_TOKEN"
 
       - name: Comprobar SUPABASE_DB_PASSWORD
+        if: always()
         env:
           DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         shell: bash
