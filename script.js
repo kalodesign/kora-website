@@ -665,4 +665,30 @@ document.addEventListener("error", (event) => {
     image.remove();
   }
 }, true);
-\n\n/* Conteo agregado: ruta y dominio de origen, sin datos personales. */\n(() => {\n  const endpoint = window.koraEndpoint?.("track-visit", "");\n  if (!endpoint || sessionStorage.getItem("kora_visit_counted")) return;\n  sessionStorage.setItem("kora_visit_counted", "1");\n  const referrerHost = (() => { try { return document.referrer ? new URL(document.referrer).hostname : ""; } catch { return ""; } })();\n  const campaignSource = new URLSearchParams(location.search).get("utm_source") || "";\n  fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json", apikey: window.KORA_CONFIG?.supabaseAnonKey || "" }, body: JSON.stringify({ page: location.pathname, referrerHost, campaignSource }), keepalive: true }).catch(() => {});\n})();\n
+\n\n/* Sesiones agregadas por origen/dispositivo; sin IP ni identificadores persistentes. */
+(() => {
+  if (document.body.classList.contains("admin-page")) return;
+  const endpoint = window.koraEndpoint?.("track-visit", "");
+  if (!endpoint || !window.KORA_CONFIG?.supabaseAnonKey) return;
+  const storageKey = "kora_analytics_session_v2";
+  const now = Date.now(), duration = 30 * 60 * 1000;
+  let previous = null;
+  try { previous = JSON.parse(sessionStorage.getItem(storageKey) || "null"); } catch {}
+  if (previous?.lastSeen && now - previous.lastSeen < duration) {
+    previous.lastSeen = now;
+    try { sessionStorage.setItem(storageKey, JSON.stringify(previous)); } catch {}
+    return;
+  }
+  const referrerHost = (() => { try { return document.referrer ? new URL(document.referrer).hostname.toLowerCase() : ""; } catch { return ""; } })();
+  const campaignSource = new URLSearchParams(location.search).get("utm_source") || "";
+  const host = referrerHost.replace(/^www\./, ""), campaign = campaignSource.toLowerCase();
+  const source = ["instagram","ig"].includes(campaign) || (host === "instagram.com" || host.endsWith(".instagram.com")) ? "instagram"
+    : ["facebook","fb","meta"].includes(campaign) || (host === "facebook.com" || host.endsWith(".facebook.com")) || host === "fb.com" ? "facebook"
+    : ["google","bing","yahoo","duckduckgo","ecosia"].includes(campaign) || ["google.com","bing.com","yahoo.com","duckduckgo.com","ecosia.org"].some((domain) => host === domain || host.endsWith("." + domain)) ? "organic_search"
+    : ["tiktok","pinterest","youtube","x","twitter"].includes(campaign) || ["tiktok.com","pinterest.com","youtube.com","x.com","twitter.com"].some((domain) => host === domain || host.endsWith("." + domain)) ? "other_social"
+    : referrerHost && !["kora3d.co","www.kora3d.co"].includes(host) ? "referral" : "direct";
+  const device = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ? "mobile" : "desktop";
+  const page = (location.pathname || "/").replace(/[^a-zA-Z0-9/_.-]/g, "").slice(0, 100) || "/";
+  try { sessionStorage.setItem(storageKey, JSON.stringify({ source, lastSeen: now })); } catch {}
+  fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json", apikey: window.KORA_CONFIG.supabaseAnonKey }, body: JSON.stringify({ page, referrerHost, campaignSource: source, device }), keepalive: true }).catch(() => {});
+})();

@@ -17,7 +17,7 @@
   const modules = {};
   const makeModule = (view) => {
     const section = document.createElement("section"); section.className = "admin-module admin-enhanced-module"; section.id = `admin-${view}-view`; section.hidden = true; section.setAttribute("aria-labelledby", `admin-${view}-title`);
-    section.innerHTML = `<div class="admin-section-head admin-section-divider"><div><p class="admin-section-kicker">Administración de Kora</p><h2 id="admin-${view}-title">${titles[view]}</h2><p>${view === "orders" ? "Pedidos confirmados desde la tienda. El estado de despacho se gestiona por separado del pago." : view === "analytics" ? "Vistas agregadas por día, página y canal de llegada. No se guardan datos personales." : "Edita las tarjetas estáticas del home y administra banners."}</p></div></div><div data-panel="${view}"></div>`;
+    section.innerHTML = `<div class="admin-section-head admin-section-divider"><div><p class="admin-section-kicker">Administración de Kora</p><h2 id="admin-${view}-title">${titles[view]}</h2><p>${view === "orders" ? "Pedidos confirmados desde la tienda. El estado de despacho se gestiona por separado del pago." : view === "analytics" ? "Sesiones agregadas por origen, página de entrada y dispositivo. No guardamos datos personales." : "Edita las tarjetas estáticas del home y administra banners."}</p></div></div><div data-panel="${view}"></div>`;
     shell.append(section); modules[view] = section; return section;
   };
   views.forEach((view) => {
@@ -42,8 +42,8 @@
     if (!event.target.closest("[data-admin-calculator]")) return;
     event.preventDefault(); event.stopImmediatePropagation(); window.top.location.href = "/calculadora/index.html?origen=admin";
   }, true);
-  const api = async (method = "GET", body) => {
-    const response = await fetch(endpoint, { method, headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` }, body: body ? JSON.stringify(body) : undefined });
+  const api = async (method = "GET", body, query = "") => {
+    const response = await fetch(`${endpoint}${query}`, { method, headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` }, body: body ? JSON.stringify(body) : undefined });
     const payload = await response.json().catch(() => ({})); if (!response.ok) throw new Error(payload.error || "No fue posible cargar los datos."); return payload;
   };
   const panel = (view) => modules[view].querySelector(`[data-panel="${view}"]`);
@@ -77,10 +77,31 @@
     draw();
   };
   const renderAnalytics = () => {
-    const target = panel("analytics"); const total = data.analytics.reduce((sum, record) => sum + Number(record.views || 0), 0);
-    const sources = Object.entries(data.analytics.reduce((map, row) => { map[row.source] = (map[row.source] || 0) + Number(row.views || 0); return map; }, {})).sort((a, b) => b[1] - a[1]);
-    const pages = Object.entries(data.analytics.reduce((map, row) => { map[row.page] = (map[row.page] || 0) + Number(row.views || 0); return map; }, {})).sort((a, b) => b[1] - a[1]).slice(0, 8);
-    target.innerHTML = `<div class="admin-analytics-summary"><article><span>Vistas últimos 90 días</span><strong>${total.toLocaleString("es-CO")}</strong><small>Vistas, no visitantes únicos</small></article><article><span>Canal principal</span><strong>${esc(sources[0] ? sourceLabels[sources[0][0]] || sources[0][0] : "Sin datos")}</strong><small>${sources[0] ? `${sources[0][1].toLocaleString("es-CO")} vistas` : "El conteo aparece al desplegar la función de medición"}</small></article></div><div class="admin-business-grid"><section class="admin-panel"><div class="admin-panel-head"><h3>Origen de visitas</h3><span>90 días</span></div>${sources.length ? sources.map(([source, count]) => `<div class="admin-analytics-row"><span>${esc(sourceLabels[source] || source)}</span><strong>${count.toLocaleString("es-CO")}</strong></div>`).join("") : `<p class="admin-empty-inline">Sin datos todavía.</p>`}</section><section class="admin-panel"><div class="admin-panel-head"><h3>Páginas más vistas</h3><span>90 días</span></div>${pages.length ? pages.map(([page, count]) => `<div class="admin-analytics-row"><span>${esc(page)}</span><strong>${count.toLocaleString("es-CO")}</strong></div>`).join("") : `<p class="admin-empty-inline">Sin datos todavía.</p>`}</section></div><p class="admin-field-help">La medición clasifica búsqueda, Instagram, Facebook, otras redes, referencias y acceso directo. No conserva IP, nombres ni URL de referencia completa.</p>`;
+    const target = panel("analytics"), records = data.analytics;
+    const total = records.reduce((sum, row) => sum + Number(row.views || 0), 0);
+    const devices = records.reduce((sum, row) => { const key = row.device === "mobile" ? "mobile" : row.device === "desktop" ? "desktop" : "unknown"; sum[key] += Number(row.views || 0); return sum; }, { mobile: 0, desktop: 0, unknown: 0 });
+    const sources = Object.values(records.reduce((map, row) => { const key = row.source || "direct"; const item = map[key] || (map[key] = { source: key, sessions: 0, mobile: 0, desktop: 0 }); const count = Number(row.views || 0); item.sessions += count; if (row.device === "mobile") item.mobile += count; if (row.device === "desktop") item.desktop += count; return map; }, {})).sort((a, b) => b.sessions - a.sessions);
+    const pages = Object.entries(records.reduce((map, row) => { map[row.page] = (map[row.page] || 0) + Number(row.views || 0); return map; }, {})).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const number = (value) => Number(value || 0).toLocaleString("es-CO"), share = (value) => total ? `${Math.round(value * 100 / total)}%` : "0%";
+    target.innerHTML = `<div class="admin-enhanced-toolbar"><label>Periodo del reporte<select data-analytics-days><option value="7">Últimos 7 días</option><option value="30">Últimos 30 días</option><option value="90">Últimos 90 días</option><option value="365">Últimos 365 días</option></select></label><button class="button button-secondary" type="button" data-analytics-refresh>Actualizar</button></div>
+      <div class="admin-analytics-summary">
+        <article><span>Sesiones estimadas</span><strong>${number(total)}</strong><small>Una sesión por pestaña; se renueva tras 30 min de inactividad</small></article>
+        <article><span>Desde móviles</span><strong>${number(devices.mobile)}</strong><small>${share(devices.mobile)} de las sesiones</small></article>
+        <article><span>Desde escritorio</span><strong>${number(devices.desktop)}</strong><small>${share(devices.desktop)} de las sesiones</small></article>
+        <article><span>Origen principal</span><strong>${esc(sources[0] ? sourceLabels[sources[0].source] || sources[0].source : "Sin datos")}</strong><small>${sources[0] ? `${number(sources[0].sessions)} sesiones` : "Se mostrará cuando ingrese tráfico"}</small></article>
+      </div><div class="admin-business-grid">
+        <section class="admin-panel"><div class="admin-panel-head"><h3>Origen y dispositivo</h3><span>Sesiones</span></div>
+          ${sources.length ? sources.map((item) => `<div class="admin-analytics-row"><span>${esc(sourceLabels[item.source] || item.source)}<small>Móvil ${number(item.mobile)} · Escritorio ${number(item.desktop)}</small></span><strong>${number(item.sessions)} <small>${share(item.sessions)}</small></strong></div>`).join("") : `<p class="admin-empty-inline">Todavía no hay sesiones en este periodo.</p>`}
+        </section><section class="admin-panel"><div class="admin-panel-head"><h3>Páginas de entrada</h3><span>Sesiones</span></div>
+          ${pages.length ? pages.map(([page, count]) => `<div class="admin-analytics-row"><span title="${esc(page)}">${esc(page)}</span><strong>${number(count)}</strong></div>`).join("") : `<p class="admin-empty-inline">No hay páginas registradas para este periodo.</p>`}
+        </section></div><p class="admin-field-help">Clasificamos tráfico directo, búsqueda orgánica, Instagram, Facebook, otras redes y referencias. Guardamos totales diarios y tipo de dispositivo; no registramos IP, nombres ni identificadores de visitantes. Las sesiones son una estimación, no personas únicas.</p>`;
+    const range = target.querySelector("[data-analytics-days]"); range.value = String(window.koraAnalyticsDays || 90);
+    const refresh = async () => { const days = Number(range.value) || 90; window.koraAnalyticsDays = days; const button = target.querySelector("[data-analytics-refresh]"); button.disabled = true;
+      try { const payload = await api("GET", undefined, `?analytics_days=${days}`); data.analytics = payload.analytics || []; renderAnalytics(); }
+      catch (error) { target.querySelector(".admin-field-help").textContent = `No se pudieron cargar las métricas: ${error.message}`; }
+      finally { target.querySelector("[data-analytics-refresh]")?.removeAttribute("disabled"); }
+    };
+    range.addEventListener("change", refresh); target.querySelector("[data-analytics-refresh]").addEventListener("click", refresh);
   };
   const renderPages = () => {
     const target = panel("pages");
