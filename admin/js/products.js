@@ -4,6 +4,15 @@
     ? window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey) : null);
   const endpoint = (name) => window.koraEndpoint?.(name, "") || "";
   const lastViewKey = "kora_admin_last_view";
+  const productImageUrl = (value) => {
+    try { return new URL(String(value || ""), new URL("../", location.href)).href; }
+    catch { return ""; }
+  };
+  document.addEventListener("error", (event) => {
+    if (!(event.target instanceof HTMLImageElement) || !event.target.closest("#products-view")) return;
+    event.target.onerror = null;
+    event.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%23f1f2f4'/%3E%3Cpath d='m20 83 25-28 18 18 18-23 20 33z' fill='%239ca3af'/%3E%3C/svg%3E";
+  }, true);
   const state = { products: [], session: null, components: [], manualColors: [], globalColors: [], productImages: [], page: 1, perPage: 10 };
   const $ = (selector) => document.querySelector(selector);
   const ui = {
@@ -88,7 +97,7 @@
   const renderComponents = () => {
     ui.components.innerHTML = state.components.length ? state.components.map((component, index) => `
       <div class="admin-component-row">
-        <img class="admin-component-thumb" src="${esc(componentProduct(component.productId)?.image || "")}" alt="" loading="lazy" />
+        <img class="admin-component-thumb" src="${esc(productImageUrl(componentProduct(component.productId)?.image || ""))}" alt="" loading="lazy" />
         <div class="admin-component-info"><strong>${esc(componentProduct(component.productId)?.title || "Producto no disponible")}</strong><span>${esc(componentProduct(component.productId)?.category || "Catálogo")}</span></div>
         <label class="admin-component-quantity"><span>Cantidad</span><input class="ds-input" data-component-quantity="${index}" type="number" min="1" value="${Number(component.quantity || 1)}" aria-label="Cantidad de ${esc(componentProduct(component.productId)?.title || "producto")}" /></label>
       <button type="button" class="ds-btn ds-btn--ghost ds-btn--icon ds-btn--sm" data-component-remove="${index}" aria-label="Eliminar producto asociado">×</button></div>`).join("") : '<p class="admin-empty-inline">Aún no hay productos incluidos.</p>';
@@ -101,7 +110,7 @@
     ui.componentCatalog.innerHTML = products.length ? products.map((product) => {
       const isSelected = selected.has(product.id);
       return `<button class="ds-btn ds-btn--secondary ds-btn--block admin-component-option${isSelected ? " selected" : ""}" type="button" role="option" data-component-product="${esc(product.id)}" aria-selected="${isSelected}"${isSelected ? " disabled" : ""}>
-        <img src="${esc(product.image)}" alt="" loading="lazy" /><span><strong>${esc(product.title)}</strong><small>${esc(product.category || "Catálogo")}</small></span><b aria-hidden="true">${isSelected ? "✓" : "+"}</b>
+        <img src="${esc(productImageUrl(product.image))}" alt="" loading="lazy" /><span><strong>${esc(product.title)}</strong><small>${esc(product.category || "Catálogo")}</small></span><b aria-hidden="true">${isSelected ? "✓" : "+"}</b>
       </button>`;
     }).join("") : '<p class="admin-empty-inline">No encontramos productos con esa búsqueda.</p>';
   };
@@ -143,7 +152,7 @@
     ui.list.innerHTML = pageProducts.length ? pageProducts.map((product) => {
       const status = productStatus(product);
       return `<article class="admin-product-row">
-        <div class="admin-product-name"><img src="${esc(product.image)}" alt="" /><div><strong>${esc(product.title)}</strong><small class="admin-product-origin${isPelgyProduct(product) ? " is-other" : ""}">${productOriginLabel(product)}</small></div></div>
+        <div class="admin-product-name"><img src="${esc(productImageUrl(product.image))}" alt="" /><div><strong>${esc(product.title)}</strong><small class="admin-product-origin${isPelgyProduct(product) ? " is-other" : ""}">${productOriginLabel(product)}</small></div></div>
         <span>${esc(product.category || "Sin categoría")}</span><span class="admin-stock admin-stock-${status}">${statusLabel(status)}<small>${Number(product.stock || 0)} u</small></span>
         <span>${esc(product.size || "No aplica")}</span><span>${Number(product.soldCount || 0)}</span><span>${money(product.price)}</span><span>${product.compareAt ? money(product.compareAt) : "—"}</span>
         <div class="admin-row-actions"><label class="ds-check admin-active-switch"><input class="ds-switch" type="checkbox" data-product-toggle="${esc(product.id)}" aria-label="${product.isActive ? "Desactivar" : "Activar"} ${esc(product.title)}" title="Activar o desactivar producto" ${product.isActive ? "checked" : ""} /><span class="ds-sr-only">Activo</span></label><button type="button" class="ds-btn ds-btn--secondary ds-btn--icon ds-btn--sm" data-edit="${esc(product.id)}" aria-label="Editar ${esc(product.title)}" title="Editar">✎</button><button class="ds-btn ds-btn--danger ds-btn--icon ds-btn--sm delete" type="button" data-delete="${esc(product.id)}" aria-label="Eliminar ${esc(product.title)}" title="Eliminar">×</button></div>
@@ -157,7 +166,7 @@
     return `<div class="admin-color-row${isManual ? " is-manual" : ""}" data-color-row="${index}">
       <input class="ds-input" type="color" value="${esc(color.hex || "#171D67")}" data-color-hex="${index}" aria-label="Muestra de color" />
       <input class="ds-input" type="text" value="${esc(color.name || "")}" data-color-name="${index}" placeholder="Nombre del color" />
-      ${isManual ? `<label class="admin-color-image-upload" title="Subir imagen para este color"><input type="file" accept="image/*" data-color-image-file="${index}" aria-label="Subir imagen para ${esc(color.name || "este color")}" />${colorImage ? `<img src="${esc(colorImage)}" alt="" />` : '<span aria-hidden="true">+</span>'}</label>` : ""}
+      ${isManual ? `<label class="admin-color-image-upload" title="Subir imagen para este color"><input type="file" accept="image/*" data-color-image-file="${index}" aria-label="Subir imagen para ${esc(color.name || "este color")}" />${colorImage ? `<img src="${esc(productImageUrl(colorImage))}" alt="" />` : '<span aria-hidden="true">+</span>'}</label>` : ""}
       <button type="button" class="ds-btn ds-btn--ghost ds-btn--icon ds-btn--sm" data-color-remove="${index}" aria-label="Eliminar color">×</button>
     </div>`;
   };
@@ -211,7 +220,7 @@
     ui.image.value = state.productImages[0] || "";
     ui.imageList.innerHTML = state.productImages.map((image, index) => `
       <article class="admin-image-item${index === 0 ? " is-primary" : ""}">
-        <img src="${esc(image)}" alt="Imagen ${index + 1} del producto" />
+        <img src="${esc(productImageUrl(image))}" alt="Imagen ${index + 1} del producto" />
         ${index === 0 ? '<span>Portada</span>' : ""}
         <div class="admin-image-item-actions">
           <button type="button" class="ds-btn ds-btn--ghost ds-btn--icon ds-btn--sm" data-image-move="previous" data-image-index="${index}" aria-label="Mover imagen ${index + 1} a la izquierda" title="Mover a la izquierda" ${index === 0 ? "disabled" : ""}>←</button>
