@@ -1,9 +1,9 @@
-import { renderTable } from './ui/table.js';
-import { attachTabs } from './ui/tabs.js';
-import { showToast } from './ui/toast.js';
-import { getOrdersPage, getOrderMetrics, getOrderDetail, updateOrderStatus, PAGE_SIZE } from './api/orders.js';
-import { openOrderDrawer } from './ui/drawer.js';
-import { getSupabase } from './supabase.js';
+import { renderTable } from './ui/table.js?v=20261110-startupfix';
+import { attachTabs } from './ui/tabs.js?v=20261110-startupfix';
+import { showToast } from './ui/toast.js?v=20261110-startupfix';
+import { getOrdersPage, getOrderMetrics, getOrderDetail, updateOrderStatus, PAGE_SIZE } from './api/orders.js?v=20261110-startupfix';
+import { openOrderDrawer } from './ui/drawer.js?v=20261110-startupfix';
+import { getSupabase } from './supabase.js?v=20261110-startupfix';
 const CONFIG = Object.freeze({ locale: window.KORA_CONFIG?.locale || 'es-CO', currency: window.KORA_CONFIG?.currency || 'COP' });
 const iconPaths = {
   box:'<path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="M3 8v9l9 5 9-5V8M12 13v9"/>',
@@ -23,18 +23,33 @@ const iconPaths = {
 };
 const icon = (name) => `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] || iconPaths.box}</svg>`;
 const app = document.getElementById('app');
+if (app) {
+  delete app.dataset.boot;
+  app.setAttribute('aria-busy', 'true');
+  app.replaceChildren();
+  const shell = document.createElement('main'); shell.className = 'ds-container ds-auth';
+  const card = document.createElement('section'); card.className = 'ds-card ds-stack';
+  const title = document.createElement('h1'); title.className = 'ds-h2'; title.textContent = 'Conectando con Kora';
+  const detail = document.createElement('p'); detail.className = 'ds-text-muted'; detail.textContent = 'Validando el acceso seguro…';
+  card.append(title, detail); shell.append(card); app.append(shell);
+}
 let authClient = null;
 let session = null;
 let startupError = null;
 try {
   authClient = getSupabase();
-  const authResult = await authClient.auth.getSession();
+  let timeoutId;
+  const authResult = await Promise.race([
+    authClient.auth.getSession(),
+    new Promise((_, reject) => { timeoutId = window.setTimeout(() => reject(new Error('La validación de sesión tardó demasiado. Comprueba tu conexión y vuelve a intentar.')), 10000); })
+  ]);
+  window.clearTimeout(timeoutId);
   session = authResult.data?.session || null;
   if (authResult.error) throw authResult.error;
 } catch (error) {
+  app?.setAttribute('aria-busy', 'false');
   startupError = error;
 }
-if (app) delete app.dataset.boot;
 function showStartupError(error) {
   app.replaceChildren();
   const main = document.createElement('main');
@@ -62,9 +77,11 @@ function showStartupError(error) {
 if (startupError) {
   showStartupError(startupError);
 } else if (!session) {
+  app?.setAttribute('aria-busy', 'false');
   app.innerHTML = `<main class="ds-container ds-auth"><form class="ds-card ds-stack" id="admin-login"><h1 class="ds-h2">Iniciar sesión</h1><p class="ds-text-muted">Acceso privado para el equipo Kora.</p><label class="ds-field"><span class="ds-label">Correo</span><input class="ds-input" type="email" name="email" autocomplete="username" required></label><label class="ds-field"><span class="ds-label">Contraseña</span><input class="ds-input" type="password" name="password" autocomplete="current-password" required></label><button class="ds-btn ds-btn--primary ds-btn--block" type="submit">Entrar</button><p id="login-message" class="ds-error" role="alert"></p></form></main>`;
   document.querySelector('#admin-login').addEventListener('submit', async event => { event.preventDefault(); const form=event.currentTarget, button=form.querySelector('button'), message=document.querySelector('#login-message'); button.disabled=true; message.textContent='Validando acceso…'; try { const {error}=await authClient.auth.signInWithPassword({email:form.email.value.trim(),password:form.password.value}); if(error)throw error; location.reload(); } catch(error) { message.textContent=error.message || 'No fue posible iniciar sesión.'; button.disabled=false; } });
 } else {
+app?.setAttribute('aria-busy', 'false');
 app.innerHTML = `<div class="ds-app">
   <div class="ds-overlay" id="overlay"></div>
   <aside class="ds-sidebar" id="sidebar" aria-label="Navegación de administración">
@@ -75,7 +92,7 @@ app.innerHTML = `<div class="ds-app">
       <button class="ds-nav__item" type="button" data-preview="Inicio">${icon('home')} Inicio</button>
       <button class="ds-nav__item" type="button" id="store-toggle" aria-expanded="true" aria-controls="store-nav">${icon('shop')} Mi tienda <span class="chevron">${icon('down')}</span></button>
       <div id="store-nav">
-        <button class="ds-nav__item" type="button" data-preview="Productos">Productos</button>
+        <a class="ds-nav__item" href="../admin-productos.html">Productos</a>
         <button class="ds-nav__item" type="button" aria-current="page">Pedidos</button>
         <button class="ds-nav__item" type="button" data-preview="Clientes">Clientes</button>
       </div>
