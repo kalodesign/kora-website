@@ -47,7 +47,7 @@ jobs:
       - name: Aplicar migraciones del panel
         run: |
           supabase link --project-ref "$SUPABASE_PROJECT_REF"
-          supabase db push --yes --password "$SUPABASE_DB_PASSWORD"
+          supabase db push --remote --yes --password "$SUPABASE_DB_PASSWORD"
 
       - name: Desplegar funciones
         shell: bash
