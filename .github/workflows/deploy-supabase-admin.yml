@@ -29,8 +29,13 @@ jobs:
       - name: Validar credenciales sin imprimirlas
         shell: bash
         run: |
-          test -n "$SUPABASE_ACCESS_TOKEN" || { echo "::error::Falta configurar el secreto SUPABASE_ACCESS_TOKEN en GitHub Actions."; exit 1; }
-          test -n "$SUPABASE_DB_PASSWORD" || { echo "::error::Falta configurar el secreto SUPABASE_DB_PASSWORD en GitHub Actions."; exit 1; }
+          missing=()
+          [[ -n "$SUPABASE_ACCESS_TOKEN" ]] || missing+=("SUPABASE_ACCESS_TOKEN")
+          [[ -n "$SUPABASE_DB_PASSWORD" ]] || missing+=("SUPABASE_DB_PASSWORD")
+          if (( ${#missing[@]} )); then
+            printf "::error::Faltan estos secretos de GitHub Actions: %s\\n" "${missing[*]}"
+            exit 1
+          fi
 
       - name: Instalar Supabase CLI
         uses: supabase/setup-cli@v1
@@ -48,3 +53,4 @@ jobs:
           for fn in catalog admin-catalog admin-product-image admin-business admin-banner-image admin-task-image site-content track-visit checkout-wompi wompi-webhook; do
             supabase functions deploy "$fn" --project-ref "$SUPABASE_PROJECT_REF"
           done
+
