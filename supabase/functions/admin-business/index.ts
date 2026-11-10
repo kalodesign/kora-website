@@ -11,7 +11,7 @@ const getAdmin = async (request: Request) => {
   let profile = await supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle();
   if (profile.error) return null;
   if (!profile.data) {
-    const created = await supabase.from("profiles").insert({ id: data.user.id, role: "admin" });
+    await supabase.from("profiles").insert({ id: data.user.id, role: "admin" });
     profile = await supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle();
   }
   return profile.data?.role === "admin" ? data.user : null;

@@ -23,7 +23,6 @@ const iconPaths = {
 };
 const icon = (name) => `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] || iconPaths.box}</svg>`;
 const app = document.getElementById('app');
-if (app) delete app.dataset.boot;
 let authClient = null;
 let session = null;
 let startupError = null;
@@ -35,6 +34,7 @@ try {
 } catch (error) {
   startupError = error;
 }
+if (app) delete app.dataset.boot;
 function showStartupError(error) {
   app.replaceChildren();
   const main = document.createElement('main');
