@@ -53,6 +53,6 @@ jobs:
         shell: bash
         run: |
           for fn in catalog admin-catalog admin-product-image admin-business admin-banner-image admin-task-image site-content track-visit checkout-wompi wompi-webhook; do
-            supabase functions deploy "$fn" --project-ref "$SUPABASE_PROJECT_REF"
+            supabase functions deploy "$fn" --project-ref "$SUPABASE_PROJECT_REF" --yes
           done
 
