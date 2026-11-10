@@ -1,6 +1,8 @@
 import { renderTable } from './ui/table.js';
 import { attachTabs } from './ui/tabs.js';
 import { showToast } from './ui/toast.js';
+import { getOrdersPage, PAGE_SIZE } from './api/orders.js';
+import { getSupabase } from './supabase.js';
 const CONFIG = Object.freeze({ locale: window.KORA_CONFIG?.locale || 'es-CO', currency: window.KORA_CONFIG?.currency || 'COP' });
 const iconPaths = {
   box:'<path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="M3 8v9l9 5 9-5V8M12 13v9"/>',
@@ -20,6 +22,12 @@ const iconPaths = {
 };
 const icon = (name) => `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] || iconPaths.box}</svg>`;
 const app = document.getElementById('app');
+const authClient = getSupabase();
+const { data: { session } } = await authClient.auth.getSession();
+if (!session) {
+  app.innerHTML = `<main class="ds-container ds-auth"><form class="ds-card ds-stack" id="admin-login"><h1 class="ds-h2">Iniciar sesión</h1><p class="ds-text-muted">Acceso privado para el equipo Kora.</p><label class="ds-field"><span class="ds-label">Correo</span><input class="ds-input" type="email" name="email" autocomplete="username" required></label><label class="ds-field"><span class="ds-label">Contraseña</span><input class="ds-input" type="password" name="password" autocomplete="current-password" required></label><button class="ds-btn ds-btn--primary ds-btn--block" type="submit">Entrar</button><p id="login-message" class="ds-error" role="alert"></p></form></main>`;
+  document.querySelector('#admin-login').addEventListener('submit', async event => { event.preventDefault(); const form=event.currentTarget, button=form.querySelector('button'), message=document.querySelector('#login-message'); button.disabled=true; message.textContent='Validando acceso…'; try { const {error}=await authClient.auth.signInWithPassword({email:form.email.value.trim(),password:form.password.value}); if(error)throw error; location.reload(); } catch(error) { message.textContent=error.message || 'No fue posible iniciar sesión.'; button.disabled=false; } });
+} else {
 app.innerHTML = `<div class="ds-app">
   <div class="ds-overlay" id="overlay"></div>
   <aside class="ds-sidebar" id="sidebar" aria-label="Navegación de administración">
@@ -57,43 +65,34 @@ app.innerHTML = `<div class="ds-app">
     </section>
     <section class="ds-card ds-card--flush" aria-label="Pedidos de ejemplo">
       <div class="ds-tabs" role="tablist" aria-label="Estado del pedido">
-        <button class="ds-tab" role="tab" aria-selected="true" tabindex="0" data-status="all">Todos <span class="ds-count">10</span></button>
-        <button class="ds-tab" role="tab" aria-selected="false" tabindex="-1" data-status="new">Nuevos <span class="ds-count">2</span></button>
-        <button class="ds-tab" role="tab" aria-selected="false" tabindex="-1" data-status="printing">En producción <span class="ds-count">4</span></button>
-        <button class="ds-tab" role="tab" aria-selected="false" tabindex="-1" data-status="delivered">Completados <span class="ds-count">3</span></button>
-        <button class="ds-tab" role="tab" aria-selected="false" tabindex="-1" data-status="cancelled">Cancelados <span class="ds-count">1</span></button>
+        <button class="ds-tab" role="tab" aria-selected="true" tabindex="0" data-status="all">Todos <span class="ds-count" data-count="all">—</span></button>
+        <button class="ds-tab" role="tab" aria-selected="false" tabindex="-1" data-status="new">Nuevos <span class="ds-count" data-count="new">—</span></button>
+        <button class="ds-tab" role="tab" aria-selected="false" tabindex="-1" data-status="printing">En producción <span class="ds-count" data-count="printing">—</span></button>
+        <button class="ds-tab" role="tab" aria-selected="false" tabindex="-1" data-status="delivered">Completados <span class="ds-count" data-count="delivered">—</span></button>
+        <button class="ds-tab" role="tab" aria-selected="false" tabindex="-1" data-status="cancelled">Cancelados <span class="ds-count" data-count="cancelled">—</span></button>
       </div>
-      <div class="ds-toolbar"><label class="ds-input-wrap ds-toolbar__grow">${icon('search')}<input class="ds-input" type="search" placeholder="Cliente, producto o ID" aria-label="Buscar pedidos de ejemplo"></label><div class="toolbar-actions"><button type="button" class="ds-btn ds-btn--secondary" data-preview="Estado">${icon('list')} Todos los estados ${icon('down')}</button><button type="button" class="ds-btn ds-btn--secondary" data-preview="Fechas">${icon('calendar')} Rango de fechas ${icon('down')}</button><button type="button" class="ds-btn ds-btn--secondary" data-preview="Más filtros">${icon('filter')} Más filtros</button></div></div>
+      <div class="ds-toolbar"><label class="ds-input-wrap ds-toolbar__grow">${icon('search')}<input class="ds-input" id="order-search" type="search" placeholder="Cliente, producto o número" aria-label="Buscar por cliente, producto o número de pedido"></label><label class="ds-sr-only" for="order-status">Estado del pedido</label><select class="ds-select" id="order-status"><option value="">Todos los estados</option><option value="pending">Pendiente</option><option value="in_progress">En producción</option><option value="ready">Listo</option><option value="shipped">Enviado</option><option value="delivered">Entregado</option><option value="cancelled">Cancelado</option></select><label class="ds-field"><span class="ds-sr-only">Desde</span><input class="ds-input" id="order-from" type="date" aria-label="Fecha desde"></label><label class="ds-field"><span class="ds-sr-only">Hasta</span><input class="ds-input" id="order-to" type="date" aria-label="Fecha hasta"></label></div><div class="ds-card__body" id="orders-feedback" aria-live="polite" hidden></div>
       <div class="ds-table-wrap"><table class="ds-table ds-table--cards orders-table"><thead><tr><th>Producto</th><th>Cliente</th><th>ID pedido</th><th>Monto</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="order-rows"></tbody></table></div>
-      <div class="mobile-orders" id="mobile-orders"></div>
-      <nav class="ds-pagination" aria-label="Páginas de ejemplo"><button class="ds-btn ds-btn--secondary" type="button" data-preview="Anterior">← Anterior</button><div class="ds-pages"><button class="ds-page" aria-current="page" type="button">1</button><button class="ds-page" type="button" data-preview="Página 2">2</button><span>…</span><button class="ds-page" type="button" data-preview="Página 10">10</button></div><button class="ds-btn ds-btn--secondary" type="button" data-preview="Siguiente">Siguiente →</button></nav>
+      
+      <nav class="ds-pagination" id="orders-pagination" aria-label="Páginas de pedidos"><button class="ds-btn ds-btn--secondary" id="orders-prev" type="button">← Anterior</button><div class="ds-pages" id="orders-pages" aria-live="polite"></div><button class="ds-btn ds-btn--secondary" id="orders-next" type="button">Siguiente →</button></nav>
     </section>
   </main>
   <div class="ds-toasts"><div id="toast" role="status" aria-live="polite" hidden></div></div>
 </div>`;
-const orders = [
-  ['Bola de Navidad personalizada','PLA · Rosado · 0,2 mm','Valentina Gómez','Nuevo','#00001234','2026-11-09',29000,'Transferencia','queued'],
-  ['Llavero de mascota Bonnie','PLA · Negro · 0,2 mm','Carlos Muñoz','Recurrente','#00001233','2026-11-09',45000,'Wompi','printing'],
-  ['Micrófono con logo 3D','PLA · Beige · 0,2 mm','Mariana Ríos','Nuevo','#00001232','2026-11-08',65000,'Transferencia','pending_payment'],
-  ['Clicker 3D personalizado','PLA · Amarillo · 0,2 mm','Julián Torres','Recurrente','#00001231','2026-11-08',18500,'Wompi','post_processing'],
-  ['Porta labial de cadena','PLA · Vinotinto · 0,2 mm','Natalia Cárdenas','Nuevo','#00001230','2026-11-07',24000,'Nequi','delivered'],
-  ['Kit de dijes Kora','PLA · Lila · 0,2 mm','Andrés Medina','Recurrente','#00001229','2026-11-07',72000,'Transferencia','shipped'],
-  ['Galletas clicleables x12','PLA · Café · 0,2 mm','Paola Herrera','Nuevo','#00001228','2026-11-06',162000,'Wompi','delivered'],
-  ['Llavero con nombre','PLA · Blanco · 0,2 mm','Sofía Pardo','Recurrente','#00001227','2026-11-05',28000,'Transferencia','printing'],
-  ['Exhibidor QR para tienda','PLA · Verde · 0,2 mm','Juan Ospina','Nuevo','#00001226','2026-11-04',85000,'Nequi','cancelled'],
-  ['Dije perro globo','PLA · Azul · 0,2 mm','Laura Perdomo','Nuevo','#00001225','2026-11-03',18000,'Wompi','delivered']
-].map(([product,detail,customer,type,reference,created,total,payment,status])=>({product,detail,customer,type,reference,created,total,payment,status}));
-renderTable(orders, CONFIG, message => showToast(message));
-attachTabs(document.querySelector('.ds-tabs'), (status) => {
- const match = {all:orders,new:orders.filter(o=>['queued','pending_payment'].includes(o.status)),printing:orders.filter(o=>['printing','post_processing','shipped'].includes(o.status)),delivered:orders.filter(o=>o.status==='delivered'),cancelled:orders.filter(o=>o.status==='cancelled')};
- renderTable(match[status] || orders,CONFIG,message=>showToast(message));
-});
-const sidebar=document.getElementById('sidebar'),overlay=document.getElementById('overlay');
-function closeMenu(){sidebar.classList.remove('is-open');overlay.classList.remove('is-open')}
-document.getElementById('open-menu').addEventListener('click',()=>{sidebar.classList.add('is-open');overlay.classList.add('is-open')});
-overlay.addEventListener('click',closeMenu);
+const params=new URLSearchParams(location.search);
+const filters={page:Math.max(1,Number(params.get('page'))||1),tab:params.get('tab')||'all',q:params.get('q')||'',status:params.get('status')||'',from:params.get('from')||'',to:params.get('to')||''};
+const searchInput=document.getElementById('order-search'),statusInput=document.getElementById('order-status'),fromInput=document.getElementById('order-from'),toInput=document.getElementById('order-to');
+searchInput.value=filters.q;statusInput.value=filters.status;fromInput.value=filters.from;toInput.value=filters.to;
+const feedback=document.getElementById('orders-feedback'),tbody=document.getElementById('order-rows');let lastPayload={orders:[],count:0,page:1,pageSize:PAGE_SIZE};
+function syncUrl(){const next=new URLSearchParams();for(const key of ['tab','q','status','from','to'])if(filters[key]&&!(key==='tab'&&filters[key]==='all'))next.set(key,filters[key]);if(filters.page>1)next.set('page',String(filters.page));history.replaceState(null,'',location.pathname+(next.size?'?'+next:''));}
+function pagination(payload){const pages=document.getElementById('orders-pages'),total=Math.max(1,Math.ceil(payload.count/PAGE_SIZE));pages.replaceChildren();const button=(number,label=String(number))=>{const el=document.createElement('button');el.type='button';el.className='ds-page';el.textContent=label;if(number===filters.page)el.setAttribute('aria-current','page');el.addEventListener('click',()=>{filters.page=number;loadOrders()});pages.append(el)};if(filters.page>1)button(Math.max(1,filters.page-1),'…');button(1);if(total>1&&filters.page!==1&&filters.page!==total)button(filters.page);if(total>1)button(total);document.getElementById('orders-prev').disabled=filters.page<=1;document.getElementById('orders-next').disabled=filters.page>=total;}
+async function loadOrders(){syncUrl();feedback.hidden=true;tbody.replaceChildren();const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=6;td.textContent='Cargando pedidos…';tr.append(td);tbody.append(tr);try{lastPayload=await getOrdersPage(filters);renderTable(lastPayload.orders,CONFIG,message=>showToast(message));pagination(lastPayload);for(const tab of ['all','new','printing','delivered','cancelled']){const el=document.querySelector('[data-count="'+tab+'"]');if(el)el.textContent=tab===filters.tab?String(lastPayload.count):'—';}if(!lastPayload.orders.length){feedback.hidden=false;feedback.textContent='Sin pedidos con estos filtros. Ajusta la búsqueda o limpia los filtros.';const clear=document.createElement('button');clear.type='button';clear.className='ds-btn ds-btn--secondary';clear.textContent='Limpiar filtros';clear.addEventListener('click',()=>{Object.assign(filters,{page:1,tab:'all',q:'',status:'',from:'',to:''});searchInput.value='';statusInput.value='';fromInput.value='';toInput.value='';loadOrders()});feedback.append(' ',clear);}}catch(error){feedback.hidden=false;feedback.replaceChildren();const message=document.createElement('p');message.textContent=error.message||'No se pudieron cargar los pedidos.';const retry=document.createElement('button');retry.type='button';retry.className='ds-btn ds-btn--secondary';retry.textContent='Reintentar';retry.addEventListener('click',loadOrders);feedback.append(message,retry);}}
+attachTabs(document.querySelector('.ds-tabs'),status=>{filters.tab=status;filters.page=1;loadOrders()});
+let searchTimer;searchInput.addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{filters.q=searchInput.value.trim();filters.page=1;loadOrders()},300)});
+for(const [input,key] of [[statusInput,'status'],[fromInput,'from'],[toInput,'to']])input.addEventListener('change',()=>{filters[key]=input.value;filters.page=1;loadOrders()});
+document.getElementById('orders-prev').addEventListener('click',()=>{if(filters.page>1){filters.page--;loadOrders()}});document.getElementById('orders-next').addEventListener('click',()=>{filters.page++;loadOrders()});
+document.getElementById('global-search').addEventListener('click',()=>searchInput.focus());document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();searchInput.focus()}if(e.key==='Escape')closeMenu()});
+const sidebar=document.getElementById('sidebar'),overlay=document.getElementById('overlay');function closeMenu(){sidebar.classList.remove('is-open');overlay.classList.remove('is-open')};document.getElementById('open-menu').addEventListener('click',()=>{sidebar.classList.add('is-open');overlay.classList.add('is-open')});overlay.addEventListener('click',closeMenu);
 document.getElementById('store-toggle').addEventListener('click',e=>{const open=e.currentTarget.getAttribute('aria-expanded')==='true';e.currentTarget.setAttribute('aria-expanded',String(!open));document.getElementById('store-nav').hidden=open});
-document.querySelectorAll('[data-preview]').forEach(button=>button.addEventListener('click',()=>showToast('Disponible en la siguiente fase: '+button.dataset.preview)));
-document.getElementById('global-search').addEventListener('click',()=>document.querySelector('.ds-input-wrap input').focus());
-document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();document.querySelector('.ds-input-wrap input').focus()}if(e.key==='Escape')closeMenu()});
-document.querySelector('.ds-input-wrap input').addEventListener('input',e=>{const q=e.target.value.trim().toLocaleLowerCase(CONFIG.locale);renderTable(orders.filter(o=>[o.product,o.customer,o.reference].some(v=>v.toLocaleLowerCase(CONFIG.locale).includes(q))),CONFIG,message=>showToast(message))});
+loadOrders();
+}
