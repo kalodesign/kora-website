@@ -4421,3 +4421,8 @@ input[type="submit"] {
 .product-card a {
   touch-action: manipulation;
 }
+
+/* Responsive banner links managed from the admin. */
+.llaveros-hero-link{position:absolute;inset:0;z-index:1;display:block}
+.llaveros-hero-picture,.mascotas-hero-picture{display:block;width:100%;height:100%}
+.mascotas-hero-photo-link{display:block;width:100%;height:100%}
