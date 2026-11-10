@@ -82,7 +82,7 @@ if (startupError) {
   document.querySelector('#admin-login').addEventListener('submit', async event => { event.preventDefault(); const form=event.currentTarget, button=form.querySelector('button'), message=document.querySelector('#login-message'); button.disabled=true; message.textContent='Validando acceso…'; try { const {error}=await authClient.auth.signInWithPassword({email:form.email.value.trim(),password:form.password.value}); if(error)throw error; location.reload(); } catch(error) { message.textContent=error.message || 'No fue posible iniciar sesión.'; button.disabled=false; } });
 } else {
 app?.setAttribute('aria-busy', 'false');
-app.innerHTML = `<div class="ds-app">
+app.innerHTML = `<div class="ds-app admin-page">
   <div class="ds-overlay" id="overlay"></div>
   <aside class="ds-sidebar" id="sidebar" aria-label="Navegación de administración">
     <div class="brand"><span class="brand-mark">${icon('box')}</span>Kora Admin</div>
@@ -92,8 +92,8 @@ app.innerHTML = `<div class="ds-app">
       <button class="ds-nav__item" type="button" data-preview="Inicio">${icon('home')} Inicio</button>
       <button class="ds-nav__item" type="button" id="store-toggle" aria-expanded="true" aria-controls="store-nav">${icon('shop')} Mi tienda <span class="chevron">${icon('down')}</span></button>
       <div id="store-nav">
-        <a class="ds-nav__item" href="../admin-productos.html">Productos</a>
-        <button class="ds-nav__item" type="button" aria-current="page">Pedidos</button>
+        <button class="ds-nav__item" type="button" data-admin-section="products">Productos</button>
+        <button class="ds-nav__item" type="button" data-admin-section="orders">Pedidos</button>
         <button class="ds-nav__item" type="button" data-preview="Clientes">Clientes</button>
       </div>
       <button class="ds-nav__item" type="button" data-preview="Gestión de tienda">${icon('settings')} Gestión de tienda</button>
@@ -108,7 +108,7 @@ app.innerHTML = `<div class="ds-app">
   </aside>
   <main class="ds-main" id="main">
     <div class="mobile-topbar"><strong>Kora Admin</strong><button type="button" class="ds-btn ds-btn--ghost ds-btn--icon" id="open-menu" aria-label="Abrir menú">${icon('menu')}</button></div>
-    <div class="ds-breadcrumb"><ol><li>Inicio</li><li aria-current="page">Pedidos</li></ol></div>
+    <div id="orders-view"><div class="ds-breadcrumb"><ol><li>Inicio</li><li aria-current="page">Pedidos</li></ol></div>
     <header class="ds-page-header"><div><h1 class="ds-h1">Lista de pedidos</h1><p>Gestiona los pedidos de impresión 3D de tu tienda.</p></div><div class="head-actions"><button type="button" class="ds-btn ds-btn--primary" data-preview="Nuevo pedido">${icon('plus')} Nuevo pedido</button><button type="button" class="ds-btn ds-btn--secondary" data-preview="Más acciones">Más acciones ${icon('more')}</button></div></header>
     <section class="ds-stats" aria-label="Indicadores de pedidos" aria-busy="true">
       <div class="ds-stat"><span class="ds-stat__label">Pedidos totales</span><div class="ds-stat__value" data-metric="total"><span class="ds-skeleton" aria-label="Cargando"></span></div><small class="ds-stat__help">Últimos 365 días</small></div>
@@ -128,12 +128,102 @@ app.innerHTML = `<div class="ds-app">
       <div class="ds-table-wrap"><table class="ds-table ds-table--cards orders-table"><thead><tr><th>Producto</th><th>Cliente</th><th>ID pedido</th><th>Monto</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="order-rows"></tbody></table></div>
       
       <nav class="ds-pagination" id="orders-pagination" aria-label="Páginas de pedidos"><button class="ds-btn ds-btn--secondary" id="orders-prev" type="button">← Anterior</button><div class="ds-pages" id="orders-pages" aria-live="polite"></div><button class="ds-btn ds-btn--secondary" id="orders-next" type="button">Siguiente →</button></nav>
+    </section></div>
+    <section id="products-view" hidden aria-label="Gestión de productos">
+      <div class="ds-breadcrumb"><ol><li>Inicio</li><li aria-current="page">Productos</li></ol></div>
+      <header class="ds-page-header"><div><h1 class="ds-h1">Productos</h1><p>Administra el catálogo que se muestra en la tienda online.</p></div></header>
+      <div id="admin-loading" class="admin-loading ds-card" role="status">Cargando catálogo de productos…</div>
+      <div id="admin-app" hidden>
+        <span id="admin-user" class="ds-sr-only"></span><button type="button" id="admin-logout" hidden>Cerrar sesión</button>
+        <div class="admin-shell">
+<section class="admin-global-colors" id="admin-global-colors" hidden aria-labelledby="admin-global-colors-title">
+          <div class="admin-section-head"><div><h2 id="admin-global-colors-title">Colores maestros globales</h2><p>Esta paleta se aplicará a los productos que usen la opción “Paleta global”.</p></div><button class="admin-icon-button ds-btn ds-btn--ghost ds-btn--icon" type="button" id="admin-global-colors-close" aria-label="Cerrar colores">×</button></div>
+          <div class="admin-color-editor" id="admin-global-colors-list"></div>
+          <div class="admin-panel-actions"><button class="ds-btn ds-btn--secondary" type="button" id="admin-add-global-color">Agregar color</button><button class="ds-btn ds-btn--primary" type="button" id="admin-save-global-colors">Guardar paleta global</button></div>
+          <p class="admin-status" id="admin-global-colors-status" aria-live="polite"></p>
+        </section>
+        <section class="admin-dashboard admin-module" id="admin-dashboard-view" aria-labelledby="admin-products-title">
+          <div class="admin-section-head admin-section-divider"><div><h2 id="admin-products-title">Productos</h2><strong id="admin-product-count">0</strong></div><div class="admin-title-actions"><button class="ds-btn ds-btn--secondary" type="button" id="admin-colors-button">Colores maestros</button><button class="ds-btn ds-btn--primary" type="button" id="admin-create-button">Crear nuevo producto</button></div></div>
+          <div class="admin-filters">
+            <label class="ds-field">Buscar<input id="admin-search" type="search" placeholder="Por nombre, categoría o material"  class="ds-input"/></label>
+            <label class="ds-field">Categorías<select id="admin-filter-category" class="ds-select"><option value="">Todas las categorías</option></select></label>
+            <label class="ds-field">Origen<select id="admin-filter-origin" class="ds-select"><option value="">Todos</option><option value="kora">Kora Studio</option><option value="other">Otros</option></select></label>
+            <label class="ds-field">Estado<select id="admin-filter-status" class="ds-select"><option value="">Todos</option><option value="stock">En stock</option><option value="out">Sin stock</option><option value="draft">Borrador</option></select></label>
+            <label class="ds-field">Rango de precio<select id="admin-filter-price" class="ds-select"><option value="">Todos</option><option value="0-20000">Hasta $20.000</option><option value="20001-50000">$20.001 a $50.000</option><option value="50001-100000">$50.001 a $100.000</option><option value="100001+">Más de $100.000</option></select></label>
+          </div>
+          <div class="admin-product-table-head" aria-hidden="true"><span>Nombre del producto</span><span>Categoría</span><span>Estado</span><span>Medida</span><span>Vendidos</span><span>Precio</span><span>Precio anterior</span><span></span></div>
+          <div class="admin-list" id="admin-products-list"></div>
+          <nav class="admin-pagination" id="admin-pagination" aria-label="Paginación de productos"></nav>
+          <p class="admin-status" id="admin-list-status" aria-live="polite"></p>
+        </section>
+        <section class="admin-editor admin-module" id="admin-editor-view" hidden aria-labelledby="admin-form-title">
+          <div class="admin-section-head admin-section-divider">
+            <h2 id="admin-form-title">Nuevo producto</h2>
+            <div class="admin-editor-navigation" aria-label="Navegación del administrador">
+              <button class="ds-btn ds-btn--secondary" type="button" id="admin-cancel"><span aria-hidden="true">←</span>Volver al catálogo</button>
+              <button class="ds-btn ds-btn--secondary" type="button" data-admin-calculator><span aria-hidden="true">⌁</span>Cotizador 3D</button>
+            </div>
+          </div>
+          <form class="admin-product-form" id="product-admin-form">
+            <input type="hidden" id="admin-product-id" />
+            <div class="admin-form-column">
+              <label class="ds-field"><span>Nombre del producto <b aria-hidden="true">*</b></span><input id="admin-title" type="text" placeholder="Ej: Dije corazón rojo" required  class="ds-input"/></label>
+              <label class="ds-field">Descripción del producto<textarea id="admin-description" rows="7" placeholder="Describe el producto para mostrar esta información en la tienda" required class="ds-textarea"></textarea></label>
+              <label class="ds-field"><span>Precio <b aria-hidden="true">*</b></span><input id="admin-price" type="number" min="0" step="500" placeholder="$" required  class="ds-input"/></label>
+              <label class="ds-field">Precio anterior<input id="admin-compare" type="number" min="0" step="500" placeholder="$"  class="ds-input"/></label>
+              <label class="ds-field"><span>Stock <b aria-hidden="true">*</b></span><input id="admin-stock" type="number" min="0" value="0" required  class="ds-input"/></label>
+              <label class="admin-toggle"><input id="admin-custom" type="checkbox"  class="ds-check"/>¿El producto es personalizado?</label>
+              <p class="admin-field-help">Al activarlo, el comprador verá un campo de texto abierto “Agrega el nombre” por cada unidad.</p>
+              <section class="admin-associations" id="admin-product-components" hidden>
+                <div class="admin-inline-head">
+                  <h3>Items incluidos en el producto</h3>
+                  <button class="ds-btn ds-btn--secondary" type="button" id="admin-add-component" aria-expanded="false" aria-controls="admin-component-picker">Añadir producto</button>
+                </div>
+                <p>Define los dijes, accesorios o piezas asociadas y su cantidad.</p>
+                <div class="admin-component-picker" id="admin-component-picker" hidden>
+                  <div class="admin-component-picker-head">
+                    <label for="admin-component-search">Buscar en el catálogo</label>
+                    <button class="admin-icon-button ds-btn ds-btn--ghost ds-btn--icon" type="button" id="admin-close-component-picker" aria-label="Cerrar buscador de productos" title="Cerrar">×</button>
+                  </div>
+                  <input id="admin-component-search" type="search" placeholder="Buscar por nombre o categoría" autocomplete="off"  class="ds-input"/>
+                  <div class="admin-component-catalog" id="admin-component-catalog" role="listbox" aria-label="Productos del catálogo"></div>
+                </div>
+                <div id="admin-components"></div>
+              </section>
+            </div>
+            <div class="admin-form-column">
+              <input id="admin-product-type" type="hidden" value="dije" />
+              <label class="ds-field"><span>Categorías <b aria-hidden="true">*</b></span><select id="admin-category" required class="ds-select"><option value="">Selecciona una categoría</option><option value="Acrílicos">Acrílicos</option><option value="Bases">Bases</option><option value="Dijes">Dijes</option><option value="Dijes y kits">Dijes y kits</option><option value="Dijes y charms">Dijes y charms</option><option value="Dijes cover gold">Dijes cover gold</option><option value="Dijes de vidrio">Dijes de vidrio</option><option value="Dijes rodinados">Dijes rodinados</option><option value="Kits">Kits</option><option value="Llaveros">Llaveros</option></select></label>
+              <label class="ds-field"><span>Material <b aria-hidden="true">*</b></span><select id="admin-material" required class="ds-select"><option value="">Selecciona una</option><option value="Biocompostable">Biocompostable</option><option value="Resina">Resina</option><option value="other">Otro material</option></select></label>
+              <label class="admin-material-custom ds-field" id="admin-material-custom-field" hidden>Especifica el material<input id="admin-material-custom" type="text" maxlength="80" placeholder="Ej: Madera reciclada" autocomplete="off"  class="ds-input"/></label>
+              <fieldset class="admin-image-fieldset"><legend>Imágenes del producto</legend>
+                <input id="admin-image" type="hidden" />
+                <label class="admin-images-upload"><input id="admin-images-file" type="file" accept="image/png,image/jpeg,image/webp" multiple /><img class="admin-image-icon" src="assets/pet-camera.svg" alt="" aria-hidden="true" /><strong>Sube hasta 3 imágenes</strong><small>Selecciona una o varias imágenes al mismo tiempo</small></label>
+                <div class="admin-image-list" id="admin-image-list" aria-live="polite"></div>
+                <p class="admin-image-status" id="admin-image-status"></p>
+              </fieldset>
+              <label class="ds-field">Medida<input id="admin-size" type="text" placeholder="Ej: 30 x 34 mm"  class="ds-input"/></label>
+              <fieldset class="admin-color-fieldset"><legend>Colores disponibles</legend>
+                <div class="admin-color-modes"><label><input type="radio" name="admin-color-mode" value="none" checked  class="ds-check"/>Sin selección</label><label><input type="radio" name="admin-color-mode" value="global"  class="ds-check"/>Paleta global</label><label><input type="radio" name="admin-color-mode" value="manual"  class="ds-check"/>Paleta manual</label></div>
+                <p class="admin-field-help" id="admin-color-help">Úsalo para productos revendidos o con color fijo.</p>
+                <div class="admin-color-editor" id="admin-manual-colors-list" hidden></div><button class="ds-btn ds-btn--secondary" type="button" id="admin-add-manual-color" hidden>Agregar color</button>
+              </fieldset>
+              <label class="ds-field">Etiquetas adicionales<input id="admin-tags" type="text" placeholder="Regalo, edición limitada"  class="ds-input"/></label>
+              <label class="admin-toggle"><input id="admin-active" type="checkbox" checked  class="ds-check"/>Publicar en la tienda</label>
+            </div>
+            <div class="admin-form-actions"><button class="ds-btn ds-btn--secondary" type="button" id="admin-reset">Limpiar</button><button class="ds-btn ds-btn--primary" id="admin-submit" type="submit">Guardar</button><p class="admin-status" id="admin-status" aria-live="polite"></p></div>
+          </form>
+        </section>
+        
+        </div>
+      </div>
     </section>
   </main>
   <div class="ds-toasts"><div id="toast" role="status" aria-live="polite" hidden></div></div>
   <div id="order-drawer-root"></div>
 </div>`;
 const params=new URLSearchParams(location.search);
+const startView = params.get('view') === 'products' ? 'products' : 'orders';
 const allowedTabs=['all','new','printing','delivered','cancelled'];const requestedTab=params.get('tab');const filters={page:Math.max(1,Number(params.get('page'))||1),tab:allowedTabs.includes(requestedTab)?requestedTab:'all',q:params.get('q')||'',status:params.get('status')||'',from:params.get('from')||'',to:params.get('to')||''};
 const searchInput=document.getElementById('order-search'),statusInput=document.getElementById('order-status'),fromInput=document.getElementById('order-from'),toInput=document.getElementById('order-to');
 searchInput.value=filters.q;statusInput.value=filters.status;fromInput.value=filters.from;toInput.value=filters.to;
@@ -146,10 +236,14 @@ attachTabs(document.querySelector('.ds-tabs'),status=>{filters.tab=status;filter
 let searchTimer;searchInput.addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{filters.q=searchInput.value.trim();filters.page=1;loadOrders()},300)});
 for(const [input,key] of [[statusInput,'status'],[fromInput,'from'],[toInput,'to']])input.addEventListener('change',()=>{filters[key]=input.value;filters.page=1;loadOrders()});
 document.getElementById('orders-prev').addEventListener('click',()=>{if(filters.page>1){filters.page--;loadOrders()}});document.getElementById('orders-next').addEventListener('click',()=>{filters.page++;loadOrders()});
+document.querySelectorAll('[data-admin-section]').forEach(button=>button.addEventListener('click',()=>showAdminSection(button.dataset.adminSection)));
+document.getElementById('user-menu').addEventListener('click',async()=>{await authClient.auth.signOut({scope:'local'});window.KORA_ADMIN_SESSION=null;location.reload()});
 document.getElementById('global-search').addEventListener('click',()=>searchInput.focus());document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();searchInput.focus()}if(e.key==='Escape')closeMenu()});
 const sidebar=document.getElementById('sidebar'),overlay=document.getElementById('overlay');function closeMenu(){sidebar.classList.remove('is-open');overlay.classList.remove('is-open')};document.getElementById('open-menu').addEventListener('click',()=>{sidebar.classList.add('is-open');overlay.classList.add('is-open')});overlay.addEventListener('click',closeMenu);
 document.getElementById('store-toggle').addEventListener('click',e=>{const open=e.currentTarget.getAttribute('aria-expanded')==='true';e.currentTarget.setAttribute('aria-expanded',String(!open));document.getElementById('store-nav').hidden=open});
-loadOrders();
+showAdminSection(startView,false);
 loadMetrics();
+async function ensureProducts(){const loading=document.getElementById('admin-loading');try{if(!window.KORA_ADMIN_CLIENT){window.KORA_ADMIN_CLIENT=authClient;window.KORA_ADMIN_SESSION=session}if(!window.KORA_PRODUCTS_MODULE)window.KORA_PRODUCTS_MODULE=import(new URL('./js/products.js?v=20261110-products',location.href));await window.KORA_PRODUCTS_MODULE}catch(error){loading.hidden=false;loading.textContent='No se pudo cargar el catálogo: '+(error.message||'Intenta nuevamente.')}}
+function showAdminSection(view,updateUrl=true){const products=view==='products';document.getElementById('orders-view').hidden=products;document.getElementById('products-view').hidden=!products;document.querySelectorAll('[data-admin-section]').forEach(button=>{if(button.dataset.adminSection===view)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current')});if(updateUrl){const url=new URL(location.href);if(products)url.searchParams.set('view','products');else url.searchParams.delete('view');history.replaceState(null,'',url.pathname+url.search)}if(products)ensureProducts();else loadOrders()}
 async function loadMetrics(){try{const data=await getOrderMetrics();const money=new Intl.NumberFormat(CONFIG.locale,{style:'currency',currency:CONFIG.currency,maximumFractionDigits:0});for(const [key,value] of Object.entries({total:data.total||0,new:data.new||0,delivered:data.delivered||0,revenue:money.format(data.revenue||0)})){const target=document.querySelector('[data-metric="'+key+'"]');if(target)target.textContent=String(value)}document.querySelector('.ds-main .ds-stats')?.setAttribute('aria-busy','false')}catch(error){document.querySelectorAll('[data-metric]').forEach(el=>el.textContent='—');document.querySelector('.ds-main .ds-stats')?.setAttribute('aria-busy','false');showToast(error.message||'No se pudieron cargar las métricas.')}}
 }
