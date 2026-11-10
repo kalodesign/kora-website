@@ -70,6 +70,28 @@ Deno.serve(async (request) => {
   const supabase = getSupabaseAdmin();
   try {
     if (request.method === "GET") {
+      const url = new URL(request.url);
+      if (url.searchParams.get("view") === "orders") {
+        const page = Math.max(1, Math.min(10000, Number(url.searchParams.get("page")) || 1));
+        const pageSize = Math.max(1, Math.min(50, Number(url.searchParams.get("pageSize")) || 10));
+        const search = text(url.searchParams.get("q"), 100).replace(/[^\p{L}\p{N}@._#\-\s]/gu, " ").trim();
+        const tab = text(url.searchParams.get("tab"), 30);
+        const status = text(url.searchParams.get("status"), 30);
+        const from = text(url.searchParams.get("from"), 10);
+        const to = text(url.searchParams.get("to"), 10);
+        let query = supabase.from("orders").select("id,reference,created_at,updated_at,status,fulfillment_status,currency,subtotal,shipping,total,items,customer,payment_provider,wompi_payment_method", { count: "exact" }).order("created_at", { ascending: false });
+        if (tab === "new") query = query.eq("fulfillment_status", "pending");
+        if (tab === "printing") query = query.in("fulfillment_status", ["in_progress", "ready"]);
+        if (tab === "delivered") query = query.eq("fulfillment_status", "delivered");
+        if (tab === "cancelled") query = query.eq("fulfillment_status", "cancelled");
+        if (status && ["pending", "in_progress", "ready", "shipped", "delivered", "cancelled"].includes(status)) query = query.eq("fulfillment_status", status);
+        if (/^\\d{4}-\\d{2}-\\d{2}$/.test(from)) query = query.gte("created_at", new Date(from + "T00:00:00-05:00").toISOString());
+        if (/^\\d{4}-\\d{2}-\\d{2}$/.test(to)) query = query.lte("created_at", new Date(new Date(to + "T00:00:00-05:00").getTime() + 86400000 - 1).toISOString());
+        if (search) query = query.or("reference.ilike.*" + search + "*,search_document.ilike.*" + search + "*");
+        const { data, error, count } = await query.range((page - 1) * pageSize, page * pageSize - 1);
+        if (error) throw error;
+        return jsonResponse(request, { orders: data || [], count: count || 0, page, pageSize });
+      }
       const [banners, accounts, entries, quotes, tasks, orders, categories, analytics] = await Promise.all([
         supabase.from("site_banners").select("*").order("placement").order("sort_order"),
         supabase.from("finance_accounts").select("*").order("account_alias"),
