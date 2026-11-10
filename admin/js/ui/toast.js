@@ -1,0 +1,1 @@
+export function showToast(message){const toast=document.getElementById('toast');toast.textContent=message;toast.hidden=false;toast.classList.add('toast');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>{toast.hidden=true},3200)}
