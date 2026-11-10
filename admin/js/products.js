@@ -1,9 +1,8 @@
 (() => {
   const config = window.KORA_CONFIG || {};
-  const client = config.supabaseUrl && config.supabaseAnonKey && window.supabase
-    ? window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey) : null;
+  const client = window.KORA_ADMIN_CLIENT || (config.supabaseUrl && config.supabaseAnonKey && window.supabase
+    ? window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey) : null);
   const endpoint = (name) => window.koraEndpoint?.(name, "") || "";
-  const privateDoor = "acceso-kora.html?destino=productos";
   const lastViewKey = "kora_admin_last_view";
   const state = { products: [], session: null, components: [], manualColors: [], globalColors: [], productImages: [], page: 1, perPage: 10 };
   const $ = (selector) => document.querySelector(selector);
@@ -268,18 +267,21 @@
     const data = await api(); state.products = data.products || []; state.globalColors = data.globalColors || [];
     renderCategoryFilter(); renderList(); renderComponents(); renderColors("global"); updateColorMode();
   };
-  const denyAccess = async () => {
-    await client?.auth.signOut({ scope: "local" }); sessionStorage.clear(); window.location.replace(privateDoor);
+  const denyAccess = async (error) => {
+    ui.loading.hidden = false;
+    ui.loading.textContent = error?.message || "No se pudo cargar el catálogo. Revisa tu conexión y vuelve a intentarlo.";
   };
   const showApp = async (session) => {
     state.session = session;
+    window.KORA_ADMIN_SESSION = session;
     try { await load(); ui.user.textContent = session.user.email; ui.loading.hidden = true; ui.app.hidden = false; }
-    catch { await denyAccess(); }
+    catch (error) { await denyAccess(error); }
   };
   if (!client) { ui.loading.textContent = "Falta configurar el acceso seguro."; return; }
-  client.auth.getSession().then(({ data }) => data.session ? showApp(data.session) : denyAccess()).catch(denyAccess);
+  if (window.KORA_ADMIN_SESSION) showApp(window.KORA_ADMIN_SESSION);
+  else client.auth.getSession().then(({ data }) => data.session ? showApp(data.session) : denyAccess(new Error("Inicia sesión para administrar el catálogo."))).catch(denyAccess);
 
-  ui.logout.addEventListener("click", async () => { localStorage.removeItem(lastViewKey); await client.auth.signOut({ scope: "local" }); window.location.replace("acceso-kora.html"); });
+  ui.logout?.addEventListener("click", async () => { localStorage.removeItem(lastViewKey); await client.auth.signOut({ scope: "local" }); window.KORA_ADMIN_SESSION = null; window.location.reload(); });
   document.querySelectorAll("[data-admin-calculator]").forEach((button) => button.addEventListener("click", () => window.location.assign("calculadora/index.html?origen=admin")));
   ui.create.addEventListener("click", () => { resetForm(); showEditor(); }); ui.cancel.addEventListener("click", showDashboard); ui.reset.addEventListener("click", resetForm);
   ui.search.addEventListener("input", () => { state.page = 1; renderList(); });
