@@ -77,6 +77,8 @@ Deno.serve(async (request) => {
   const supabase = getSupabaseAdmin();
   try {
     if (request.method === "GET") {
+      const analyticsDays = Math.max(1, Math.min(365, Number(new URL(request.url).searchParams.get("analytics_days")) || 90));
+      const analyticsSince = new Date(Date.now() - (analyticsDays - 1) * 86400000).toISOString().slice(0, 10);
       const url = new URL(request.url);
       if (url.searchParams.get("view") === "metrics") {
         const { data, error } = await supabase.rpc("admin_order_metrics");
@@ -124,7 +126,7 @@ Deno.serve(async (request) => {
         supabase.from("production_tasks").select("*").order("due_date", { ascending: true, nullsFirst: false }).order("created_at", { ascending: false }).limit(200),
         supabase.from("orders").select("id,reference,created_at,status,fulfillment_status,currency,subtotal,shipping,total,items,customer,payment_provider,wompi_payment_method").order("created_at", { ascending: false }).limit(500),
         supabase.from("site_home_categories").select("*").order("sort_order"),
-        supabase.from("site_analytics_daily").select("day,source,page,views").gte("day", new Date(Date.now() - 89 * 86400000).toISOString().slice(0, 10)).order("day", { ascending: false })
+        supabase.from("site_analytics_daily").select("day,source,page,device,views").gte("day", analyticsSince).order("day", { ascending: false })
       ]);
       for (const result of [banners, accounts, entries, quotes, tasks]) if (result.error) throw result.error;
       let orderRows = orders.data || [];

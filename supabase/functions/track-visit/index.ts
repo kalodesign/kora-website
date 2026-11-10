@@ -15,6 +15,7 @@ const classifyCampaign = (source: string) => {
   if (["instagram", "ig"].includes(value)) return "instagram";
   if (["facebook", "fb", "meta"].includes(value)) return "facebook";
   if (["tiktok", "pinterest", "youtube", "x", "twitter"].includes(value)) return "other_social";
+  if (["direct", "organic_search", "instagram", "facebook", "other_social", "referral"].includes(value)) return value;
   return "";
 };
 
@@ -27,11 +28,12 @@ Deno.serve(async (request) => {
   if (limited) return limited;
   if (oversized) return oversized;
   try {
-    const payload = await request.json() as { page?: unknown; referrerHost?: unknown; campaignSource?: unknown };
-    const page = String(payload.page || "/").slice(0, 100).replace(/[^a-zA-Z0-9/_-]/g, "");
+    const payload = await request.json() as { page?: unknown; referrerHost?: unknown; campaignSource?: unknown; device?: unknown };
+    const page = String(payload.page || "/").slice(0, 100).replace(/[^a-zA-Z0-9/_.-]/g, "") || "/";
     const referrerHost = String(payload.referrerHost || "").slice(0, 120).replace(/[^a-zA-Z0-9.-]/g, "");
     const source = classifyCampaign(String(payload.campaignSource || "")) || classify(referrerHost);
-    const { error } = await getSupabaseAdmin().rpc("track_site_visit", { p_source: source, p_page: page || "/" });
+    const device = ["mobile", "desktop"].includes(String(payload.device || "")) ? String(payload.device) : "unknown";
+    const { error } = await getSupabaseAdmin().rpc("track_site_visit", { p_source: source, p_page: page, p_device: device });
     if (error) throw error;
     return jsonResponse(request, { ok: true });
   } catch (error) {
