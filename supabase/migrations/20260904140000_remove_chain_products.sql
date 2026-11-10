@@ -1,0 +1,1 @@
+-- Legacy product deletion intentionally disabled in this release.\n-- The current product catalog and kit components are preserved.\n

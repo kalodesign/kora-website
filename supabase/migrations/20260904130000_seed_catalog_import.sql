@@ -1,0 +1,1 @@
+-- Historical catalog import intentionally omitted from this public release.\n-- Current storefront products are loaded through the idempotent catalog seed migration.\n

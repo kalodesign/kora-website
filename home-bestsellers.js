@@ -1,4 +1,4 @@
-(() => {
+(async () => {
   const track = document.querySelector("#best-sellers-track");
   if (!track) return;
 
@@ -30,7 +30,7 @@
   const money = value => new Intl.NumberFormat("es-CO", {
     style: "currency", currency: "COP", maximumFractionDigits: 0
   }).format(value);
-  const products = window.KORA_PRODUCTS || [];
+  let products = window.KORA_PRODUCTS || [];\n  const catalogUrl = window.koraEndpoint?.("catalog", "");\n  if (catalogUrl) {\n    try {\n      const response = await fetch(catalogUrl, { cache: "no-store" });\n      const payload = response.ok ? await response.json() : null;\n      if (Array.isArray(payload?.products)) products = payload.products;\n    } catch {}\n  }
   const escape = value => String(value ?? "").replace(/[&<>"']/g, char => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
   })[char]);
