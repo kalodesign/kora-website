@@ -1,5 +1,8 @@
 window.KORA_CONFIG = Object.freeze({
-  supabaseFunctionsUrl: "https://hapveghsbqnhkeuraxow.supabase.co/functions/v1"
+  supabaseFunctionsUrl: "https://hapveghsbqnhkeuraxow.supabase.co/functions/v1",
+  supabaseUrl: "https://hapveghsbqnhkeuraxow.supabase.co",
+  supabaseAnonKey: "sb_publishable_Hl7EO14GkByGlYP1Q6if8g_tx2lIRlr",
+  fallbackShippingCop: 20000
 });
 
 window.koraEndpoint = (function createEndpointResolver() {

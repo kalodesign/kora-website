@@ -4,90 +4,174 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Kora Studio | Admin productos</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>Kora Studio | Administrador de productos</title>
+    <link rel="stylesheet" href="styles.css?v=20260920-product-origin2" />
+    <link rel="stylesheet" href="admin-enhancements.css?v=20261110-admin1" />
+    <link rel="stylesheet" href="admin-refresh.css?v=20261110-admin2" />
+    <link rel="stylesheet" href="admin-extra.css?v=20261110-admin3" />
   </head>
   <body class="admin-page">
-    <header class="site-header">
-      <nav class="main-nav" aria-label="Navegación privada">
-        <a class="brand" href="index.html" aria-label="Kora Studio inicio">
-          <img src="assets/icon-06.svg" alt="Kora" />
-        </a>
-        <div class="nav-menu">
-          <a href="index.html">Volver al sitio</a>
-          <a class="active" href="admin-productos.html">Admin productos</a>
-        </div>
-      </nav>
-    </header>
-
-    <main class="admin-shell">
-      <section class="admin-hero">
-        <p>Privado</p>
-        <h1>Administrador de productos</h1>
-        <span>Agrega, edita y exporta los productos que alimentan Hazlo tú mismo.</span>
-      </section>
-
-      <section class="admin-grid">
-        <form class="admin-form" id="product-admin-form">
-          <input type="hidden" id="admin-product-id" />
-          <label>
-            Título
-            <input id="admin-title" type="text" placeholder="Dije corazón rojo" required />
-          </label>
-          <label>
-            Categoría
-            <input id="admin-category" type="text" placeholder="Dijes" required />
-          </label>
-          <label>
-            Imagen
-            <input id="admin-image" type="text" placeholder="assets/image-12.png" required />
-          </label>
-          <label>
-            Subir imagen como dato local
-            <input id="admin-image-file" type="file" accept="image/*" />
-          </label>
-          <label>
-            Descripción breve
-            <textarea id="admin-description" rows="4" placeholder="Texto corto para la tarjeta y el detalle" required></textarea>
-          </label>
-          <div class="admin-row">
-            <label>
-              Medida
-              <input id="admin-size" type="text" placeholder="30x34 mm" />
-            </label>
-            <label>
-              Stock
-              <input id="admin-stock" type="number" min="0" value="0" />
-            </label>
+    <section class="admin-loading" id="admin-loading" aria-live="polite">Validando acceso seguro...</section>
+    <div id="admin-app" hidden>
+      <header class="admin-header">
+        <a href="index.html" aria-label="Kora Studio inicio"><img src="assets/icon-06.svg" alt="Kora" /></a>
+        <button class="admin-logout" type="button" id="admin-logout"><span aria-hidden="true">↪</span>Cerrar sesión</button>
+      </header>
+      <div class="admin-workspace">
+        <aside class="admin-sidebar" aria-label="Menú administrativo">
+          <a class="admin-sidebar-brand" href="index.html" aria-label="Ver tienda Kora"><img src="assets/icon-06.svg" alt="Kora" /></a>
+          <nav class="admin-side-nav">
+            <p>Administración</p>
+            <button class="active" type="button" data-admin-view="overview"><span aria-hidden="true">▦</span>Resumen</button>
+            <button type="button" data-admin-view="tasks"><span aria-hidden="true">▤</span>Producción</button>
+            <button type="button" data-admin-view="banners"><span aria-hidden="true">▧</span>Banners del sitio</button>
+            <button type="button" data-admin-view="finance"><span aria-hidden="true">◔</span>Finanzas</button>
+            <p>Catálogo</p>
+            <button type="button" data-admin-view="products"><span aria-hidden="true">▤</span>Productos</button>
+            <button class="admin-side-link" type="button" data-admin-calculator><span aria-hidden="true">⌁</span>Cotizador 3D</button>
+          </nav>
+          <div class="admin-sidebar-footer"><a href="index.html" target="_blank" rel="noopener noreferrer">Ver sitio público ↗</a><button class="admin-logout" type="button" data-admin-logout><span aria-hidden="true">↪</span>Cerrar sesión</button></div>
+        </aside>
+        <main class="admin-shell">
+        <div class="admin-titlebar"><div><p id="admin-user"></p><h1>Administrador de Kora</h1></div></div>
+        <section class="admin-overview admin-module" id="admin-overview-view" aria-labelledby="admin-overview-title">
+          <div class="admin-section-head admin-section-divider"><div><p class="admin-section-kicker">Vista general</p><h2 id="admin-overview-title">Así va Kora hoy</h2></div></div>
+          <div class="admin-metric-grid">
+            <article><span>Ingresos del mes</span><strong id="admin-metric-income">$0</strong><small id="admin-metric-income-note">Sin movimientos registrados</small></article>
+            <article><span>Gastos del mes</span><strong id="admin-metric-expense">$0</strong><small id="admin-metric-expense-note">Sin movimientos registrados</small></article>
+            <article><span>Resultado del mes</span><strong id="admin-metric-balance">$0</strong><small id="admin-metric-balance-note">Ingresos menos gastos</small></article>
+            <article><span>Cotizaciones activas</span><strong id="admin-metric-quotes">0</strong><small>En borrador o enviadas</small></article>
           </div>
-          <div class="admin-row">
-            <label>
-              Precio
-              <input id="admin-price" type="number" min="0" step="500" required />
-            </label>
-            <label>
-              Precio antes
-              <input id="admin-compare" type="number" min="0" step="500" />
-            </label>
+          <div class="admin-overview-grid admin-overview-chart-only"><section class="admin-panel"><div class="admin-panel-head"><h3>Flujo mensual</h3><span>Últimos 6 meses</span></div><div class="admin-bar-chart" id="admin-finance-chart" aria-label="Gráfico de ingresos y gastos"></div></section></div>
+        </section>
+        <section class="admin-module" id="admin-banners-view" hidden aria-labelledby="admin-banners-title">
+          <div class="admin-section-head admin-section-divider"><div><p class="admin-section-kicker">Contenido público</p><h2 id="admin-banners-title">Banners del sitio</h2><p>Administra imágenes para inicio, llaveros y mascotas, con versiones para escritorio y móvil. Los cambios se reflejan en las ubicaciones conectadas.</p></div></div>
+          <div class="admin-business-grid"><form class="admin-panel admin-business-form" id="admin-banner-form"><input type="hidden" id="admin-banner-id" /><label>Título interno<input id="admin-banner-title" type="text" placeholder="Ej: Campaña septiembre" required /></label><label>Ubicación<select id="admin-banner-placement"><option value="llaveros_hero">Encabezado de llaveros</option><option value="home_hero">Inicio</option><option value="mascotas_hero">Mascotas</option></select></label><label>Imagen desktop<input id="admin-banner-desktop" type="file" accept="image/png,image/jpeg,image/webp" required /><small id="admin-banner-desktop-name">PNG, JPG o WEBP. Máximo 8 MB.</small></label><label>Imagen mobile<input id="admin-banner-mobile" type="file" accept="image/png,image/jpeg,image/webp" /><small id="admin-banner-mobile-name">Opcional; se recomienda formato vertical.</small></label><label>Texto alternativo<input id="admin-banner-alt" type="text" placeholder="Describe el banner para lectores de pantalla" required /></label><label>Enlace al hacer clic<input id="admin-banner-link" type="text" placeholder="hazlotumismo.html o https://..." /></label><label>Orden<input id="admin-banner-order" type="number" min="0" value="0" /></label><label class="admin-toggle"><input id="admin-banner-active" type="checkbox" checked />Banner activo</label><div class="admin-form-actions"><button class="button button-secondary" id="admin-banner-reset" type="button">Limpiar</button><button class="button button-primary" type="submit">Guardar banner</button></div><p class="admin-status" id="admin-banner-status" aria-live="polite"></p></form><section class="admin-panel"><div class="admin-panel-head"><h3>Banners guardados</h3><span id="admin-banner-count">0</span></div><div class="admin-banner-list" id="admin-banner-list"></div></section></div>
+        </section>
+        <section class="admin-module" id="admin-finance-view" hidden aria-labelledby="admin-finance-title">
+          <div class="admin-section-head admin-section-divider"><div><p class="admin-section-kicker">Control interno</p><h2 id="admin-finance-title">Finanzas</h2><p>Registra ingresos y gastos manualmente. Por seguridad, las cuentas solo guardan un alias y los últimos cuatro dígitos.</p></div></div>
+          <div class="admin-finance-summary"><article><span>Ingresos</span><strong id="admin-finance-income">$0</strong></article><article><span>Gastos</span><strong id="admin-finance-expense">$0</strong></article><article><span>Disponible</span><strong id="admin-finance-balance">$0</strong></article></div>
+          <div class="admin-business-grid"><form class="admin-panel admin-business-form" id="admin-entry-form">
+            <section class="finance-capture" aria-labelledby="finance-capture-title">
+              <div class="finance-capture-heading"><div><p>Registro rápido</p><h3 id="finance-capture-title">Leer desde imagen</h3></div><img src="assets/pet-camera.svg" alt="" aria-hidden="true" /></div>
+              <label class="finance-capture-upload" id="finance-capture-upload"><input id="admin-entry-image" type="file" accept="image/png,image/jpeg,image/webp" capture="environment" /><span>Tomar foto o subir captura</span><small>La imagen se analiza en este dispositivo y no se guarda.</small></label>
+              <div class="finance-capture-preview" id="finance-capture-preview" hidden><img id="finance-capture-preview-image" alt="Vista previa del comprobante" /><button type="button" id="finance-capture-remove" aria-label="Quitar imagen">×</button></div>
+              <p class="admin-status" id="finance-capture-status" aria-live="polite"></p>
+              <details class="finance-capture-text" id="finance-capture-text" hidden><summary>Texto detectado</summary><textarea id="finance-capture-raw-text" rows="5" readonly></textarea></details>
+            </section>
+            <h3>Nuevo movimiento</h3><label>Tipo<select id="admin-entry-type"><option value="income">Ingreso</option><option value="expense">Gasto</option></select></label><label>Categoría<input id="admin-entry-category" list="admin-entry-categories" placeholder="Ej: Materiales" required /><datalist id="admin-entry-categories"><option value="Ventas"><option value="Materiales"><option value="Envíos"><option value="Comisiones Wompi"><option value="Publicidad"><option value="Herramientas"><option value="Otros"></datalist></label><label>Valor<input id="admin-entry-amount" type="number" min="1" step="1" inputmode="numeric" placeholder="0" required /></label><label>Fecha<input id="admin-entry-date" type="date" required /></label><label>Cuenta<select id="admin-entry-account"><option value="">Sin cuenta asociada</option></select></label><label>Método de pago<input id="admin-entry-method" placeholder="Efectivo, Wompi, transferencia..." /></label><label>Referencia<input id="admin-entry-reference" placeholder="Pedido, factura o comprobante" /></label><label>Nota<textarea id="admin-entry-note" rows="3" placeholder="Detalle opcional"></textarea></label><div class="admin-form-actions"><button class="button button-primary" type="submit">Guardar movimiento</button></div><p class="admin-status" id="admin-entry-status" aria-live="polite"></p></form><section class="admin-panel admin-finance-side"><form class="admin-account-form" id="admin-account-form"><h3>Cuentas de referencia</h3><label>Entidad bancaria<input id="admin-account-bank" placeholder="Ej: Nequi" required /></label><label>Nombre interno<input id="admin-account-alias" placeholder="Ej: Cuenta ventas" required /></label><label>Últimos 4 dígitos<input id="admin-account-last-four" inputmode="numeric" maxlength="4" placeholder="0000" /></label><button class="button button-secondary" type="submit">Guardar cuenta</button><p class="admin-status" id="admin-account-status" aria-live="polite"></p></form><div class="admin-account-list" id="admin-account-list"></div></section></div>
+          <section class="admin-panel admin-finance-ledger"><div class="admin-panel-head"><h3>Movimientos recientes</h3><span id="admin-entry-count">0</span></div><div id="admin-entry-list"></div></section>
+        </section>
+        <section class="admin-module admin-task-board" id="admin-tasks-view" hidden aria-labelledby="admin-tasks-title">
+          <div class="admin-section-head admin-section-divider"><div><p class="admin-section-kicker">Producción</p><h2 id="admin-tasks-title">Pedidos</h2><p>Organiza cada pedido y mueve su tarjeta cuando cambie de etapa.</p></div><button class="button button-primary" type="button" id="admin-task-new">Nueva tarea</button></div>
+          <form class="admin-task-form" id="admin-task-form" hidden>
+            <input id="admin-task-id" type="hidden" />
+            <div class="admin-task-form-head"><div><h3 id="admin-task-form-title">Nuevo pedido</h3><p>Agrega la referencia que usarás durante la producción.</p></div><button class="admin-icon-button" id="admin-task-cancel" type="button" aria-label="Cerrar formulario">×</button></div>
+            <label>Nombre del pedido<input id="admin-task-title" type="text" placeholder="Ej: Llavero personalizado de Luna" required /></label>
+            <label>Cliente<input id="admin-task-customer" type="text" placeholder="Ej: Valentina Gómez" /></label>
+            <label>Pedido o referencia<input id="admin-task-reference" type="text" placeholder="Ej: #KORA-1042" /></label>
+            <label>Fecha de entrega<input id="admin-task-date" type="date" /></label>
+            <label>Tipo de llavero<select id="admin-task-product-type"><option value="personalized">Llavero personalizado</option><option value="pet">Llavero mascotas</option></select></label>
+            <label>Estado de pago<select id="admin-task-payment-status"><option value="due">Debe</option><option value="paid">Pagado</option></select></label>
+            <label>Entrega<select id="admin-task-delivery-status"><option value="shipping">Por enviar</option><option value="cash_on_delivery">Contraentrega</option></select></label>
+            <label class="admin-full-field">Notas<textarea id="admin-task-notes" rows="3" placeholder="Colores, nombres, detalles de producción..."></textarea></label>
+            <label class="admin-task-image-field">Imagen de referencia<input id="admin-task-image" type="file" accept="image/png,image/jpeg,image/webp" /><span>Sube una foto de la mascota o referencia</span><small>PNG, JPG o WEBP. Máximo 8 MB.</small></label>
+            <div class="admin-task-image-preview" id="admin-task-image-preview" hidden><img id="admin-task-image-preview-image" alt="Vista previa de referencia" /><button id="admin-task-image-remove" type="button" aria-label="Quitar imagen">×</button></div>
+            <div class="admin-form-actions"><button class="button button-secondary" id="admin-task-reset" type="button">Limpiar</button><button class="button button-primary" type="submit">Guardar tarea</button></div>
+            <p class="admin-status" id="admin-task-status-message" aria-live="polite"></p>
+          </form>
+          <div class="admin-kanban" id="admin-kanban" aria-live="polite">
+            <section class="admin-kanban-column" data-task-dropzone="pending"><header><div><span class="admin-kanban-dot pending"></span><h3>Pendiente</h3></div><strong id="admin-task-count-pending">0</strong></header><div class="admin-kanban-list" id="admin-task-list-pending"></div></section>
+            <section class="admin-kanban-column" data-task-dropzone="in_progress"><header><div><span class="admin-kanban-dot in-progress"></span><h3>En proceso</h3></div><strong id="admin-task-count-in-progress">0</strong></header><div class="admin-kanban-list" id="admin-task-list-in-progress"></div></section>
+            <section class="admin-kanban-column" data-task-dropzone="done"><header><div><span class="admin-kanban-dot done"></span><h3>Finalizado</h3></div><strong id="admin-task-count-done">0</strong></header><div class="admin-kanban-list" id="admin-task-list-done"></div></section>
           </div>
-          <div class="admin-actions">
-            <button class="button button-primary" type="submit">Guardar producto</button>
-            <button class="button mascotas-dark-button" type="button" id="admin-reset">Nuevo</button>
+        </section>
+        <section class="admin-global-colors" id="admin-global-colors" hidden aria-labelledby="admin-global-colors-title">
+          <div class="admin-section-head"><div><h2 id="admin-global-colors-title">Colores maestros globales</h2><p>Esta paleta se aplicará a los productos que usen la opción “Paleta global”.</p></div><button class="admin-icon-button" type="button" id="admin-global-colors-close" aria-label="Cerrar colores">×</button></div>
+          <div class="admin-color-editor" id="admin-global-colors-list"></div>
+          <div class="admin-panel-actions"><button class="button button-secondary" type="button" id="admin-add-global-color">Agregar color</button><button class="button button-primary" type="button" id="admin-save-global-colors">Guardar paleta global</button></div>
+          <p class="admin-status" id="admin-global-colors-status" aria-live="polite"></p>
+        </section>
+        <section class="admin-dashboard admin-module" id="admin-dashboard-view" hidden aria-labelledby="admin-products-title">
+          <div class="admin-section-head admin-section-divider"><div><h2 id="admin-products-title">Productos</h2><strong id="admin-product-count">0</strong></div><div class="admin-title-actions"><button class="button button-secondary" type="button" id="admin-colors-button">Colores maestros</button><button class="button button-primary" type="button" id="admin-create-button">Crear nuevo producto</button></div></div>
+          <div class="admin-filters">
+            <label>Buscar<input id="admin-search" type="search" placeholder="Por nombre, categoría o material" /></label>
+            <label>Categorías<select id="admin-filter-category"><option value="">Todas las categorías</option></select></label>
+            <label>Origen<select id="admin-filter-origin"><option value="">Todos</option><option value="kora">Kora Studio</option><option value="other">Otros</option></select></label>
+            <label>Estado<select id="admin-filter-status"><option value="">Todos</option><option value="stock">En stock</option><option value="out">Sin stock</option><option value="draft">Borrador</option></select></label>
+            <label>Rango de precio<select id="admin-filter-price"><option value="">Todos</option><option value="0-20000">Hasta $20.000</option><option value="20001-50000">$20.001 a $50.000</option><option value="50001-100000">$50.001 a $100.000</option><option value="100001+">Más de $100.000</option></select></label>
           </div>
-          <p class="admin-status" id="admin-status"></p>
-        </form>
-
-        <div class="admin-list-panel">
-          <div class="admin-list-head">
-            <h2>Productos cargados</h2>
-            <button class="button mascotas-dark-button" type="button" id="admin-export">Exportar JSON</button>
-          </div>
+          <div class="admin-product-table-head" aria-hidden="true"><span>Nombre del producto</span><span>Categoría</span><span>Estado</span><span>Medida</span><span>Vendidos</span><span>Precio</span><span>Precio anterior</span><span></span></div>
           <div class="admin-list" id="admin-products-list"></div>
-        </div>
-      </section>
-    </main>
-
-    <script src="products.js"></script>
-    <script src="admin-products.js"></script>
+          <nav class="admin-pagination" id="admin-pagination" aria-label="Paginación de productos"></nav>
+          <p class="admin-status" id="admin-list-status" aria-live="polite"></p>
+        </section>
+        <section class="admin-editor admin-module" id="admin-editor-view" hidden aria-labelledby="admin-form-title">
+          <div class="admin-section-head admin-section-divider">
+            <h2 id="admin-form-title">Nuevo producto</h2>
+            <div class="admin-editor-navigation" aria-label="Navegación del administrador">
+              <button class="button button-secondary" type="button" id="admin-cancel"><span aria-hidden="true">←</span>Volver al catálogo</button>
+              <button class="button button-secondary" type="button" data-admin-calculator><span aria-hidden="true">⌁</span>Cotizador 3D</button>
+            </div>
+          </div>
+          <form class="admin-product-form" id="product-admin-form">
+            <input type="hidden" id="admin-product-id" />
+            <div class="admin-form-column">
+              <label><span>Nombre del producto <b aria-hidden="true">*</b></span><input id="admin-title" type="text" placeholder="Ej: Dije corazón rojo" required /></label>
+              <label>Descripción del producto<textarea id="admin-description" rows="7" placeholder="Describe el producto para mostrar esta información en la tienda" required></textarea></label>
+              <label><span>Precio <b aria-hidden="true">*</b></span><input id="admin-price" type="number" min="0" step="500" placeholder="$" required /></label>
+              <label>Precio anterior<input id="admin-compare" type="number" min="0" step="500" placeholder="$" /></label>
+              <label><span>Stock <b aria-hidden="true">*</b></span><input id="admin-stock" type="number" min="0" value="0" required /></label>
+              <label class="admin-toggle"><input id="admin-custom" type="checkbox" />¿El producto es personalizado?</label>
+              <p class="admin-field-help">Al activarlo, el comprador verá un campo de texto abierto “Agrega el nombre” por cada unidad.</p>
+              <section class="admin-associations" id="admin-product-components" hidden>
+                <div class="admin-inline-head">
+                  <h3>Items incluidos en el producto</h3>
+                  <button class="button button-secondary" type="button" id="admin-add-component" aria-expanded="false" aria-controls="admin-component-picker">Añadir producto</button>
+                </div>
+                <p>Define los dijes, accesorios o piezas asociadas y su cantidad.</p>
+                <div class="admin-component-picker" id="admin-component-picker" hidden>
+                  <div class="admin-component-picker-head">
+                    <label for="admin-component-search">Buscar en el catálogo</label>
+                    <button class="admin-icon-button" type="button" id="admin-close-component-picker" aria-label="Cerrar buscador de productos" title="Cerrar">×</button>
+                  </div>
+                  <input id="admin-component-search" type="search" placeholder="Buscar por nombre o categoría" autocomplete="off" />
+                  <div class="admin-component-catalog" id="admin-component-catalog" role="listbox" aria-label="Productos del catálogo"></div>
+                </div>
+                <div id="admin-components"></div>
+              </section>
+            </div>
+            <div class="admin-form-column">
+              <input id="admin-product-type" type="hidden" value="dije" />
+              <label><span>Categorías <b aria-hidden="true">*</b></span><select id="admin-category" required><option value="">Selecciona una categoría</option><option value="Acrílicos">Acrílicos</option><option value="Bases">Bases</option><option value="Dijes">Dijes</option><option value="Dijes y kits">Dijes y kits</option><option value="Dijes y charms">Dijes y charms</option><option value="Dijes cover gold">Dijes cover gold</option><option value="Dijes de vidrio">Dijes de vidrio</option><option value="Dijes rodinados">Dijes rodinados</option><option value="Kits">Kits</option><option value="Llaveros">Llaveros</option></select></label>
+              <label><span>Material <b aria-hidden="true">*</b></span><select id="admin-material" required><option value="">Selecciona una</option><option value="Biocompostable">Biocompostable</option><option value="Resina">Resina</option><option value="other">Otro material</option></select></label>
+              <label class="admin-material-custom" id="admin-material-custom-field" hidden>Especifica el material<input id="admin-material-custom" type="text" maxlength="80" placeholder="Ej: Madera reciclada" autocomplete="off" /></label>
+              <fieldset class="admin-image-fieldset"><legend>Imágenes del producto</legend>
+                <input id="admin-image" type="hidden" />
+                <label class="admin-images-upload"><input id="admin-images-file" type="file" accept="image/png,image/jpeg,image/webp" multiple /><img class="admin-image-icon" src="assets/pet-camera.svg" alt="" aria-hidden="true" /><strong>Sube hasta 3 imágenes</strong><small>Selecciona una o varias imágenes al mismo tiempo</small></label>
+                <div class="admin-image-list" id="admin-image-list" aria-live="polite"></div>
+                <p class="admin-image-status" id="admin-image-status"></p>
+              </fieldset>
+              <label>Medida<input id="admin-size" type="text" placeholder="Ej: 30 x 34 mm" /></label>
+              <fieldset class="admin-color-fieldset"><legend>Colores disponibles</legend>
+                <div class="admin-color-modes"><label><input type="radio" name="admin-color-mode" value="none" checked />Sin selección</label><label><input type="radio" name="admin-color-mode" value="global" />Paleta global</label><label><input type="radio" name="admin-color-mode" value="manual" />Paleta manual</label></div>
+                <p class="admin-field-help" id="admin-color-help">Úsalo para productos revendidos o con color fijo.</p>
+                <div class="admin-color-editor" id="admin-manual-colors-list" hidden></div><button class="button button-secondary" type="button" id="admin-add-manual-color" hidden>Agregar color</button>
+              </fieldset>
+              <label>Etiquetas adicionales<input id="admin-tags" type="text" placeholder="Regalo, edición limitada" /></label>
+              <label class="admin-toggle"><input id="admin-active" type="checkbox" checked />Publicar en la tienda</label>
+            </div>
+            <div class="admin-form-actions"><button class="button button-secondary" type="button" id="admin-reset">Limpiar</button><button class="button button-primary" id="admin-submit" type="submit">Guardar</button><p class="admin-status" id="admin-status" aria-live="polite"></p></div>
+          </form>
+        </section>
+        </main>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="config.js"></script>
+    <script src="admin-products.js?v=20260920-product-origin2"></script>
+    <script src="admin-business.js?v=20261110-admin-view3"></script>
+    <script src="admin-enhancements.js?v=20261110-admin1"></script>
   </body>
 </html>

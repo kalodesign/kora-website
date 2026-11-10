@@ -7,5 +7,35 @@ verify_jwt = false
 [functions.checkout-wompi]
 verify_jwt = false
 
+[functions.checkout-cod]
+verify_jwt = false
+
+[functions.shipping-quote]
+verify_jwt = false
+
+[functions.catalog]
+verify_jwt = false
+
+[functions.whatsapp-import]
+verify_jwt = false
+
+[functions.admin-catalog]
+verify_jwt = false
+
+[functions.admin-product-image]
+verify_jwt = false
+
 [functions.wompi-webhook]
+verify_jwt = false
+
+[functions.site-content]
+verify_jwt = false
+
+[functions.track-visit]
+verify_jwt = false
+
+[functions.admin-business]
+verify_jwt = false
+
+[functions.admin-banner-image]
 verify_jwt = false

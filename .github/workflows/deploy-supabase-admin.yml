@@ -1,0 +1,50 @@
+name: Publicar backend del admin Kora
+
+on:
+  push:
+    branches: [main, codex/admin-refresh-release]
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/deploy-supabase-admin.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kora-supabase-release
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_REF: hapveghsbqnhkeuraxow
+    steps:
+      - name: Descargar cambios
+        uses: actions/checkout@v4
+
+      - name: Validar credenciales sin imprimirlas
+        shell: bash
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN" || { echo "::error::Falta configurar el secreto SUPABASE_ACCESS_TOKEN en GitHub Actions."; exit 1; }
+          test -n "$SUPABASE_DB_PASSWORD" || { echo "::error::Falta configurar el secreto SUPABASE_DB_PASSWORD en GitHub Actions."; exit 1; }
+
+      - name: Instalar Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Aplicar migraciones del panel
+        run: |
+          supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+          supabase db push --yes
+
+      - name: Desplegar funciones
+        shell: bash
+        run: |
+          for fn in catalog admin-catalog admin-product-image admin-business admin-banner-image admin-task-image site-content track-visit checkout-wompi wompi-webhook; do
+            supabase functions deploy "$fn" --project-ref "$SUPABASE_PROJECT_REF"
+          done

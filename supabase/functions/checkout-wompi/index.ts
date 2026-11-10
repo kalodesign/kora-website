@@ -8,6 +8,7 @@ import {
   sha256
 } from "../_shared/http.ts";
 import { emailLayout, escapeHtml, formatCop, sendKoraEmail } from "../_shared/email.ts";
+import { getCatalogProducts } from "../_shared/catalog.ts";
 
 type CatalogProduct = {
   id: string;
@@ -31,7 +32,6 @@ Deno.serve(async (request) => {
     const publicKey = Deno.env.get("WOMPI_PUBLIC_KEY");
     const integritySecret = Deno.env.get("WOMPI_INTEGRITY_SECRET");
     const siteUrl = (Deno.env.get("KORA_SITE_URL") || "https://kora3d.co").replace(/\/$/, "");
-    const productsUrl = Deno.env.get("KORA_PRODUCTS_URL") || `${siteUrl}/data/products.json`;
     if (!publicKey || !integritySecret) {
       return jsonResponse(request, { error: "Wompi no esta configurado todavia" }, 503);
     }
@@ -44,9 +44,7 @@ Deno.serve(async (request) => {
       return jsonResponse(request, { error: "Completa los datos del pedido" }, 400);
     }
 
-    const productResponse = await fetch(productsUrl, { signal: AbortSignal.timeout(8000) });
-    if (!productResponse.ok) throw new Error("No se pudo consultar el catalogo");
-    const products = await productResponse.json() as CatalogProduct[];
+    const products = await getCatalogProducts() as CatalogProduct[];
 
     const items = cartItems.map((cartItem: { id?: string; qty?: number }) => {
       const product = products.find((item) => item.id === cartItem.id);

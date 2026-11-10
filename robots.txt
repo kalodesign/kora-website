@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin-productos.html
+Disallow: /admin/
+Disallow: /acceso-kora.html
+Disallow: /carrito.html
+Disallow: /checkout-resultado.html
+Disallow: /data/
+Disallow: /supabase/
+
+Sitemap: https://kora3d.co/sitemap.xml

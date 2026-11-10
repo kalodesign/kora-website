@@ -16,6 +16,15 @@
   let pendingNames = [];
   const idFromUrl=()=>new URLSearchParams(location.search).get("id");
   const readProducts=async()=>{
+    const endpoint=window.koraEndpoint?.("catalog", "");
+    if(endpoint){
+      try{
+        const response=await fetch(endpoint,{cache:"no-store"});
+        if(!response.ok) throw new Error("Catalog unavailable");
+        const payload=await response.json();
+        if(Array.isArray(payload.products)) return payload.products;
+      }catch{}
+    }
     const requestedId=idFromUrl();
     const configuredProduct=(window.KORA_PRODUCTS||[]).find(item=>item.id===requestedId);
     const mergeConfiguredProduct=(data)=>Array.isArray(data)&&data.length

@@ -401,24 +401,38 @@ const mergeConfiguredProducts = (items) => {
 };
 
 const loadProducts = async () => {
-  try {
-    const response = await fetch(productSource, { cache: "no-store" });
-    if (!response.ok) throw new Error("No products JSON");
-    store.products = mergeConfiguredProducts(await response.json());
-    if (!Array.isArray(store.products) || store.products.length === 0) {
+  let loadedFromCatalog = false;
+  const catalogUrl = window.koraEndpoint?.("catalog", "");
+  if (catalogUrl) {
+    try {
+      const response = await fetch(catalogUrl, { cache: "no-store" });
+      if (!response.ok) throw new Error("No se pudo consultar el catálogo");
+      const payload = await response.json();
+      if (!Array.isArray(payload.products)) throw new Error("Respuesta de catálogo no válida");
+      store.products = payload.products;
+      loadedFromCatalog = true;
+    } catch {}
+  }
+  if (!loadedFromCatalog) {
+    try {
+      const response = await fetch(productSource, { cache: "no-store" });
+      if (!response.ok) throw new Error("No products JSON");
+      store.products = mergeConfiguredProducts(await response.json());
+      if (!Array.isArray(store.products) || store.products.length === 0) {
+        try {
+          const demoResponse = await fetch("data/demo-products.json", { cache: "no-store" });
+          if (demoResponse.ok) store.products = mergeConfiguredProducts(await demoResponse.json());
+        } catch {
+          store.products = window[productFallbackKey] || window.KORA_PRODUCTS || [];
+        }
+      }
+    } catch {
       try {
         const demoResponse = await fetch("data/demo-products.json", { cache: "no-store" });
-        if (demoResponse.ok) store.products = mergeConfiguredProducts(await demoResponse.json());
+        store.products = demoResponse.ok ? mergeConfiguredProducts(await demoResponse.json()) : (window[productFallbackKey] || window.KORA_PRODUCTS || []);
       } catch {
         store.products = window[productFallbackKey] || window.KORA_PRODUCTS || [];
       }
-    }
-  } catch {
-    try {
-      const demoResponse = await fetch("data/demo-products.json", { cache: "no-store" });
-      store.products = demoResponse.ok ? mergeConfiguredProducts(await demoResponse.json()) : (window[productFallbackKey] || window.KORA_PRODUCTS || []);
-    } catch {
-      store.products = window[productFallbackKey] || window.KORA_PRODUCTS || [];
     }
   }
   if (selectors.productGrid && initialCategory && store.products.some((product) => product.category === initialCategory)) {
@@ -651,3 +665,4 @@ document.addEventListener("error", (event) => {
     image.remove();
   }
 }, true);
+\n\n/* Conteo agregado: ruta y dominio de origen, sin datos personales. */\n(() => {\n  const endpoint = window.koraEndpoint?.("track-visit", "");\n  if (!endpoint || sessionStorage.getItem("kora_visit_counted")) return;\n  sessionStorage.setItem("kora_visit_counted", "1");\n  const referrerHost = (() => { try { return document.referrer ? new URL(document.referrer).hostname : ""; } catch { return ""; } })();\n  const campaignSource = new URLSearchParams(location.search).get("utm_source") || "";\n  fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json", apikey: window.KORA_CONFIG?.supabaseAnonKey || "" }, body: JSON.stringify({ page: location.pathname, referrerHost, campaignSource }), keepalive: true }).catch(() => {});\n})();\n

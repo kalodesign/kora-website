@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <title>Kora Studio | Acceso privado</title>
+    <link rel="stylesheet" href="styles.css?v=20260828-mobile-social1" />
+  </head>
+  <body class="admin-page">
+    <main class="private-access-shell">
+      <section class="private-access-panel">
+        <p>Acceso privado</p>
+        <h1>Gestion Kora</h1>
+        <span>Ingresa con el correo autorizado para administrar el catalogo.</span>
+        <form id="private-login-form" class="admin-form" autocomplete="off">
+          <label>Correo autorizado<input id="private-email" type="email" autocomplete="email" required /></label>
+          <label>Contrasena
+            <span class="private-password-field">
+              <input id="private-password" type="password" value="" autocomplete="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore="true" readonly required />
+              <button id="private-password-toggle" class="private-password-toggle" type="button" aria-label="Mostrar contrasena" title="Mostrar contrasena"><i data-lucide="eye" aria-hidden="true"></i></button>
+            </span>
+          </label>
+          <button class="button button-primary" type="submit">Entrar</button>
+          <p class="admin-status" id="private-status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script src="config.js"></script>
+    <script src="private-access.js"></script>
+  </body>
+</html>
