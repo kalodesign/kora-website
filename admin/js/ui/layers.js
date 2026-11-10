@@ -4,7 +4,8 @@ export function bindLayers({ overlay, layers }) {
   const close = () => { if (!active) return; active.classList.remove('is-open'); overlay.classList.remove('is-open'); document.body.style.overflow = ''; active = null; opener?.focus(); };
   document.querySelectorAll('[data-open]').forEach(button => button.addEventListener('click', () => {
     const layer = layers.find(item => item.id === button.dataset.open); if (!layer) return;
-    close(); opener = button; active = layer; active.classList.add('is-open'); overlay.classList.add('is-open'); document.body.style.overflow = 'hidden'; focusables()[0]?.focus();
+    close(); opener = button; active = layer; active.classList.add('is-open'); overlay.classList.add('is-open'); document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => { if (active === layer) focusables()[0]?.focus(); });
   }));
   document.querySelectorAll('[data-close]').forEach(button => button.addEventListener('click', close));
   overlay.addEventListener('click', close);
@@ -14,7 +15,8 @@ export function bindLayers({ overlay, layers }) {
     if (event.key !== 'Tab') return;
     const items = focusables(); if (!items.length) { event.preventDefault(); return; }
     const index = items.indexOf(document.activeElement);
-    if (event.shiftKey && index <= 0) { event.preventDefault(); items.at(-1).focus(); }
+    if (index === -1) { event.preventDefault(); (event.shiftKey ? items.at(-1) : items[0]).focus(); }
+    else if (event.shiftKey && index === 0) { event.preventDefault(); items.at(-1).focus(); }
     else if (!event.shiftKey && index === items.length - 1) { event.preventDefault(); items[0].focus(); }
   });
 }
