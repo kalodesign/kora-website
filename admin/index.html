@@ -13,7 +13,31 @@
   <link rel="stylesheet" href="./css/base.css">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
   <script defer src="../config.js"></script>
-  <script type="module" src="./js/main.js"></script>
+  <script type="module">
+    const app = document.getElementById("app");
+    import("./js/main.js?v=20261110-startupfix").catch((error) => {
+      if (!app) return;
+      delete app.dataset.boot;
+      app.replaceChildren();
+      const shell = document.createElement("main");
+      shell.className = "ds-container ds-auth";
+      const card = document.createElement("section");
+      card.className = "ds-card ds-stack";
+      const title = document.createElement("h1");
+      title.className = "ds-h2";
+      title.textContent = "No se pudo cargar el panel";
+      const detail = document.createElement("p");
+      detail.className = "ds-text-muted";
+      detail.textContent = error?.message || "Falló la carga de los módulos del admin.";
+      const retry = document.createElement("button");
+      retry.className = "ds-btn ds-btn--primary";
+      retry.textContent = "Reintentar";
+      retry.addEventListener("click", () => location.reload());
+      card.append(title, detail, retry);
+      shell.append(card);
+      app.append(shell);
+    });
+  </script>
 </head>
 <body class="ds-root">
   <div id="app" data-boot="true">

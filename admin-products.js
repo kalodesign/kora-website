@@ -91,8 +91,8 @@
       <div class="admin-component-row">
         <img class="admin-component-thumb" src="${esc(componentProduct(component.productId)?.image || "")}" alt="" loading="lazy" />
         <div class="admin-component-info"><strong>${esc(componentProduct(component.productId)?.title || "Producto no disponible")}</strong><span>${esc(componentProduct(component.productId)?.category || "Catálogo")}</span></div>
-        <label class="admin-component-quantity"><span>Cantidad</span><input data-component-quantity="${index}" type="number" min="1" value="${Number(component.quantity || 1)}" aria-label="Cantidad de ${esc(componentProduct(component.productId)?.title || "producto")}" /></label>
-      <button type="button" data-component-remove="${index}" aria-label="Eliminar producto asociado">×</button></div>`).join("") : '<p class="admin-empty-inline">Aún no hay productos incluidos.</p>';
+        <label class="admin-component-quantity"><span>Cantidad</span><input class="ds-input" data-component-quantity="${index}" type="number" min="1" value="${Number(component.quantity || 1)}" aria-label="Cantidad de ${esc(componentProduct(component.productId)?.title || "producto")}" /></label>
+      <button type="button" class="ds-btn ds-btn--ghost ds-btn--icon ds-btn--sm" data-component-remove="${index}" aria-label="Eliminar producto asociado">×</button></div>`).join("") : '<p class="admin-empty-inline">Aún no hay productos incluidos.</p>';
   };
   const componentMatchesSearch = (product, search) => !search || normalizeSearch(`${product.title} ${product.category} ${product.productType}`).includes(search);
   const renderComponentPicker = () => {
@@ -101,7 +101,7 @@
     const products = state.products.filter((product) => product.id !== ui.id.value && componentMatchesSearch(product, search));
     ui.componentCatalog.innerHTML = products.length ? products.map((product) => {
       const isSelected = selected.has(product.id);
-      return `<button class="admin-component-option${isSelected ? " selected" : ""}" type="button" role="option" data-component-product="${esc(product.id)}" aria-selected="${isSelected}"${isSelected ? " disabled" : ""}>
+      return `<button class="ds-btn ds-btn--secondary ds-btn--block admin-component-option${isSelected ? " selected" : ""}" type="button" role="option" data-component-product="${esc(product.id)}" aria-selected="${isSelected}"${isSelected ? " disabled" : ""}>
         <img src="${esc(product.image)}" alt="" loading="lazy" /><span><strong>${esc(product.title)}</strong><small>${esc(product.category || "Catálogo")}</small></span><b aria-hidden="true">${isSelected ? "✓" : "+"}</b>
       </button>`;
     }).join("") : '<p class="admin-empty-inline">No encontramos productos con esa búsqueda.</p>';
@@ -134,7 +134,7 @@
   });
   const renderPagination = (total) => {
     const pages = Math.max(1, Math.ceil(total / state.perPage)); state.page = Math.min(state.page, pages);
-    ui.pagination.innerHTML = Array.from({ length: pages }, (_, index) => `<button type="button" data-page="${index + 1}" class="${state.page === index + 1 ? "active" : ""}">${index + 1}</button>`).join("");
+    ui.pagination.innerHTML = Array.from({ length: pages }, (_, index) => `<button type="button" class="ds-page${state.page === index + 1 ? " is-current" : ""}" data-page="${index + 1}">${index + 1}</button>`).join("");
     ui.pagination.hidden = pages <= 1;
   };
   const renderList = () => {
@@ -147,7 +147,7 @@
         <div class="admin-product-name"><img src="${esc(product.image)}" alt="" /><div><strong>${esc(product.title)}</strong><small class="admin-product-origin${isPelgyProduct(product) ? " is-other" : ""}">${productOriginLabel(product)}</small></div></div>
         <span>${esc(product.category || "Sin categoría")}</span><span class="admin-stock admin-stock-${status}">${statusLabel(status)}<small>${Number(product.stock || 0)} u</small></span>
         <span>${esc(product.size || "No aplica")}</span><span>${Number(product.soldCount || 0)}</span><span>${money(product.price)}</span><span>${product.compareAt ? money(product.compareAt) : "—"}</span>
-        <div class="admin-row-actions"><button type="button" class="admin-active-switch${product.isActive ? " is-on" : ""}" data-product-toggle="${esc(product.id)}" aria-pressed="${product.isActive ? "true" : "false"}" aria-label="${product.isActive ? "Desactivar" : "Activar"} ${esc(product.title)}" title="${product.isActive ? "Desactivar producto" : "Activar producto"}"><span></span></button><button type="button" data-edit="${esc(product.id)}" aria-label="Editar ${esc(product.title)}" title="Editar">✎</button><button class="delete" type="button" data-delete="${esc(product.id)}" aria-label="Eliminar ${esc(product.title)}" title="Eliminar">×</button></div>
+        <div class="admin-row-actions"><label class="ds-check admin-active-switch"><input class="ds-switch" type="checkbox" data-product-toggle="${esc(product.id)}" aria-label="${product.isActive ? "Desactivar" : "Activar"} ${esc(product.title)}" title="Activar o desactivar producto" ${product.isActive ? "checked" : ""} /><span class="ds-sr-only">Activo</span></label><button type="button" class="ds-btn ds-btn--secondary ds-btn--icon ds-btn--sm" data-edit="${esc(product.id)}" aria-label="Editar ${esc(product.title)}" title="Editar">✎</button><button class="ds-btn ds-btn--danger ds-btn--icon ds-btn--sm delete" type="button" data-delete="${esc(product.id)}" aria-label="Eliminar ${esc(product.title)}" title="Eliminar">×</button></div>
       </article>`;
     }).join("") : '<p class="admin-empty">No encontramos productos con esos filtros.</p>';
   };
@@ -156,10 +156,10 @@
     const isManual = scope === "manual";
     const colorImage = String(color.image || "").trim();
     return `<div class="admin-color-row${isManual ? " is-manual" : ""}" data-color-row="${index}">
-      <input type="color" value="${esc(color.hex || "#171D67")}" data-color-hex="${index}" aria-label="Muestra de color" />
-      <input type="text" value="${esc(color.name || "")}" data-color-name="${index}" placeholder="Nombre del color" />
+      <input class="ds-input" type="color" value="${esc(color.hex || "#171D67")}" data-color-hex="${index}" aria-label="Muestra de color" />
+      <input class="ds-input" type="text" value="${esc(color.name || "")}" data-color-name="${index}" placeholder="Nombre del color" />
       ${isManual ? `<label class="admin-color-image-upload" title="Subir imagen para este color"><input type="file" accept="image/*" data-color-image-file="${index}" aria-label="Subir imagen para ${esc(color.name || "este color")}" />${colorImage ? `<img src="${esc(colorImage)}" alt="" />` : '<span aria-hidden="true">+</span>'}</label>` : ""}
-      <button type="button" data-color-remove="${index}" aria-label="Eliminar color">×</button>
+      <button type="button" class="ds-btn ds-btn--ghost ds-btn--icon ds-btn--sm" data-color-remove="${index}" aria-label="Eliminar color">×</button>
     </div>`;
   };
   const renderColors = (scope) => {
@@ -215,9 +215,9 @@
         <img src="${esc(image)}" alt="Imagen ${index + 1} del producto" />
         ${index === 0 ? '<span>Portada</span>' : ""}
         <div class="admin-image-item-actions">
-          <button type="button" data-image-move="previous" data-image-index="${index}" aria-label="Mover imagen ${index + 1} a la izquierda" title="Mover a la izquierda" ${index === 0 ? "disabled" : ""}>←</button>
-          <button type="button" data-image-move="next" data-image-index="${index}" aria-label="Mover imagen ${index + 1} a la derecha" title="Mover a la derecha" ${index === state.productImages.length - 1 ? "disabled" : ""}>→</button>
-          <button type="button" data-image-remove="${index}" aria-label="Eliminar imagen ${index + 1}" title="Eliminar imagen">×</button>
+          <button type="button" class="ds-btn ds-btn--ghost ds-btn--icon ds-btn--sm" data-image-move="previous" data-image-index="${index}" aria-label="Mover imagen ${index + 1} a la izquierda" title="Mover a la izquierda" ${index === 0 ? "disabled" : ""}>←</button>
+          <button type="button" class="ds-btn ds-btn--ghost ds-btn--icon ds-btn--sm" data-image-move="next" data-image-index="${index}" aria-label="Mover imagen ${index + 1} a la derecha" title="Mover a la derecha" ${index === state.productImages.length - 1 ? "disabled" : ""}>→</button>
+          <button type="button" class="ds-btn ds-btn--danger ds-btn--icon ds-btn--sm" data-image-remove="${index}" aria-label="Eliminar imagen ${index + 1}" title="Eliminar imagen">×</button>
         </div>
       </article>`).join("");
   };
@@ -352,7 +352,7 @@
       const product = state.products.find((item) => item.id === toggle.dataset.productToggle); if (!product) return;
       toggle.disabled = true;
       try { await api("POST", { action: "upsert", product: { ...product, isActive: !product.isActive } }); await load(); ui.listStatus.textContent = `Producto ${product.isActive ? "desactivado" : "activado"}.`; }
-      catch (error) { toggle.disabled = false; ui.listStatus.textContent = error.message; }
+      catch (error) { toggle.disabled = false; toggle.checked = product.isActive; ui.listStatus.textContent = error.message; }
       return;
     }
     if (edit) fill(state.products.find((product) => product.id === edit.dataset.edit));

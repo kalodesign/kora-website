@@ -1,4 +1,4 @@
-import { getSupabase } from "../supabase.js";
+import { getSupabase } from "../supabase.js?v=20261110-startupfix";
 
 export const PAGE_SIZE = 10;
 async function request(view, params = {}, body) {
