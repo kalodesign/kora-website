@@ -26,16 +26,17 @@ jobs:
       - name: Descargar cambios
         uses: actions/checkout@v4
 
-      - name: Validar credenciales sin imprimirlas
+      - name: Comprobar SUPABASE_ACCESS_TOKEN
+        env:
+          ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         shell: bash
-        run: |
-          missing=()
-          [[ -n "$SUPABASE_ACCESS_TOKEN" ]] || missing+=("SUPABASE_ACCESS_TOKEN")
-          [[ -n "$SUPABASE_DB_PASSWORD" ]] || missing+=("SUPABASE_DB_PASSWORD")
-          if (( ${#missing[@]} )); then
-            printf "::error::Faltan estos secretos de GitHub Actions: %s\\n" "${missing[*]}"
-            exit 1
-          fi
+        run: test -n "$ACCESS_TOKEN"
+
+      - name: Comprobar SUPABASE_DB_PASSWORD
+        env:
+          DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        shell: bash
+        run: test -n "$DB_PASSWORD"
 
       - name: Instalar Supabase CLI
         uses: supabase/setup-cli@v1
