@@ -29,7 +29,3 @@
 .ds-main #orders-feedback{margin:0 var(--card-padding) var(--space-4);color:var(--color-text-muted)}.orders-table .ds-cell{max-width:100%}
 @media(max-width:767px){#order-status{width:100%}.ds-toolbar #order-from,.ds-toolbar #order-to{width:100%}.ds-main .ds-toolbar{align-items:stretch}.orders-table .ds-cell{min-width:0}}
 
-.ds-detail-row{display:grid;gap:var(--space-1);padding:var(--space-3) 0;border-bottom:var(--border-width) solid var(--color-border)}
-.ds-detail-row strong{overflow-wrap:anywhere}.ds-detail-row p{margin:0}
-[data-metric] .ds-skeleton{display:inline-block;width:5rem;height:1.25em;vertical-align:middle}
-@media(max-width:767px){.ds-detail-row{font-size:var(--fs-md)}}
