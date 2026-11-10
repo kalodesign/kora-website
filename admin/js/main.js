@@ -20,56 +20,56 @@ const iconPaths = {
 };
 const icon = (name) => `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] || iconPaths.box}</svg>`;
 const app = document.getElementById('app');
-app.innerHTML = `<div class="shell">
-  <div class="overlay" id="overlay" hidden></div>
-  <aside class="sidebar" id="sidebar" aria-label="Navegación de administración">
+app.innerHTML = `<div class="ds-app">
+  <div class="ds-overlay" id="overlay"></div>
+  <aside class="ds-sidebar" id="sidebar" aria-label="Navegación de administración">
     <div class="brand"><span class="brand-mark">${icon('box')}</span>Kora Admin</div>
-    <button class="side-search" type="button" id="global-search">${icon('search')} Buscar <kbd>⌘ K</kbd></button>
+    <button class="ds-btn ds-btn--secondary side-search" type="button" id="global-search">${icon('search')} Buscar <kbd>⌘ K</kbd></button>
     <nav aria-label="Secciones">
-      <p class="side-label">Menú principal</p>
-      <button class="side-link" type="button" data-preview="Inicio">${icon('home')} Inicio</button>
-      <button class="side-toggle" type="button" id="store-toggle" aria-expanded="true" aria-controls="store-nav">${icon('shop')} Mi tienda <span class="chevron">${icon('down')}</span></button>
+      <p class="ds-nav__label">Menú principal</p>
+      <button class="ds-nav__item" type="button" data-preview="Inicio">${icon('home')} Inicio</button>
+      <button class="ds-nav__item" type="button" id="store-toggle" aria-expanded="true" aria-controls="store-nav">${icon('shop')} Mi tienda <span class="chevron">${icon('down')}</span></button>
       <div id="store-nav">
-        <button class="side-sub-link" type="button" data-preview="Productos">Productos</button>
-        <button class="side-sub-link active" type="button" aria-current="page">Pedidos</button>
-        <button class="side-sub-link" type="button" data-preview="Clientes">Clientes</button>
+        <button class="ds-nav__item" type="button" data-preview="Productos">Productos</button>
+        <button class="ds-nav__item" type="button" aria-current="page">Pedidos</button>
+        <button class="ds-nav__item" type="button" data-preview="Clientes">Clientes</button>
       </div>
-      <button class="side-link" type="button" data-preview="Gestión de tienda">${icon('settings')} Gestión de tienda</button>
-      <button class="side-link" type="button" data-preview="Reportes">${icon('chart')} Reportes</button>
-      <button class="side-link" type="button" data-preview="Bandeja">${icon('inbox')} Bandeja</button>
-      <p class="side-label">Otros</p>
-      <button class="side-link" type="button" data-preview="Promociones">${icon('tag')} Promociones</button>
-      <button class="side-link" type="button" data-preview="Configuración">${icon('settings')} Configuración</button>
-      <button class="side-link" type="button" data-preview="Ayuda">${icon('help')} Ayuda</button>
+      <button class="ds-nav__item" type="button" data-preview="Gestión de tienda">${icon('settings')} Gestión de tienda</button>
+      <button class="ds-nav__item" type="button" data-preview="Reportes">${icon('chart')} Reportes</button>
+      <button class="ds-nav__item" type="button" data-preview="Bandeja">${icon('inbox')} Bandeja</button>
+      <p class="ds-nav__label">Otros</p>
+      <button class="ds-nav__item" type="button" data-preview="Promociones">${icon('tag')} Promociones</button>
+      <button class="ds-nav__item" type="button" data-preview="Configuración">${icon('settings')} Configuración</button>
+      <button class="ds-nav__item" type="button" data-preview="Ayuda">${icon('help')} Ayuda</button>
     </nav>
-    <div class="side-footer"><button class="profile" type="button" id="user-menu"><span class="avatar-initials">K</span><span class="profile-copy"><strong>Equipo Kora</strong><small>Vista de diseño</small></span><span class="chevron">${icon('down')}</span></button></div>
+    <div class="ds-sidebar__footer"><button class="profile" type="button" id="user-menu"><span class="ds-avatar">K</span><span class="profile-copy"><strong>Equipo Kora</strong><small>Vista de diseño</small></span><span class="chevron">${icon('down')}</span></button></div>
   </aside>
-  <main class="main" id="main">
-    <div class="mobile-topbar"><strong>Kora Admin</strong><button type="button" class="icon-button" id="open-menu" aria-label="Abrir menú">${icon('menu')}</button></div>
-    <div class="breadcrumb">${icon('home')} <span>/</span><strong>Pedidos</strong></div>
-    <header class="page-head"><div><h1>Lista de pedidos</h1><p>Gestiona los pedidos de impresión 3D de tu tienda.</p></div><div class="head-actions"><button type="button" class="button primary" data-preview="Nuevo pedido">${icon('plus')} Nuevo pedido</button><button type="button" class="button" data-preview="Más acciones">Más acciones ${icon('more')}</button></div></header>
-    <p class="preview-note">Vista previa · datos de ejemplo · sin conexión a pedidos reales</p>
-    <section class="kpis" aria-label="Indicadores de ejemplo">
-      <div class="kpi"><span class="kpi-label">Pedidos totales</span><div class="kpi-value">1.248 <span class="kpi-indicator">—</span></div><small class="kpi-help">Últimos 365 días</small></div>
-      <div class="kpi"><span class="kpi-label">Pedidos nuevos</span><div class="kpi-value">126 <span class="kpi-indicator">—</span></div><small class="kpi-help">Últimos 365 días</small></div>
-      <div class="kpi"><span class="kpi-label">Completados</span><div class="kpi-value">982 <span class="kpi-indicator">—</span></div><small class="kpi-help">Últimos 365 días</small></div>
-      <div class="kpi"><span class="kpi-label">Cancelados</span><div class="kpi-value">19 <span class="kpi-indicator">—</span></div><small class="kpi-help">Últimos 365 días</small></div>
+  <main class="ds-main" id="main">
+    <div class="mobile-topbar"><strong>Kora Admin</strong><button type="button" class="ds-btn ds-btn--ghost ds-btn--icon" id="open-menu" aria-label="Abrir menú">${icon('menu')}</button></div>
+    <div class="ds-breadcrumb"><ol><li>Inicio</li><li aria-current="page">Pedidos</li></ol></div>
+    <header class="ds-page-header"><div><h1 class="ds-h1">Lista de pedidos</h1><p>Gestiona los pedidos de impresión 3D de tu tienda.</p></div><div class="head-actions"><button type="button" class="ds-btn ds-btn--primary" data-preview="Nuevo pedido">${icon('plus')} Nuevo pedido</button><button type="button" class="ds-btn ds-btn--secondary" data-preview="Más acciones">Más acciones ${icon('more')}</button></div></header>
+    <p class="ds-alert ds-alert--warning preview-note">Vista previa · datos de ejemplo · sin conexión a pedidos reales</p>
+    <section class="ds-stats" aria-label="Indicadores de ejemplo">
+      <div class="ds-stat"><span class="ds-stat__label">Pedidos totales</span><div class="ds-stat__value">1.248 <span class="ds-trend">—</span></div><small class="ds-stat__help">Últimos 365 días</small></div>
+      <div class="ds-stat"><span class="ds-stat__label">Pedidos nuevos</span><div class="ds-stat__value">126 <span class="ds-trend">—</span></div><small class="ds-stat__help">Últimos 365 días</small></div>
+      <div class="ds-stat"><span class="ds-stat__label">Completados</span><div class="ds-stat__value">982 <span class="ds-trend">—</span></div><small class="ds-stat__help">Últimos 365 días</small></div>
+      <div class="ds-stat"><span class="ds-stat__label">Cancelados</span><div class="ds-stat__value">19 <span class="ds-trend">—</span></div><small class="ds-stat__help">Últimos 365 días</small></div>
     </section>
-    <section class="table-card" aria-label="Pedidos de ejemplo">
-      <div class="tabs" role="tablist" aria-label="Estado del pedido">
-        <button class="tab" role="tab" aria-selected="true" tabindex="0" data-status="all">Todos <span class="tab-count">10</span></button>
-        <button class="tab" role="tab" aria-selected="false" tabindex="-1" data-status="new">Nuevos <span class="tab-count">2</span></button>
-        <button class="tab" role="tab" aria-selected="false" tabindex="-1" data-status="printing">En producción <span class="tab-count">4</span></button>
-        <button class="tab" role="tab" aria-selected="false" tabindex="-1" data-status="delivered">Completados <span class="tab-count">3</span></button>
-        <button class="tab" role="tab" aria-selected="false" tabindex="-1" data-status="cancelled">Cancelados <span class="tab-count">1</span></button>
+    <section class="ds-card ds-card--flush" aria-label="Pedidos de ejemplo">
+      <div class="ds-tabs" role="tablist" aria-label="Estado del pedido">
+        <button class="ds-tab" role="tab" aria-selected="true" tabindex="0" data-status="all">Todos <span class="ds-count">10</span></button>
+        <button class="ds-tab" role="tab" aria-selected="false" tabindex="-1" data-status="new">Nuevos <span class="ds-count">2</span></button>
+        <button class="ds-tab" role="tab" aria-selected="false" tabindex="-1" data-status="printing">En producción <span class="ds-count">4</span></button>
+        <button class="ds-tab" role="tab" aria-selected="false" tabindex="-1" data-status="delivered">Completados <span class="ds-count">3</span></button>
+        <button class="ds-tab" role="tab" aria-selected="false" tabindex="-1" data-status="cancelled">Cancelados <span class="ds-count">1</span></button>
       </div>
-      <div class="table-toolbar"><label class="search-wrap">${icon('search')}<input type="search" placeholder="Cliente, producto o ID" aria-label="Buscar pedidos de ejemplo"></label><div class="toolbar-actions"><button type="button" class="control" data-preview="Estado">${icon('list')} Todos los estados ${icon('down')}</button><button type="button" class="control" data-preview="Fechas">${icon('calendar')} Rango de fechas ${icon('down')}</button><button type="button" class="control" data-preview="Más filtros">${icon('filter')} Más filtros</button></div></div>
-      <div class="table-scroll"><table class="orders-table"><thead><tr><th>Producto</th><th>Cliente</th><th>ID pedido</th><th>Monto</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="order-rows"></tbody></table></div>
+      <div class="ds-toolbar"><label class="ds-input-wrap ds-toolbar__grow">${icon('search')}<input class="ds-input" type="search" placeholder="Cliente, producto o ID" aria-label="Buscar pedidos de ejemplo"></label><div class="toolbar-actions"><button type="button" class="ds-btn ds-btn--secondary" data-preview="Estado">${icon('list')} Todos los estados ${icon('down')}</button><button type="button" class="ds-btn ds-btn--secondary" data-preview="Fechas">${icon('calendar')} Rango de fechas ${icon('down')}</button><button type="button" class="ds-btn ds-btn--secondary" data-preview="Más filtros">${icon('filter')} Más filtros</button></div></div>
+      <div class="ds-table-wrap"><table class="ds-table ds-table--cards orders-table"><thead><tr><th>Producto</th><th>Cliente</th><th>ID pedido</th><th>Monto</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="order-rows"></tbody></table></div>
       <div class="mobile-orders" id="mobile-orders"></div>
-      <nav class="pagination" aria-label="Páginas de ejemplo"><button class="button" type="button" data-preview="Anterior">← Anterior</button><div class="pages"><button class="page-number active" aria-current="page" type="button">1</button><button class="page-number" type="button" data-preview="Página 2">2</button><span>…</span><button class="page-number" type="button" data-preview="Página 10">10</button></div><button class="button" type="button" data-preview="Siguiente">Siguiente →</button></nav>
+      <nav class="ds-pagination" aria-label="Páginas de ejemplo"><button class="ds-btn ds-btn--secondary" type="button" data-preview="Anterior">← Anterior</button><div class="ds-pages"><button class="ds-page" aria-current="page" type="button">1</button><button class="ds-page" type="button" data-preview="Página 2">2</button><span>…</span><button class="ds-page" type="button" data-preview="Página 10">10</button></div><button class="ds-btn ds-btn--secondary" type="button" data-preview="Siguiente">Siguiente →</button></nav>
     </section>
   </main>
-  <div id="toast" role="status" aria-live="polite" hidden></div>
+  <div class="ds-toasts"><div id="toast" role="status" aria-live="polite" hidden></div></div>
 </div>`;
 const orders = [
   ['Bola de Navidad personalizada','PLA · Rosado · 0,2 mm','Valentina Gómez','Nuevo','#00001234','2026-11-09',29000,'Transferencia','queued'],
@@ -84,16 +84,16 @@ const orders = [
   ['Dije perro globo','PLA · Azul · 0,2 mm','Laura Perdomo','Nuevo','#00001225','2026-11-03',18000,'Wompi','delivered']
 ].map(([product,detail,customer,type,reference,created,total,payment,status])=>({product,detail,customer,type,reference,created,total,payment,status}));
 renderTable(orders, CONFIG, message => showToast(message));
-attachTabs(document.querySelector('.tabs'), (status) => {
+attachTabs(document.querySelector('.ds-tabs'), (status) => {
  const match = {all:orders,new:orders.filter(o=>['queued','pending_payment'].includes(o.status)),printing:orders.filter(o=>['printing','post_processing','shipped'].includes(o.status)),delivered:orders.filter(o=>o.status==='delivered'),cancelled:orders.filter(o=>o.status==='cancelled')};
  renderTable(match[status] || orders,CONFIG,message=>showToast(message));
 });
 const sidebar=document.getElementById('sidebar'),overlay=document.getElementById('overlay');
-function closeMenu(){sidebar.classList.remove('open');overlay.hidden=true}
-document.getElementById('open-menu').addEventListener('click',()=>{sidebar.classList.add('open');overlay.hidden=false});
+function closeMenu(){sidebar.classList.remove('is-open');overlay.classList.remove('is-open')}
+document.getElementById('open-menu').addEventListener('click',()=>{sidebar.classList.add('is-open');overlay.classList.add('is-open')});
 overlay.addEventListener('click',closeMenu);
 document.getElementById('store-toggle').addEventListener('click',e=>{const open=e.currentTarget.getAttribute('aria-expanded')==='true';e.currentTarget.setAttribute('aria-expanded',String(!open));document.getElementById('store-nav').hidden=open});
 document.querySelectorAll('[data-preview]').forEach(button=>button.addEventListener('click',()=>showToast('Disponible en la siguiente fase: '+button.dataset.preview)));
-document.getElementById('global-search').addEventListener('click',()=>document.querySelector('.search-wrap input').focus());
-document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();document.querySelector('.search-wrap input').focus()}if(e.key==='Escape')closeMenu()});
-document.querySelector('.search-wrap input').addEventListener('input',e=>{const q=e.target.value.trim().toLocaleLowerCase(CONFIG.locale);renderTable(orders.filter(o=>[o.product,o.customer,o.reference].some(v=>v.toLocaleLowerCase(CONFIG.locale).includes(q))),CONFIG,message=>showToast(message))});
+document.getElementById('global-search').addEventListener('click',()=>document.querySelector('.ds-input-wrap input').focus());
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();document.querySelector('.ds-input-wrap input').focus()}if(e.key==='Escape')closeMenu()});
+document.querySelector('.ds-input-wrap input').addEventListener('input',e=>{const q=e.target.value.trim().toLocaleLowerCase(CONFIG.locale);renderTable(orders.filter(o=>[o.product,o.customer,o.reference].some(v=>v.toLocaleLowerCase(CONFIG.locale).includes(q))),CONFIG,message=>showToast(message))});

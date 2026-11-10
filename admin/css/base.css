@@ -1,1 +1,25 @@
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:500 var(--font-body)/1.45 Inter,system-ui,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.55}a{color:inherit;text-decoration:none}svg{width:1.25em;height:1.25em;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}img{display:block;object-fit:cover}h1,h2,h3,p{margin:0}h1{font-size:var(--font-title);line-height:1.2;letter-spacing:-.035em}small,.muted{color:var(--text-muted);font-size:var(--font-small);font-weight:400}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--primary);outline-offset:2px}[hidden]{display:none!important}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+/* Page layout only. Shared component appearance lives in assets/css/components.css. */
+.ds-main{max-width:1800px}
+.brand{display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-6);font-size:var(--fs-lg);font-weight:var(--fw-bold)}
+.brand-mark{display:grid;place-items:center;width:var(--control-h-md);height:var(--control-h-md);border-radius:var(--control-radius);color:var(--color-text-on-brand);background:var(--color-interactive)}
+.brand-mark svg,.ds-main svg,.ds-sidebar svg{width:20px;height:20px;flex:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.ds-sidebar nav{display:flex;flex-direction:column;gap:var(--space-1)}
+.ds-sidebar nav .ds-nav__label{margin-top:var(--space-4);margin-bottom:var(--space-1)}
+.ds-sidebar .ds-nav__item{width:100%;border:0;background:transparent;font:inherit;text-align:left}
+.ds-sidebar .ds-nav__item:hover{background:var(--color-nav-hover)}
+.ds-sidebar .ds-nav__item[aria-current="page"]{background:var(--color-nav-active);color:var(--color-text);font-weight:var(--fw-semibold)}
+.ds-sidebar .chevron{margin-left:auto}
+.ds-sidebar kbd{margin-left:auto;color:var(--color-text-subtle);font:inherit}
+.side-search{justify-content:flex-start;width:100%}
+#store-nav{display:flex;flex-direction:column;gap:var(--space-1);padding-left:var(--space-5)}
+.profile{display:flex;align-items:center;gap:var(--space-2);width:100%;padding:var(--space-2);border:0;background:transparent;color:var(--color-text);font:inherit;text-align:left;cursor:pointer}
+.profile .chevron{margin-left:auto}.profile-copy{display:grid;line-height:var(--lh-snug)}.profile-copy small{color:var(--color-text-subtle)}
+.mobile-topbar{display:none}.head-actions,.toolbar-actions,.row-actions{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap}
+.ds-page-header p{margin-top:var(--space-1);color:var(--color-text-muted)}
+.preview-note{margin:var(--space-4) 0 var(--space-6)}.ds-main>.ds-breadcrumb{margin-bottom:var(--space-4)}
+.ds-main>.ds-stats{margin-top:var(--space-6)}.ds-main .ds-stat__value{font-size:var(--fs-xl)}
+.orders-table{table-layout:fixed}.orders-table th:nth-child(1){width:27%}.orders-table th:nth-child(2){width:20%}.orders-table th:nth-child(3){width:16%}.orders-table th:nth-child(4){width:15%}.orders-table th:nth-child(5){width:12%}.orders-table th:nth-child(6){width:10%}
+.orders-table td{height:56px}.cell-copy{display:grid;min-width:0;line-height:var(--lh-snug)}.ds-cell__meta{display:block}.row-actions{flex-wrap:nowrap}
+.ds-sidebar [aria-current="page"]:focus-visible{box-shadow:var(--focus-ring)}
+@media(max-width:1023px){.mobile-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-6)}.ds-overlay.is-open{z-index:var(--z-overlay)}}
+@media(max-width:767px){.ds-page-header{flex-direction:column}.ds-toolbar__grow{max-width:none}.toolbar-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.orders-table{table-layout:auto}.orders-table td{height:auto}.orders-table .row-actions{justify-content:flex-end}.orders-table .ds-cell{justify-content:flex-start}.ds-pagination{gap:var(--space-2)}}
