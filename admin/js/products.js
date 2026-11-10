@@ -95,6 +95,7 @@
   const componentProduct = (productId) => state.products.find((product) => product.id === productId);
   const supportsComponentsType = () => ["kit", "a_medida"].includes(selectedProductType());
   const renderComponents = () => {
+    ui.addComponent.textContent = state.components.length ? `Añadir ítem · ${state.components.length} incluido${state.components.length === 1 ? "" : "s"}` : "Añadir producto";
     ui.components.innerHTML = state.components.length ? state.components.map((component, index) => `
       <div class="admin-component-row">
         <img class="admin-component-thumb" src="${esc(productImageUrl(componentProduct(component.productId)?.image || ""))}" alt="" loading="lazy" />
@@ -106,11 +107,11 @@
   const renderComponentPicker = () => {
     const search = normalizeSearch(ui.componentSearch.value.trim());
     const selected = new Set(state.components.map((component) => component.productId));
-    const products = state.products.filter((product) => product.id !== ui.id.value && componentMatchesSearch(product, search));
+    const products = state.products.filter((product) => product.id !== ui.id.value && componentMatchesSearch(product, search)).sort((a, b) => Number(b.category === "Dijes") - Number(a.category === "Dijes") || a.title.localeCompare(b.title, "es"));
     ui.componentCatalog.innerHTML = products.length ? products.map((product) => {
       const isSelected = selected.has(product.id);
       return `<button class="ds-btn ds-btn--secondary ds-btn--block admin-component-option${isSelected ? " selected" : ""}" type="button" role="option" data-component-product="${esc(product.id)}" aria-selected="${isSelected}"${isSelected ? " disabled" : ""}>
-        <img src="${esc(productImageUrl(product.image))}" alt="" loading="lazy" /><span><strong>${esc(product.title)}</strong><small>${esc(product.category || "Catálogo")}</small></span><b aria-hidden="true">${isSelected ? "✓" : "+"}</b>
+        <img src="${esc(productImageUrl(product.image))}" alt="" loading="lazy" width="48" height="48" /><span><strong title="${esc(product.title)}">${esc(product.title)}</strong><small>${esc(product.category || "Catálogo")}</small></span><b aria-hidden="true">${isSelected ? "✓" : "+"}</b>
       </button>`;
     }).join("") : '<p class="admin-empty-inline">No encontramos productos con esa búsqueda.</p>';
   };

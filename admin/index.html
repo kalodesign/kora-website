@@ -11,12 +11,12 @@
   <link rel="stylesheet" href="../assets/css/tokens.css">
   <link rel="stylesheet" href="../assets/css/components.css">
   <link rel="stylesheet" href="./css/base.css">
-  <link rel="stylesheet" href="./css/products.css?v=20261110-admin-interactions">
+  <link rel="stylesheet" href="./css/products.css?v=20261110-component-picker">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
   <script defer src="../config.js"></script>
   <script type="module">
     const bootApp = document.getElementById("app");
-    import("./js/main.js?v=20261110-dashboard").catch(async (moduleError) => {
+    import("./js/main.js?v=20261110-component-picker").catch(async (moduleError) => {
       try {
         await (async () => {
           // Cliente único. La fase 2 lo usará después de aplicar Auth y RLS (fase 4).

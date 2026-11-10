@@ -665,7 +665,9 @@ document.addEventListener("error", (event) => {
     image.remove();
   }
 }, true);
-\n\n/* Sesiones agregadas por origen/dispositivo; sin IP ni identificadores persistentes. */
+
+
+/* Sesiones agregadas por origen/dispositivo; sin IP ni identificadores persistentes. */
 (() => {
   if (document.body.classList.contains("admin-page")) return;
   const endpoint = window.koraEndpoint?.("track-visit", "");
