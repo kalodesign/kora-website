@@ -1,0 +1,121 @@
+/* ==========================================================
+   TOKENS — única fuente de verdad visual (admin + tienda)
+   Capa 1 PRIMITIVOS  → valores crudos. NUNCA se usan en componentes.
+   Capa 2 SEMÁNTICOS  → significado (texto, fondo, borde, acción).
+   Capa 3 COMPONENTE  → decisiones por componente (radio, alturas).
+   Regla: components.css solo lee capas 2 y 3.
+   Marca: cambia --brand-* y todo el sistema cambia.
+   ========================================================== */
+
+:root {
+  /* ---------- CAPA 1: PRIMITIVOS ---------- */
+  /* Marca ROSA. 200 = rosado exacto de tu imagen (#FFCFDB). Texto blanco sobre 700 = 5.5:1 (AA) */
+  --brand-25:#FFF8FA; --brand-50:#FFF1F5; --brand-100:#FFE5EC; --brand-200:#FFCFDB; --brand-300:#FFB0C6;
+  --brand-400:#F985A6; --brand-500:#EC5C87; --brand-600:#D63A6A; --brand-700:#C42B5C;
+  --brand-800:#A31D45; --brand-900:#8F1A3C;
+
+  /* Neutros */
+  --neutral-0:#FFFFFF; --neutral-50:#F7F7F8; --neutral-100:#F1F2F4; --neutral-200:#E5E7EB;
+  --neutral-300:#D1D5DB; --neutral-400:#9CA3AF; --neutral-500:#6B7280; --neutral-600:#4B5563;
+  --neutral-700:#374151; --neutral-800:#1F2937; --neutral-900:#0F172A;
+
+  /* Estados (pares texto/fondo AA) */
+  --green-100:#DCFCE7; --green-600:#16A34A; --green-800:#166534;
+  --amber-100:#FEF3C7; --amber-600:#D97706; --amber-800:#92400E;
+  --blue-100:#DBEAFE;  --blue-600:#2563EB;  --blue-800:#1E40AF;
+  --red-100:#FEE2E2;   --red-600:#DC2626;   --red-700:#B91C1C; --red-800:#991B1B;
+
+  /* Tipografía */
+  --font-sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --fs-xs:.75rem; --fs-sm:.875rem; --fs-md:1rem; --fs-lg:1.25rem;
+  --fs-xl:1.5rem; --fs-2xl:1.75rem; --fs-3xl:2.25rem; --fs-4xl:3rem;
+  --fw-regular:400; --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+  --lh-tight:1.2; --lh-snug:1.35; --lh-normal:1.5;
+
+  /* Espaciado (base 4px) */
+  --space-0:0; --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:20px;
+  --space-6:24px; --space-8:32px; --space-10:40px; --space-12:48px; --space-16:64px;
+
+  /* Radios */
+  --radius-sm:4px; --radius-md:8px; --radius-lg:12px; --radius-xl:16px; --radius-full:999px;
+
+  /* Elevación */
+  --shadow-sm:0 1px 2px rgba(15,23,42,.06);
+  --shadow-md:0 4px 12px rgba(15,23,42,.08);
+  --shadow-lg:0 12px 32px rgba(15,23,42,.14);
+
+  /* Movimiento */
+  --dur-fast:120ms; --dur-base:180ms; --dur-slow:260ms;
+  --ease-out:cubic-bezier(.2,.8,.2,1);
+
+  /* Capas (z-index) */
+  --z-sticky:1100; --z-dropdown:1200; --z-overlay:1300; --z-modal:1400; --z-toast:1500; --z-tooltip:1600;
+
+  /* Breakpoints (referencia; CSS no permite var() en @media):
+     sm 640 · md 768 · lg 1024 · xl 1280 · 2xl 1536 */
+
+  /* ---------- CAPA 2: SEMÁNTICOS ---------- */
+  /* Superficies */
+  --color-bg-page:var(--neutral-0);
+  --color-bg-subtle:var(--neutral-50);
+  --color-bg-muted:var(--neutral-100);
+  --color-bg-sidebar:var(--brand-25);
+  --color-nav-hover:var(--brand-100);
+  --color-nav-active:var(--brand-200);
+  --color-bg-overlay:rgba(15,23,42,.45);
+  /* Texto */
+  --color-text:var(--neutral-900);
+  --color-text-muted:var(--neutral-600);
+  --color-text-subtle:var(--neutral-500);   /* mínimo AA sobre blanco (4.8:1) */
+  --color-text-disabled:var(--neutral-400);
+  --color-text-on-brand:var(--neutral-0);
+  /* Bordes */
+  --color-border:var(--neutral-200);
+  --color-border-strong:var(--neutral-300);
+  /* Acción / interactivo */
+  --color-interactive:var(--brand-700);
+  --color-interactive-hover:var(--brand-800);
+  --color-interactive-active:var(--brand-900);
+  --color-interactive-soft:var(--brand-50);
+  --color-accent:var(--brand-500);          /* solo decoración: íconos, gráficas (no texto) */
+  --color-focus:var(--brand-700);
+  /* Estados */
+  --color-success-bg:var(--green-100); --color-success-text:var(--green-800); --color-success-solid:var(--green-600);
+  --color-warning-bg:var(--amber-100); --color-warning-text:var(--amber-800); --color-warning-solid:var(--amber-600);
+  --color-info-bg:var(--blue-100);     --color-info-text:var(--blue-800);     --color-info-solid:var(--blue-600);
+  --color-danger-bg:var(--red-100);    --color-danger-text:var(--red-800);    --color-danger-solid:var(--red-700);
+  --color-neutral-bg:var(--neutral-100); --color-neutral-text:var(--neutral-700);
+  /* Foco */
+  --focus-ring:0 0 0 2px var(--neutral-0),0 0 0 4px var(--color-focus);
+
+  /* Tipografía semántica */
+  --fs-body:var(--fs-sm);                   /* admin: 14px */
+  --fs-caption:var(--fs-xs);
+  --fs-h1:var(--fs-2xl); --fs-h2:var(--fs-xl); --fs-h3:var(--fs-lg);
+
+  /* ---------- CAPA 3: COMPONENTE / LAYOUT ---------- */
+  --control-h-sm:28px; --control-h-md:36px; --control-h-lg:44px;   /* densidad compacta (admin) */
+  --control-radius:var(--radius-md);        /* tu botón de 8px */
+  --card-radius:var(--radius-lg);
+  --card-padding:var(--space-5);
+  --cell-padding-y:var(--space-3); --cell-padding-x:var(--space-4);
+  --page-padding:var(--space-8);
+  --sidebar-w:256px; --header-h:56px; --container-max:1200px;
+}
+
+/* Densidad cómoda (tienda): objetivos táctiles de 44px y texto de 16px.
+   Se activa con <html data-density="comfortable"> */
+[data-density="comfortable"] {
+  --control-h-sm:36px; --control-h-md:44px; --control-h-lg:52px;
+  --fs-body:var(--fs-md);
+  --fs-h1:var(--fs-3xl); --fs-h2:var(--fs-2xl); --fs-h3:var(--fs-xl);
+  --cell-padding-y:var(--space-4);
+  --page-padding:var(--space-6);
+}
+
+@media (max-width:767px) { :root { --page-padding:var(--space-4); } }
+
+@media (prefers-reduced-motion:reduce) {
+  :root { --dur-fast:0ms; --dur-base:0ms; --dur-slow:0ms; }
+}
