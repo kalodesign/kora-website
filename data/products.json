@@ -1,1 +1,36 @@
-[]
+[
+  {
+    "id": "reno-navideno-con-bufanda",
+    "title": "Reno navideño con bufanda",
+    "category": "Navidad",
+    "image": "assets/reno-navideno-1.webp",
+    "images": [
+      "assets/reno-navideno-1.webp",
+      "assets/reno-navideno-2.webp"
+    ],
+    "description": "Un tierno reno navideño impreso en 3D, con su característica bufanda roja y acabados llenos de encanto. Ideal para decorar tu hogar, regalar en Navidad o convertirlo en un detalle especial para tus clientes, familiares y amigos.",
+    "size": "Aprox. 5 cm de alto",
+    "material": "PLA de alta definición",
+    "price": 18900,
+    "compareAt": 22000,
+    "stock": 100,
+    "priceTiers": [
+      {
+        "quantity": 1,
+        "price": 18900
+      },
+      {
+        "quantity": 12,
+        "price": 17100
+      },
+      {
+        "quantity": 100,
+        "price": 15700
+      }
+    ],
+    "relatedProductIds": [
+      "bola-nombre-personalizado",
+      "set-inicial"
+    ]
+  }
+]
