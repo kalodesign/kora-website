@@ -105,6 +105,7 @@
   --cell-padding-y:var(--space-3); --cell-padding-x:var(--space-4);
   --page-padding:var(--space-8);
   --sidebar-w:256px; --header-h:56px; --container-max:1200px;
+  --cart-panel-width:440px; --cart-media-radius:var(--radius-md); --cart-action-radius:var(--radius-full);
 }
 
 /* Densidad cómoda (tienda): objetivos táctiles de 44px y texto de 16px.
