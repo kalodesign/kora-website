@@ -8,8 +8,8 @@
       name="description"
       content="Compra dijes, bases y piezas para armar accesorios personalizados Kora."
     />
-    <link rel="stylesheet" href="assets/css/tokens.css">
-  <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/tokens.css?v=20261111-sidecart">
+  <link rel="stylesheet" href="assets/css/components.css?v=20261111-sidecart">
   <link rel="stylesheet" href="styles.css?v=store-grid-v2" />
     <link rel="stylesheet" href="visual-kora.css?v=navbar-shared-llaveros-v3" />
     <link rel="stylesheet" href="navbar-shared.css?v=20261108-1" />
@@ -90,10 +90,10 @@
       </article>
     </div>
 
-    <div class="cart-overlay" id="cart-overlay" aria-hidden="true"></div>
-    <aside class="cart-drawer" id="cart-drawer" aria-hidden="true" aria-labelledby="cart-title">
+    <div class="cart-overlay ds-overlay ds-cart-overlay" id="cart-overlay" aria-hidden="true"></div>
+    <aside class="cart-drawer ds-drawer ds-cart" id="cart-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="cart-title">
       <div class="cart-head">
-        <h2 id="cart-title">Carrito</h2>
+        <div><h2 id="cart-title">Carrito</h2><p class="ds-cart__subtitle" id="cart-items-count">0 productos</p></div>
         <button type="button" class="modal-close" data-close-cart aria-label="Cerrar carrito">×</button>
       </div>
       <div class="cart-items" id="cart-items"></div>
@@ -103,7 +103,8 @@
           <span>Total</span>
           <strong id="cart-total">$0</strong>
         </div>
-        <button class="button button-primary" type="button" data-checkout-open>Finalizar pedido</button>
+        <button class="ds-btn ds-btn--primary ds-btn--block" type="button" data-checkout-open disabled>Finalizar pedido</button>
+        <a class="ds-btn ds-btn--secondary ds-btn--block" href="carrito.html">Ver carrito</a>
       </div>
     </aside>
 
@@ -139,7 +140,7 @@
 
     <script src="config.js"></script>
     <script src="products.js"></script>
-    <script src="script.js?v=20261110-catalog-repair-2"></script>
+    <script src="script.js?v=20261111-sidecart"></script>
     <script src="shop-catalog-rescue.js?v=20261110-shop-rescue"></script>
   </body>
 </html>

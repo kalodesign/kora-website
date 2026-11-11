@@ -26,18 +26,20 @@ const ensureCartDrawer = () => {
   if (!document.querySelector(".cart-button") || document.querySelector("#cart-drawer")) return;
 
   const overlay = document.createElement("div");
-  overlay.className = "cart-overlay";
+  overlay.className = "cart-overlay ds-overlay ds-cart-overlay";
   overlay.id = "cart-overlay";
   overlay.setAttribute("aria-hidden", "true");
 
   const drawer = document.createElement("aside");
-  drawer.className = "cart-drawer";
+  drawer.className = "cart-drawer ds-drawer ds-cart";
   drawer.id = "cart-drawer";
   drawer.setAttribute("aria-hidden", "true");
+  drawer.setAttribute("role", "dialog");
+  drawer.setAttribute("aria-modal", "true");
   drawer.setAttribute("aria-labelledby", "cart-title");
   drawer.innerHTML = `
     <div class="cart-head">
-      <h2 id="cart-title">Carrito</h2>
+      <div><h2 id="cart-title">Carrito</h2><p class="ds-cart__subtitle" id="cart-items-count">0 productos</p></div>
       <button type="button" class="modal-close" data-close-cart aria-label="Cerrar carrito">×</button>
     </div>
     <div class="cart-items" id="cart-items"></div>
@@ -47,7 +49,8 @@ const ensureCartDrawer = () => {
         <span>Total</span>
         <strong id="cart-total">$0</strong>
       </div>
-      <button class="button button-primary" type="button" data-checkout-open>Finalizar pedido</button>
+      <button class="ds-btn ds-btn--primary ds-btn--block" type="button" data-checkout-open disabled>Finalizar pedido</button>
+      <a class="ds-btn ds-btn--secondary ds-btn--block" href="carrito.html">Ver carrito</a>
     </div>
   `;
 
@@ -60,7 +63,7 @@ const ensureCheckoutModal = () => {
   if (!document.querySelector(".cart-button") || document.querySelector("#checkout-modal")) return;
 
   const modal = document.createElement("div");
-  modal.className = "checkout-modal-overlay";
+  modal.className = "checkout-modal-overlay ds-cart-checkout";
   modal.id = "checkout-modal";
   modal.setAttribute("aria-hidden", "true");
   modal.innerHTML = `
@@ -316,22 +319,27 @@ const closeProductModal = () => {
   document.body.classList.remove("modal-open");
 };
 
+let cartReturnFocus = null;
 const openCart = () => {
   if (!selectors.cartDrawer || !selectors.cartOverlay) return;
+  cartReturnFocus = document.activeElement;
   selectors.cartDrawer.classList.add("is-open");
   selectors.cartOverlay.classList.add("is-open");
   selectors.cartDrawer.setAttribute("aria-hidden", "false");
   selectors.cartOverlay.setAttribute("aria-hidden", "false");
   document.body.classList.add("modal-open");
+  selectors.cartDrawer.querySelector("[data-close-cart]")?.focus();
 };
 
 const closeCart = () => {
-  if (!selectors.cartDrawer || !selectors.cartOverlay) return;
+  if (!selectors.cartDrawer || !selectors.cartOverlay || !selectors.cartDrawer.classList.contains("is-open")) return;
   selectors.cartDrawer.classList.remove("is-open");
   selectors.cartOverlay.classList.remove("is-open");
   selectors.cartDrawer.setAttribute("aria-hidden", "true");
   selectors.cartOverlay.setAttribute("aria-hidden", "true");
   document.body.classList.remove("modal-open");
+  if (cartReturnFocus?.isConnected) cartReturnFocus.focus();
+  cartReturnFocus = null;
 };
 
 const getCartTotal = () =>
@@ -370,6 +378,10 @@ window.KoraCart = {
   snapshot: () => store.cart.map((item) => ({ ...item, product: getProduct(item.id) || item.product }))
 };
 
+const escapeCart = (value) => String(value ?? "")
+  .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+  .replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+
 const renderCart = () => {
   updateCartCount();
   if (!selectors.cartItems) return;
@@ -377,17 +389,26 @@ const renderCart = () => {
     .map((item) => {
       const product = getProduct(item.id);
       if (!product) return "";
+      const id = escapeCart(item.id);
+      const href = "producto.html?id=" + encodeURIComponent(item.id);
+      const src = String(product.image || "");
+      const image = src.startsWith("assets/") || src.startsWith("https://") ? src : "assets/icon-06.svg";
+      const customized = Boolean(item.customNames?.length);
+      const max = Number(product.maxQuantity || product.stock || Infinity);
       return `
         <article class="cart-item">
-          <img src="${product.image}" alt="${product.title}" />
-          <div>
-            <h3>${product.title}</h3>
-            <p>${formatMoney(product.price)} · ${product.size || product.category}</p>${item.customNames?.length ? `<p class="cart-item-customization">Nombres: ${item.customNames.join(", ")}</p>` : ""}
+          <a class="ds-cart__media" href="${escapeCart(href)}" aria-label="Ver ${escapeCart(product.title)}">
+            <img src="${escapeCart(image)}" alt="${escapeCart(product.title)}" loading="lazy" width="88" height="88" />
+          </a>
+          <div class="ds-cart__details">
+            <h3><a href="${escapeCart(href)}">${escapeCart(product.title)}</a></h3>
+            <p>${formatMoney(product.price)} · ${escapeCart(product.size || product.category || "")}</p>
+            ${customized ? `<p class="cart-item-customization">Nombres: ${escapeCart(item.customNames.join(", "))}</p>` : ""}
             <div class="cart-item-controls">
-              <button type="button" data-cart-dec="${item.id}" aria-label="Restar" ${item.customNames?.length || item.qty <= 1 ? "disabled" : ""}>-</button>
-              <strong>${item.qty}</strong>
-              <button type="button" data-cart-inc="${item.id}" aria-label="Sumar" ${item.customNames?.length ? "disabled" : ""}>+</button>
-              <button class="cart-remove" type="button" data-cart-remove="${item.id}">Eliminar</button>
+              <button type="button" data-cart-dec="${id}" aria-label="Restar una unidad de ${escapeCart(product.title)}" ${customized || item.qty <= 1 ? "disabled" : ""}>−</button>
+              <strong>${Number(item.qty) || 1}</strong>
+              <button type="button" data-cart-inc="${id}" aria-label="Añadir una unidad de ${escapeCart(product.title)}" ${customized || item.qty >= max ? "disabled" : ""}>+</button>
+              <button class="cart-remove" type="button" data-cart-remove="${id}">Eliminar</button>
             </div>
           </div>
         </article>
@@ -395,6 +416,10 @@ const renderCart = () => {
     })
     .join("");
   selectors.cartItems.innerHTML = rows;
+  const itemCount = document.querySelector("#cart-items-count");
+  if (itemCount) itemCount.textContent = `${getCartQuantity()} ${getCartQuantity() === 1 ? "producto" : "productos"}`;
+  const checkoutButton = selectors.cartDrawer?.querySelector("[data-checkout-open]");
+  if (checkoutButton) checkoutButton.disabled = store.cart.length === 0;
   const total = store.cart.reduce((sum, item) => {
     const product = getProduct(item.id);
     return sum + (product ? product.price * item.qty : 0);
@@ -496,6 +521,18 @@ selectors.productModal?.addEventListener("click", (event) => {
   if (event.target === selectors.productModal) closeProductModal();
 });
 
+selectors.cartDrawer?.addEventListener("keydown", (event) => {
+  if (event.key !== "Tab" || !selectors.cartDrawer.classList.contains("is-open")) return;
+  const focusable = [...selectors.cartDrawer.querySelectorAll('a[href], button:not([disabled])')];
+  if (!focusable.length) return;
+  if (event.shiftKey && document.activeElement === focusable[0]) {
+    event.preventDefault();
+    focusable.at(-1).focus();
+  } else if (!event.shiftKey && document.activeElement === focusable.at(-1)) {
+    event.preventDefault();
+    focusable[0].focus();
+  }
+});
 selectors.cartButton?.addEventListener("click", openCart);
 selectors.cartOverlay?.addEventListener("click", closeCart);
 selectors.checkoutModal?.addEventListener("click", (event) => {
@@ -673,6 +710,9 @@ loadProducts();
 
 document.addEventListener("error", (event) => {
   const image = event.target;
+  if (image instanceof HTMLImageElement && image.matches(".ds-cart .cart-item img") && !image.src.endsWith("/assets/icon-06.svg")) {
+    image.src = "assets/icon-06.svg";
+  }
   if (image instanceof HTMLImageElement && image.matches(".product-image-hover, .best-card-secondary")) {
     image.remove();
   }
