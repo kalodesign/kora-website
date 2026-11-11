@@ -22,7 +22,7 @@
         const response=await fetch(endpoint,{cache:"no-store"});
         if(!response.ok) throw new Error("Catalog unavailable");
         const payload=await response.json();
-        if(Array.isArray(payload.products) && payload.products.some(item=>item.id===idFromUrl())) return payload.products;
+        if(Array.isArray(payload.products) && idFromUrl()!=="reno-navideno-con-bufanda" && payload.products.some(item=>item.id===idFromUrl())) return payload.products;
       }catch{}
     }
     const requestedId=idFromUrl();
