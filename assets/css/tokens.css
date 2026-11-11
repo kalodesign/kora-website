@@ -13,6 +13,7 @@
   --brand-25:#FFF8FA; --brand-50:#FFF1F5; --brand-100:#FFE5EC; --brand-200:#FFCFDB; --brand-300:#FFB0C6;
   --brand-400:#F985A6; --brand-500:#EC5C87; --brand-600:#D63A6A; --brand-700:#C42B5C;
   --brand-800:#A31D45; --brand-900:#8F1A3C;
+  --brand-product:#F2A6C2;
 
   /* Neutros */
   --neutral-0:#FFFFFF; --neutral-50:#F7F7F8; --neutral-100:#F1F2F4; --neutral-200:#E5E7EB;
@@ -78,6 +79,8 @@
   --color-interactive-hover:var(--brand-800);
   --color-interactive-active:var(--brand-900);
   --color-interactive-soft:var(--brand-50);
+  --color-product-action:var(--brand-product);
+  --color-product-action-text:var(--neutral-900);
   --color-accent:var(--brand-500);          /* solo decoración: íconos, gráficas (no texto) */
   --color-focus:var(--brand-700);
   /* Estados */
