@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es" data-density="comfortable">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrito | Kora Studio</title>
+  <meta name="description" content="Revisa tus productos Kora y finaliza tu pedido.">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="styles.css?v=store-grid-v2">
+  <link rel="stylesheet" href="visual-kora.css?v=20261110-diy-pink">
+  <link rel="stylesheet" href="navbar-shared.css?v=20261108-1">
+  <link rel="stylesheet" href="carrito.css?v=20261111-cart-flow">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="ds-root shop-page cart-page">
+<header class="site-header">
+      <div class="reference-announcement">ENVÍO GRATIS DESPUÉS DE $100.000 EN COMPRAS</div>
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a class="brand" href="index.html" aria-label="Kora Studio inicio">
+          <img src="assets/icon-06.svg" alt="Kora" />
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="nav-menu" id="nav-menu">
+          <a href="index.html" >Inicio</a>
+          <a href="llaveros.html" >Llaveros</a>
+          <a href="hazlotumismo.html">Tienda</a>
+          <a href="contacto.html" >Contacto</a>
+          <a href="nosotros.html" >Nosotros</a>
+        </div>
+        <div class="nav-actions" aria-label="Acciones de tienda">
+          <button class="cart-button" type="button" aria-label="Abrir carrito" title="Abrir carrito">
+            <img src="assets/icon-01.svg" alt="" />
+            <strong class="cart-count">0</strong>
+          </button>
+        </div>
+      </nav>
+    </header>
+<main class="ds-container cart-page-main">
+  <nav class="cart-breadcrumb" aria-label="Miga de pan"><a href="hazlotumismo.html">Tienda</a><span aria-hidden="true">/</span><span aria-current="page">Carrito</span></nav>
+  <header class="cart-page-heading"><h1>Tu carrito</h1><p>Revisa tus piezas antes de finalizar el pedido.</p></header>
+  <div class="cart-page-layout">
+    <section class="ds-card cart-page-products" aria-labelledby="cart-products-title">
+      <div class="ds-card__header"><h2 id="cart-products-title">Productos <span id="cart-page-count"></span></h2></div>
+      <div class="ds-card__body" id="cart-page-items" aria-live="polite"></div>
+      <div class="ds-card__footer"><a href="hazlotumismo.html">← Seguir comprando</a></div>
+    </section>
+    <aside class="ds-card cart-page-summary" aria-labelledby="cart-summary-title">
+      <div class="ds-card__header"><h2 id="cart-summary-title">Resumen del pedido</h2></div>
+      <div class="ds-card__body">
+        <div class="cart-page-line"><span>Subtotal</span><strong id="cart-page-subtotal">$0</strong></div>
+        <p>El envío se calcula al confirmar tu compra.</p>
+        <button class="ds-btn ds-btn--primary ds-btn--block" type="button" id="cart-page-checkout" data-checkout-open disabled>Finalizar pedido</button>
+        <p class="cart-page-help">Podrás revisar tus datos antes de pagar con Wompi.</p>
+      </div>
+    </aside>
+  </div>
+</main>
+<footer class="footer" id="contacto">
+      <div class="section-inner footer-grid">
+        <div>
+          <h2>Compañía</h2>
+          <a href="nosotros.html">Sobre nosotros</a>
+          <a href="hazlotumismo.html">Tienda</a>
+          <a href="personaliza-microfono.html">Personaliza tu micrófono</a>
+          <a href="mascotas.html">Mascotas</a>
+          <a href="llaveros.html">Llaveros</a>
+          <a href="contacto.html">Contacto</a>
+        </div>
+        <div>
+          <h2>Síguenos o escríbenos</h2>
+          <a href="#">Instagram</a>
+          <a href="#">TikTok</a>
+          <a href="mailto:info@kora.co">info@kora.co</a>
+        </div>
+        <div>
+          <h2>Legal</h2>
+          <a href="#">Políticas de privacidad</a>
+          <a href="#">Términos y condiciones</a>
+          <a href="#">Términos de devolución</a>
+        </div>
+        <div class="footer-brand">
+          <img src="assets/icon-08.svg" alt="Kora" />
+          <p>Kora Studio 2026. Todos los derechos reservados.</p>
+        </div>
+      </div>
+    </footer>
+<script src="config.js"></script>
+<script src="products.js"></script>
+<script src="script.js?v=20261111-cart-flow"></script>
+<script src="carrito.js?v=20261111-cart-flow"></script>
+</body>
+</html>

@@ -171,7 +171,13 @@ const addToCart = (productId, qty = 1, fallbackProduct = null, customNames = [])
   const nextQty = Math.max(1, Number(qty) || 1);
   const existing = store.cart.find((item) => item.id === productId);
   if (existing) {
-    existing.qty = Math.min(Number(existing.maxQuantity || existing.qty + nextQty), existing.qty + nextQty);
+    const max = Number(product.maxQuantity || product.stock || Infinity);
+    const addedQty = Math.min(nextQty, Math.max(0, max - Number(existing.qty)));
+    if (!addedQty) return;
+    existing.qty += addedQty;
+    if (Array.isArray(customNames) && customNames.length) {
+      existing.customNames = [...(existing.customNames || []), ...customNames.slice(0, addedQty)];
+    }
   } else {
     store.cart.push({
       id: productId,
@@ -204,7 +210,9 @@ const removeFromCart = (productId) => {
 const updateCartItem = (productId, qty) => {
   const item = store.cart.find((cartItem) => cartItem.id === productId);
   if (!item) return;
-  item.qty = Math.max(1, qty);
+  if (item.customNames?.length && Number(qty) !== Number(item.qty)) return;
+  const product = getProduct(productId);
+  item.qty = Math.max(1, Math.min(Number(qty), Number(product?.maxQuantity || product?.stock || Infinity)));
   saveCart();
   renderCart();
 };
@@ -356,7 +364,10 @@ const closeCheckout = () => {
 
 window.KoraCart = {
   add: addToCart,
-  open: openCart
+  open: openCart,
+  remove: removeFromCart,
+  setQuantity: updateCartItem,
+  snapshot: () => store.cart.map((item) => ({ ...item, product: getProduct(item.id) || item.product }))
 };
 
 const renderCart = () => {
@@ -373,9 +384,9 @@ const renderCart = () => {
             <h3>${product.title}</h3>
             <p>${formatMoney(product.price)} · ${product.size || product.category}</p>${item.customNames?.length ? `<p class="cart-item-customization">Nombres: ${item.customNames.join(", ")}</p>` : ""}
             <div class="cart-item-controls">
-              <button type="button" data-cart-dec="${item.id}" aria-label="Restar">-</button>
+              <button type="button" data-cart-dec="${item.id}" aria-label="Restar" ${item.customNames?.length || item.qty <= 1 ? "disabled" : ""}>-</button>
               <strong>${item.qty}</strong>
-              <button type="button" data-cart-inc="${item.id}" aria-label="Sumar">+</button>
+              <button type="button" data-cart-inc="${item.id}" aria-label="Sumar" ${item.customNames?.length ? "disabled" : ""}>+</button>
               <button class="cart-remove" type="button" data-cart-remove="${item.id}">Eliminar</button>
             </div>
           </div>
@@ -391,6 +402,7 @@ const renderCart = () => {
   selectors.cartTotal.textContent = formatMoney(total);
   if (selectors.checkoutTotal) selectors.checkoutTotal.textContent = formatMoney(total);
   selectors.cartEmpty.classList.toggle("is-visible", store.cart.length === 0);
+  document.dispatchEvent(new CustomEvent("kora:cart-updated"));
 };
 
 const mergeConfiguredProducts = (items) => {

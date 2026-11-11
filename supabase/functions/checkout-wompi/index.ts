@@ -46,12 +46,15 @@ Deno.serve(async (request) => {
 
     const products = await getCatalogProducts() as CatalogProduct[];
 
-    const items = cartItems.map((cartItem: { id?: string; qty?: number }) => {
+    const items = cartItems.map((cartItem: { id?: string; qty?: number; customNames?: unknown }) => {
       const product = products.find((item) => item.id === cartItem.id);
       if (!product || Number(product.price) <= 0 || Number(product.stock ?? 0) <= 0) return null;
       const qty = Math.max(1, Math.min(Math.floor(Number(cartItem.qty || 1)), Number(product.stock)));
       const unitPrice = Math.round(Number(product.price));
-      return { id: product.id, title: product.title, qty, unitPrice, total: unitPrice * qty };
+      const customNames = Array.isArray(cartItem.customNames)
+        ? cartItem.customNames.slice(0, qty).map((name: unknown) => cleanText(name, 24)).filter(Boolean)
+        : [];
+      return { id: product.id, title: product.title, qty, unitPrice, total: unitPrice * qty, customNames };
     }).filter(Boolean);
 
     const subtotal = items.reduce((sum, item) => sum + (item?.total || 0), 0);
@@ -95,7 +98,7 @@ Deno.serve(async (request) => {
     });
     if (error) throw error;
 
-    const itemLines = items.map((item) => `${item?.qty} x ${item?.title}: ${formatCop(item?.total)}`).join("\n");
+    const itemLines = items.map((item) => `${item?.qty} x ${item?.title}: ${formatCop(item?.total)}${item?.customNames.length ? ` (Nombres: ${item.customNames.join(", ")})` : ""}`).join("\n");
     await sendKoraEmail({
       subject: `Nueva orden pendiente ${reference}`,
       replyTo: cleanCustomer.email,
@@ -105,7 +108,7 @@ Deno.serve(async (request) => {
         <p><strong>Referencia:</strong> ${escapeHtml(reference)}</p>
         <p><strong>Cliente:</strong> ${escapeHtml(cleanCustomer.name)}<br>${escapeHtml(cleanCustomer.email)}<br>${escapeHtml(cleanCustomer.phone)}</p>
         <p><strong>Entrega:</strong> ${escapeHtml(`${cleanCustomer.address}, ${cleanCustomer.city}, ${cleanCustomer.region}`)}</p>
-        <p><strong>Productos:</strong><br>${items.map((item) => `${escapeHtml(item?.qty)} x ${escapeHtml(item?.title)}: ${escapeHtml(formatCop(item?.total))}`).join("<br>")}</p>
+        <p><strong>Productos:</strong><br>${items.map((item) => `${escapeHtml(item?.qty)} x ${escapeHtml(item?.title)}: ${escapeHtml(formatCop(item?.total))}${item?.customNames.length ? ` (Nombres: ${item.customNames.map(escapeHtml).join(", ")})` : ""}`).join("<br>")}</p>
         <p><strong>Total:</strong> ${escapeHtml(formatCop(total))}</p>
       `)
     }).catch((emailError) => console.error("order created email", emailError));
