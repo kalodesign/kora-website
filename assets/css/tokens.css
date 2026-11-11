@@ -65,6 +65,7 @@
   --color-nav-hover:var(--brand-100);
   --color-nav-active:var(--brand-200);
   --color-bg-overlay:rgba(15,23,42,.45);
+  --color-category-overlay:rgba(15,23,42,.72);
   /* Texto */
   --color-text:var(--neutral-900);
   --color-text-muted:var(--neutral-600);
