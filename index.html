@@ -17,11 +17,11 @@
       fetchpriority="high"
     />
     <link rel="stylesheet" href="assets/css/tokens.css?v=20261111-category-labels">
-  <link rel="stylesheet" href="assets/css/components.css?v=20261111-sidecart">
+  <link rel="stylesheet" href="assets/css/components.css?v=20261111-nav-xmas">
   <link rel="stylesheet" href="styles.css?v=buttons-pink-v2" />
     <link rel="stylesheet" href="home-editorial.css" />
     <link rel="stylesheet" href="visual-kora.css?v=20261111-category-labels" />
-    <link rel="stylesheet" href="navbar-shared.css?v=20261108-1" />
+    <link rel="stylesheet" href="navbar-shared.css?v=20261111-nav-xmas" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
   <body class="ds-root home-reference">
@@ -42,7 +42,15 @@
         <div class="nav-menu" id="nav-menu">
           <a href="index.html" aria-current="page">Inicio</a>
           <a href="llaveros.html">Llaveros</a>
-          <a href="hazlotumismo.html">Tienda</a>
+          <div class="nav-dropdown">
+            <button class="nav-dropdown-trigger" type="button" aria-expanded="false" aria-controls="nav-shop-dropdown">
+              Tienda <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="nav-dropdown-menu" id="nav-shop-dropdown" hidden>
+              <a href="hazlotumismo.html">Todos los productos</a>
+              <a href="hazlotumismo.html?categoria=Navidad">Navidad</a>
+            </div>
+          </div>
           <a href="contacto.html">Contacto</a>
           <a href="nosotros.html">Nosotros</a>
         </div>
@@ -208,7 +216,7 @@
     <script src="config.js"></script>
     <script src="site-banners.js?v=20261110-1" defer></script>
     <script src="products.js"></script>
-    <script src="script.js?v=20261111-sidecart"></script>
+    <script src="script.js?v=20261111-nav-xmas"></script>
     <script src="home-bestsellers.js?v=card-gallery-hover-v2"></script>
     <script src="site-home-categories.js?v=admin-refresh-1" defer></script>
     <script src="home-instagram.js?v=20261107-1" defer></script>

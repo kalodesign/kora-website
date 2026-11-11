@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Personaliza tu micrófono | Kora</title>
   <link rel="stylesheet" href="assets/css/tokens.css?v=20261111-sidecart">
-  <link rel="stylesheet" href="assets/css/components.css?v=20261111-sidecart">
+  <link rel="stylesheet" href="assets/css/components.css?v=20261111-nav-xmas">
   <link rel="stylesheet" href="styles.css?v=navbar-shared-llaveros-v3" />
   <link rel="stylesheet" href="visual-kora.css?v=navbar-shared-llaveros-v3" />
-    <link rel="stylesheet" href="navbar-shared.css?v=20261108-1" />
+    <link rel="stylesheet" href="navbar-shared.css?v=20261111-nav-xmas" />
   <style>
     :root { --azul:#171d67; --tinta:#111b45; --lila:#e8e1ff; --rosa:#ffe5ee; --borde:#d4d3df; --radio:6px; }
     * { box-sizing:border-box; }
@@ -100,7 +100,15 @@
       <a class="brand" href="index.html" aria-label="Kora Studio inicio"><img src="assets/icon-06.svg" alt="Kora" /></a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu"><span></span><span></span><span></span></button>
       <div class="nav-menu" id="nav-menu">
-        <a href="index.html">Inicio</a><a href="llaveros.html">Llaveros</a><a href="hazlotumismo.html">Tienda</a><a href="contacto.html">Contacto</a><a href="nosotros.html">Nosotros</a>
+        <a href="index.html">Inicio</a><a href="llaveros.html">Llaveros</a><div class="nav-dropdown">
+            <button class="nav-dropdown-trigger" type="button" aria-expanded="false" aria-controls="nav-shop-dropdown">
+              Tienda <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="nav-dropdown-menu" id="nav-shop-dropdown" hidden>
+              <a href="hazlotumismo.html">Todos los productos</a>
+              <a href="hazlotumismo.html?categoria=Navidad">Navidad</a>
+            </div>
+          </div><a href="contacto.html">Contacto</a><a href="nosotros.html">Nosotros</a>
       </div>
       <div class="nav-actions" aria-label="Acciones de tienda">
         <button class="cart-button" type="button" aria-label="Carrito" title="Carrito"><img src="assets/icon-01.svg" alt="" /><strong class="cart-count">0</strong></button>
@@ -738,6 +746,6 @@
   </script>
   <script src="config.js"></script>
   <script src="products.js"></script>
-  <script src="script.js?v=20261111-sidecart"></script>
+  <script src="script.js?v=20261111-nav-xmas"></script>
 </body>
 </html>

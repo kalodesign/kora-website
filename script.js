@@ -7,6 +7,29 @@ navToggle?.addEventListener("click", () => {
   navToggle.setAttribute("aria-expanded", String(isOpen));
 });
 
+const shopDropdown = document.querySelector(".nav-dropdown");
+const shopDropdownTrigger = shopDropdown?.querySelector(".nav-dropdown-trigger");
+const closeShopDropdown = () => {
+  if (!shopDropdown || !shopDropdownTrigger) return;
+  shopDropdown.classList.remove("is-open");
+  shopDropdownTrigger.setAttribute("aria-expanded", "false");
+  shopDropdown.querySelector(".nav-dropdown-menu")?.setAttribute("hidden", "");
+};
+shopDropdownTrigger?.addEventListener("click", () => {
+  const isOpen = shopDropdown.classList.toggle("is-open");
+  shopDropdownTrigger.setAttribute("aria-expanded", String(isOpen));
+  shopDropdown.querySelector(".nav-dropdown-menu")?.toggleAttribute("hidden", !isOpen);
+});
+document.addEventListener("click", (event) => {
+  if (shopDropdown && !shopDropdown.contains(event.target)) closeShopDropdown();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && shopDropdown?.classList.contains("is-open")) {
+    closeShopDropdown();
+    shopDropdownTrigger?.focus();
+  }
+});
+
 const money = new Intl.NumberFormat("es-CO", {
   style: "currency",
   currency: "COP",
