@@ -266,7 +266,8 @@ const getFilteredProducts = () => {
   const term = selectors.search?.value.trim().toLowerCase() || "";
   let products = [...store.products];
   if (store.activeCategory !== "Todos") {
-    products = products.filter((product) => product.category === store.activeCategory);
+    const category = store.activeCategory.trim().toLocaleLowerCase("es");
+    products = products.filter((product) => [product.category, ...(Array.isArray(product.tags) ? product.tags : [])].some(value => String(value || "").trim().toLocaleLowerCase("es") === category));
   }
   if (term) {
     products = products.filter((product) => {
@@ -504,7 +505,7 @@ const loadProducts = async () => {
       }
     }
   }
-  if (selectors.productGrid && initialCategory && store.products.some((product) => product.category === initialCategory)) {
+  if (selectors.productGrid && initialCategory) {
     store.activeCategory = initialCategory;
   }
   if (selectors.productGrid) {

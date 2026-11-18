@@ -25,6 +25,8 @@
   const render = () => {
     if (!fallbackProducts) return;
     let items = [...fallbackProducts];
+    const category = new URLSearchParams(location.search).get("categoria")?.trim().toLocaleLowerCase("es");
+    if (category) items = items.filter(product => [product.category, ...(Array.isArray(product.tags) ? product.tags : [])].some(value => String(value || "").trim().toLocaleLowerCase("es") === category));
     if (sort?.value === "price-asc") items.sort((a, b) => Number(a.price) - Number(b.price));
     if (sort?.value === "price-desc") items.sort((a, b) => Number(b.price) - Number(a.price));
     if (sort?.value === "name") items.sort((a, b) => String(a.title).localeCompare(String(b.title), "es"));
