@@ -50,6 +50,7 @@
       heading.append(titleLink);
       details.append(heading, node("p", "", product.category || ""));
       if (item.customNames?.length) details.append(node("p", "", "Nombres: " + item.customNames.join(", ")));
+      if (item.lotLogo) details.append(node('p','','Logo del lote: '+item.lotLogo.name));
       const controls = node("div", "cart-page-controls");
       const stepper = node("div", "cart-page-stepper");
       const personalized = Boolean(item.customNames?.length);

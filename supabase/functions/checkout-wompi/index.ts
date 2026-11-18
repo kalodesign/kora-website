@@ -6,6 +6,7 @@ import {
   isAllowedBrowserOrigin,
   jsonResponse,
   sha256
+  ,uploadFormFile
 } from "../_shared/http.ts";
 import { emailLayout, escapeHtml, formatCop, sendKoraEmail } from "../_shared/email.ts";
 import { getCatalogProducts } from "../_shared/catalog.ts";
@@ -15,6 +16,8 @@ type CatalogProduct = {
   title: string;
   price: number;
   stock?: number;
+  priceTiers?: Array<{quantity:number;price:number}>;
+  customization?: {type:string};
 };
 
 const cleanText = (value: unknown, maxLength: number) => String(value || "").trim().slice(0, maxLength);
@@ -24,7 +27,7 @@ Deno.serve(async (request) => {
   if (request.method !== "POST") return jsonResponse(request, { error: "Metodo no permitido" }, 405);
   if (!isAllowedBrowserOrigin(request)) return jsonResponse(request, { error: "Origen no permitido" }, 403);
   const limited = enforceRateLimit(request, "checkout-wompi", 6);
-  const oversized = enforceBodyLimit(request, 256 * 1024);
+  const oversized = enforceBodyLimit(request, 1024 * 1024);
   if (limited) return limited;
   if (oversized) return oversized;
 
@@ -46,16 +49,29 @@ Deno.serve(async (request) => {
 
     const products = await getCatalogProducts() as CatalogProduct[];
 
-    const items = cartItems.map((cartItem: { id?: string; qty?: number; customNames?: unknown }) => {
+    const seen=new Set<string>();
+    const items = (await Promise.all(cartItems.map(async (cartItem: { id?: string; qty?: number; customNames?: unknown; lotLogo?: {name:string;data:string} }) => {
       const product = products.find((item) => item.id === cartItem.id);
       if (!product || Number(product.price) <= 0 || Number(product.stock ?? 0) <= 0) return null;
       const qty = Math.max(1, Math.min(Math.floor(Number(cartItem.qty || 1)), Number(product.stock)));
-      const unitPrice = Math.round(Number(product.price));
+      if(seen.has(product.id)) throw new Error('Producto duplicado');
+      seen.add(product.id);
+      const tier=[...(product.priceTiers||[])].sort((a,b)=>b.quantity-a.quantity).find(t=>qty>=t.quantity);
+      const unitPrice = Math.round(Number(tier?.price??product.price));
+      let logo=null;
+      if(product.customization?.type==='logo'){
+        const value=cartItem.lotLogo;
+        const match=value?.data?.match(/^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=]+)$/);
+        if(!match||match[2].length>683000) throw new Error('Logo obligatorio o demasiado grande');
+        const bytes=Uint8Array.from(atob(match[2]),c=>c.charCodeAt(0));
+        const extension=match[1]==='image/jpeg'?'jpg':match[1].split('/')[1];
+        logo=await uploadFormFile({supabase:getSupabaseAdmin(),file:new File([bytes],'logo.'+extension,{type:match[1]}),bucket:'order-logos',recordId:crypto.randomUUID(),allowedExtensions:new Set(['.png','.jpg','.webp']),maxBytes:512000});
+      }
       const customNames = Array.isArray(cartItem.customNames)
         ? cartItem.customNames.slice(0, qty).map((name: unknown) => cleanText(name, 24)).filter(Boolean)
         : [];
-      return { id: product.id, title: product.title, qty, unitPrice, total: unitPrice * qty, customNames };
-    }).filter(Boolean);
+      return { id: product.id, title: product.title, qty, unitPrice, total: unitPrice * qty, customNames, logo };
+    }))).filter(Boolean);
 
     const subtotal = items.reduce((sum, item) => sum + (item?.total || 0), 0);
     const freeShippingFrom = Number(Deno.env.get("KORA_FREE_SHIPPING_FROM_COP") || 50000);

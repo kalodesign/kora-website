@@ -22,6 +22,8 @@ export type StoreProduct = {
   colors: ProductColor[];
   availableColors: ProductColor[];
   soldCount: number;
+  priceTiers?: Array<{quantity:number;price:number}>;
+  customization?: {type:string};
 };
 
 export type ProductColor = { name: string; hex: string; image?: string };
@@ -46,6 +48,8 @@ const mapProduct = (row: Record<string, unknown>): StoreProduct => ({
   size: String(row.size || ""),
   material: String(row.material || ""),
   price: Number(row.price || 0),
+  priceTiers: asArray<{quantity:number;price:number}>(row.price_tiers),
+  customization: row.customization as {type:string} || undefined,
   compareAt: Number(row.compare_at || 0),
   stock: Number(row.stock || 0),
   isActive: Boolean(row.is_active),

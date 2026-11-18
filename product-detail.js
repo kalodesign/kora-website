@@ -14,6 +14,23 @@
   };
   let products=[], product=null, currentMode="suggestions";
   let pendingNames = [];
+  let lotLogo = null;
+  const setupLotLogo = () => {
+    if(product.customization?.type !== 'logo') return;
+    el.quantity.innerHTML = Array.from({length:100},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');
+    const section=document.createElement('section');
+    section.innerHTML='<h3>Personaliza tu lote</h3><p>Un solo logo para todas las unidades del lote. PNG, JPG o WebP, máximo 500 KB.</p><label>Sube tu logo <input type="file" accept="image/png,image/jpeg,image/webp" required></label><p role="status" aria-live="polite"></p><p>1–11 unidades: $15.000 c/u · 12–19: $10.000 c/u · Desde 20: $7.000 c/u</p>';
+    el.add.before(section);
+    el.add.disabled=el.buy.disabled=true;
+    section.querySelector('input').addEventListener('change',async e=>{
+      lotLogo=null;el.add.disabled=el.buy.disabled=true;
+      const file=e.target.files[0], status=section.querySelector('[role=status]');
+      if(!file) return;
+      if(file.size>500*1024||!['image/png','image/jpeg','image/webp'].includes(file.type)){status.textContent='Selecciona una imagen PNG, JPG o WebP de máximo 500 KB.';return;}
+      const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);});
+      lotLogo={name:file.name,data};status.textContent='Logo seleccionado: '+file.name;el.add.disabled=el.buy.disabled=false;
+    });
+  };
   const idFromUrl=()=>new URLSearchParams(location.search).get("id");
   const readProducts=async()=>{
     const endpoint=window.koraEndpoint?.("catalog", "");
@@ -58,15 +75,16 @@
     el.stock.textContent=label; el.stock.className="product-stock-status "+(stock<=0?"is-out":stock<=5?"is-low":"is-ready");
     [...el.quantity.options].forEach(o=>{o.disabled=Number(o.value)>Math.min(stock,maxQty);});
     if(Number(el.quantity.value)>Math.min(stock,maxQty)) el.quantity.value="1";
-    el.add.disabled=stock<=0; el.buy.disabled=stock<=0;
+    el.add.disabled=stock<=0||(product.customization?.type==='logo'&&!lotLogo); el.buy.disabled=el.add.disabled;
   };
   const addToCart=(goToCheckout,names=[])=>{
     const qty=Number(el.quantity.value||1);
     if(!product||qty>Number(product.stock||0)) return;
+    if(product.customization?.type==='logo'&&!lotLogo) return;
     const tiers=product.priceTiers||[];
     const tier=[...tiers].sort((a,b)=>Number(b.quantity)-Number(a.quantity)).find(t=>qty>=Number(t.quantity));
     const cartProduct={...product,price:Number(tier?.price??product.price??0)};
-    window.KoraCart?.add(product.id,qty,cartProduct,names);
+    window.KoraCart?.add(product.id,qty,cartProduct,names,lotLogo);
     if(goToCheckout){location.href="carrito.html";return;}
     const original=el.add.textContent; el.add.textContent="Añadido al carrito";
     setTimeout(()=>el.add.textContent=original,1200);
@@ -85,7 +103,7 @@
     el.materials.textContent=product.material||"Materiales seleccionados y acabados cuidados para cada pieza.";
     if(el.breadcrumb){el.breadcrumb.textContent="Tienda"; el.breadcrumb.href="hazlotumismo.html";} el.breadcrumbTitle.textContent=product.title;
     el.specs.innerHTML=`<div><dt>Medida</dt><dd>${esc(product.size||"No aplica")}</dd></div><div><dt>Disponibilidad</dt><dd>${Number(product.stock||0)} unidades</dd></div><div><dt>Tipo</dt><dd>${esc(product.category||"Producto")}</dd></div>`;
-    setGallery(product.images); updatePriceAndStock(); renderComponents(); remember(); renderRelated();
+    setGallery(product.images); setupLotLogo(); updatePriceAndStock(); renderComponents(); remember(); renderRelated();
   };
   const ensureNameModal=()=>{
     if(document.querySelector("#name-customization-modal")) return;

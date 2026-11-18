@@ -187,16 +187,22 @@ const updateCartCount = () => {
   if (cartCount) cartCount.textContent = String(getCartQuantity());
 };
 
-const getProduct = (id) =>
-  store.products.find((product) => product.id === id) ||
-  store.cart.find((item) => item.id === id)?.product;
+const getProduct = (id) => {
+  const item=store.cart.find(item=>item.id===id);
+  const product=store.products.find(product=>product.id===id)||item?.product;
+  if(!product) return product;
+  const tier=[...(product.priceTiers||[])].sort((a,b)=>b.quantity-a.quantity).find(t=>Number(item?.qty||1)>=t.quantity);
+  return {...product,price:tier?.price??product.price};
+};
 
-const addToCart = (productId, qty = 1, fallbackProduct = null, customNames = []) => {
+const addToCart = (productId, qty = 1, fallbackProduct = null, customNames = [], lotLogo = null) => {
   const product = getProduct(productId) || fallbackProduct;
   if (!product) return;
+  if(product.customization?.type==='logo'&&!lotLogo){location.href='producto.html?id='+encodeURIComponent(productId);return;}
   const nextQty = Math.max(1, Number(qty) || 1);
   const existing = store.cart.find((item) => item.id === productId);
   if (existing) {
+    if(lotLogo && existing.lotLogo?.data !== lotLogo.data){alert('Este lote ya tiene un logo. Elimínalo del carrito para cambiarlo.');return;}
     const max = Number(product.maxQuantity || product.stock || Infinity);
     const addedQty = Math.min(nextQty, Math.max(0, max - Number(existing.qty)));
     if (!addedQty) return;
@@ -208,6 +214,7 @@ const addToCart = (productId, qty = 1, fallbackProduct = null, customNames = [])
     store.cart.push({
       id: productId,
       qty: nextQty,
+      lotLogo,
       customNames: Array.isArray(customNames) ? customNames : [],
       product: {
         id: product.id,
@@ -217,6 +224,7 @@ const addToCart = (productId, qty = 1, fallbackProduct = null, customNames = [])
         description: product.description,
         size: product.size,
         price: product.price,
+        priceTiers: product.priceTiers || [],
         compareAt: product.compareAt,
         maxQuantity: product.maxQuantity || null,
         customization: product.customization || null
@@ -427,6 +435,7 @@ const renderCart = () => {
             <h3><a href="${escapeCart(href)}">${escapeCart(product.title)}</a></h3>
             <p>${formatMoney(product.price)} · ${escapeCart(product.size || product.category || "")}</p>
             ${customized ? `<p class="cart-item-customization">Nombres: ${escapeCart(item.customNames.join(", "))}</p>` : ""}
+            ${item.lotLogo ? `<p>Logo del lote: ${escapeCart(item.lotLogo.name)}</p>` : ''}
             <div class="cart-item-controls">
               <button type="button" data-cart-dec="${id}" aria-label="Restar una unidad de ${escapeCart(product.title)}" ${customized || item.qty <= 1 ? "disabled" : ""}>−</button>
               <strong>${Number(item.qty) || 1}</strong>
@@ -577,7 +586,7 @@ selectors.checkoutForm?.addEventListener("submit", async (event) => {
   const submitButton = selectors.checkoutForm.querySelector("button[type='submit']");
   const formData = new FormData(selectors.checkoutForm);
   const payload = {
-    items: store.cart.map((item) => ({ id: item.id, qty: item.qty, customNames: item.customNames || [] })),
+    items: store.cart.map((item) => ({ id: item.id, qty: item.qty, customNames: item.customNames || [], lotLogo: item.lotLogo || null })),
     customer: Object.fromEntries(formData.entries())
   };
 
