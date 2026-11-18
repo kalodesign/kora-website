@@ -17,9 +17,9 @@
   let lotLogo = null;
   const setupLotLogo = () => {
     if(product.customization?.type !== 'logo') return;
-    el.quantity.innerHTML = Array.from({length:100},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');
+    el.quantity.innerHTML = [1,12,20,100].map(qty=>`<option value="${qty}">${qty}</option>`).join('');
     const section=document.createElement('section');
-    section.innerHTML='<h3>Personaliza tu lote</h3><p>Un solo logo para todas las unidades del lote. PNG, JPG o WebP, máximo 500 KB.</p><label>Sube tu logo <input type="file" accept="image/png,image/jpeg,image/webp" required></label><p role="status" aria-live="polite"></p><p>1–11 unidades: $15.000 c/u · 12–19: $10.000 c/u · Desde 20: $7.000 c/u</p>';
+    section.innerHTML='<h3>Personaliza tu lote</h3><p>Un solo logo para todas las unidades del lote. PNG, JPG o WebP, máximo 500 KB.</p><label>Sube tu logo <input type="file" accept="image/png,image/jpeg,image/webp" required></label><p role="status" aria-live="polite"></p>';
     el.add.before(section);
     el.add.disabled=el.buy.disabled=true;
     section.querySelector('input').addEventListener('change',async e=>{
