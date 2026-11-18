@@ -230,7 +230,24 @@
         </div>
       </article>`).join("");
   };
+  const ensureCategory = (value) => {
+    const name = String(value || "").trim();
+    if (!name) return;
+    if (![...ui.category.options].some(option => option.value.toLocaleLowerCase("es") === name.toLocaleLowerCase("es"))) {
+      ui.category.add(new Option(name, name));
+    }
+  };
+  document.querySelector("#admin-add-category")?.addEventListener("click", () => {
+    const name = window.prompt("Nombre de la nueva categoría:");
+    if (!name?.trim()) return;
+    ensureCategory(name);
+    const option = [...ui.category.options].find(item => item.value.toLocaleLowerCase("es") === name.trim().toLocaleLowerCase("es"));
+    ui.category.value = option.value;
+    ui.category.dispatchEvent(new Event("change", { bubbles: true }));
+  });
   const renderCategoryFilter = () => {
+    ensureCategory("Navidad");
+    state.products.forEach(product => ensureCategory(product.category));
     const selected = ui.filterCategory.value;
     const categories = [...new Set(state.products.map((product) => String(product.category || "").trim()).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" }));
@@ -243,7 +260,7 @@
     ui.formTitle.textContent = "Nuevo producto"; ui.submit.textContent = "Guardar"; ui.imageStatus.textContent = ""; updateMaterialInput(); updateComponentsVisibility(); renderColors("manual"); updateColorMode(); setStatus("");
   };
   const fill = (product) => {
-    resetForm(); ui.id.value = product.id; ui.title.value = product.title; ui.custom.checked = product.productType === "a_medida"; ui.category.value = product.category || categoryFor(product.productType); ui.type.value = selectedProductType(); ui.category.dataset.auto = "false";
+    resetForm(); ui.id.value = product.id; ui.title.value = product.title; ui.custom.checked = product.productType === "a_medida"; ensureCategory(product.category); ui.category.value = product.category || categoryFor(product.productType); ui.type.value = selectedProductType(); ui.category.dataset.auto = "false";
     setProductImages(product.images?.length ? product.images : [product.image]);
     ui.description.value = product.description; ui.size.value = product.size || "";
     restoreMaterial(product.material); ui.stock.value = product.stock || 0; ui.price.value = product.price || 0;

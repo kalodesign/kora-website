@@ -214,3 +214,11 @@ body:not(.home-reference) .nav-menu .nav-dropdown-menu a::after { display: none;
   .nav-menu .nav-dropdown-trigger::after,
   .nav-menu .nav-dropdown-trigger svg { transition: none; }
 }
+
+/* Menú de categorías compacto y situado debajo de Tienda. */
+.nav-menu .nav-dropdown { align-self: stretch; }
+.nav-menu .nav-dropdown-trigger { min-height: 100%; }
+.nav-menu .nav-dropdown-menu { top: 100%; max-height: min(60vh, 440px); overflow-y: auto; }
+.nav-menu .nav-dropdown-menu a, body:not(.home-reference) .nav-menu .nav-dropdown-menu a { display: flex; align-items: center; min-height: 40px; height: auto; padding: 8px 12px; line-height: 1.35; }
+.nav-menu .nav-dropdown-menu a::after { display: none; }
+@media (max-width: 1100px) { .nav-menu .nav-dropdown-trigger { min-height: 46px; } .nav-menu .nav-dropdown-menu { max-height: 50vh; } }
